@@ -3,56 +3,21 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Membership
 {
-    public class GetMembershipResponse
-    {
-        public ActionResult Output { get; set; }
-        public int ErrorId { get; set; }
-        public string ErrorDescription { get; set; }
-
-        public GetMembershipResponse(ActionResult output, int errorId = -1, string errorDescription = "")
-        {
-            Output = output;
-            ErrorId = errorId;
-            ErrorDescription = errorDescription;
-        }
-    }
-
-    public class GetMembershipRequest : IRequest<GetMembershipResponse>
-    {
-    }
-
-    public class GetMembershipHandler : IRequestHandler<GetMembershipRequest, GetMembershipResponse>
-    {
-        private readonly IMembershipRepository repository;
-
-        public GetMembershipHandler(IMembershipRepository repository)
-        {
-            this.repository = repository;
-        }
-
-        public async Task<GetMembershipResponse> Handle(GetMembershipRequest request, CancellationToken cancellationToken)
-        {
-            var membership = repository.GetMemberships().FirstOrDefault();
-            var points = repository.GetMembershipTotalPoints(membership.Id);
-            var newOkObjectResult = new OkObjectResult(points);
-            return new GetMembershipResponse(newOkObjectResult);
-        }
-    }
-
     [ApiController]
     [Route("[controller]")]
     public class MembershipController : Controller
     {
-        private readonly IMembershipRepository repository;
+        private readonly IMembershipRepository _repository;
+        private readonly IMediator _mediator;
 
-        public MembershipController(IMembershipRepository repository)
+        public MembershipController(IMembershipRepository repository, IMediator mediator)
         {
-            this.repository = repository;
+            _repository = repository;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -60,24 +25,18 @@ namespace SolidSampleApplication.Api.Membership
             return View();
         }
 
-        public IActionResult RegisterMember()
-        {
-            return View();
-        }
-
         [HttpGet]
-        public ActionResult<IEnumerable<MembershipTotalPoints>> GetMemberships()
+        public async Task<ActionResult<IEnumerable<MembershipTotalPoints>>> GetMemberships()
         {
-            var membership = repository.GetMemberships().FirstOrDefault();
-            var points = repository.GetMembershipTotalPoints(membership.Id);
-            return Ok(points);
+            var request = new GetMembershipRequest();
+            return (await _mediator.Send(request)).Output;
         }
 
         [HttpGet]
         [Route("{id}")]
         public ActionResult<IEnumerable<MembershipTotalPoints>> GetMember(Guid id)
         {
-            var membership = repository.GetMembership(id);
+            var membership = _repository.GetMembership(id);
             return Ok(membership);
         }
     }
