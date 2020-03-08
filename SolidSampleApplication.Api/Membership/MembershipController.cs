@@ -11,12 +11,10 @@ namespace SolidSampleApplication.Api.Membership
     [Route("[controller]")]
     public class MembershipController : Controller
     {
-        private readonly IMembershipRepository _repository;
         private readonly IMediator _mediator;
 
-        public MembershipController(IMembershipRepository repository, IMediator mediator)
+        public MembershipController(IMediator mediator)
         {
-            _repository = repository;
             _mediator = mediator;
         }
 
@@ -26,18 +24,16 @@ namespace SolidSampleApplication.Api.Membership
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MembershipTotalPoints>>> GetMemberships()
+        public async Task<ActionResult> GetMemberships()
         {
-            var request = new GetMembershipRequest();
-            return (await _mediator.Send(request)).Output;
+            return (await _mediator.Send(new GetAllMembershipRequest())).ActionResult;
         }
 
         [HttpGet]
         [Route("{id}")]
-        public ActionResult<IEnumerable<MembershipTotalPoints>> GetMember(Guid id)
+        public async Task<ActionResult> GetMember(Guid id)
         {
-            var membership = _repository.GetMembership(id);
-            return Ok(membership);
+            return (await _mediator.Send(new GetMembershipRequest(id))).ActionResult;
         }
     }
 }

@@ -1,30 +1,21 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Membership
 {
-    public class GetMembershipResponse
+    public class GetMembershipRequest : IRequest<DefaultResponse>
     {
-        public ActionResult Output { get; set; }
-        public int ErrorId { get; set; }
-        public string ErrorDescription { get; set; }
+        public Guid Id { get; }
 
-        public GetMembershipResponse(ActionResult output, int errorId = -1, string errorDescription = "")
+        public GetMembershipRequest(Guid id)
         {
-            Output = output;
-            ErrorId = errorId;
-            ErrorDescription = errorDescription;
+            Id = id;
         }
     }
 
-    public class GetMembershipRequest : IRequest<GetMembershipResponse>
-    {
-    }
-
-    public class GetMembershipHandler : IRequestHandler<GetMembershipRequest, GetMembershipResponse>
+    public class GetMembershipHandler : IRequestHandler<GetMembershipRequest, DefaultResponse>
     {
         private readonly IMembershipRepository repository;
 
@@ -33,12 +24,7 @@ namespace SolidSampleApplication.Api.Membership
             this.repository = repository;
         }
 
-        public async Task<GetMembershipResponse> Handle(GetMembershipRequest request, CancellationToken cancellationToken)
-        {
-            var membership = repository.GetMemberships().FirstOrDefault();
-            var points = repository.GetMembershipTotalPoints(membership.Id);
-            var newOkObjectResult = new OkObjectResult(points);
-            return new GetMembershipResponse(newOkObjectResult);
-        }
+        public async Task<DefaultResponse> Handle(GetMembershipRequest request, CancellationToken cancellationToken)
+            => DefaultResponse.Success(repository.GetMembershipTotalPoints(request.Id));
     }
 }

@@ -23,7 +23,7 @@ namespace SolidSampleApplication.Api.Membership
         {
             var memberships = new List<Membership>();
             var memberPoints = new List<MembershipPoint>();
-            var newMember1 = Membership.New(MembershipType.Level1, "John");
+            var newMember1 = Membership.New(MembershipType.Level1, "john");
             memberships.Add(newMember1);
             var member1Points = new List<MembershipPoint>()
             {
@@ -32,8 +32,21 @@ namespace SolidSampleApplication.Api.Membership
                 MembershipPoint.New(newMember1.Id, 1, MembershipPointsType.Music),
                 MembershipPoint.New(newMember1.Id, 3, MembershipPointsType.Music)
             };
-
             memberPoints.AddRange(member1Points);
+
+            var newMember2 = Membership.New(MembershipType.Level3, "martha");
+            memberships.Add(newMember2);
+            var member2Points = new List<MembershipPoint>()
+            {
+                MembershipPoint.New(newMember2.Id, 10, MembershipPointsType.Movie),
+                MembershipPoint.New(newMember2.Id, 20, MembershipPointsType.Movie),
+                MembershipPoint.New(newMember2.Id, 20, MembershipPointsType.Movie),
+                MembershipPoint.New(newMember2.Id, 20, MembershipPointsType.Movie),
+                MembershipPoint.New(newMember2.Id, 1, MembershipPointsType.Music),
+                MembershipPoint.New(newMember2.Id, 7, MembershipPointsType.Music),
+                MembershipPoint.New(newMember2.Id, 3, MembershipPointsType.Music)
+            };
+            memberPoints.AddRange(member2Points);
 
             _memberships = memberships;
             _membershipPoints = memberPoints;
