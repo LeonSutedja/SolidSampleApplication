@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Shouldly;
 using SolidSampleApplication.Api.Membership;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -108,6 +110,31 @@ namespace SolidSampleApplication.Api.Test
                 var contentWithId = await responseWithId.Content.ReadAsStringAsync();
                 _output.WriteLine(contentWithId);
             }
+        }
+
+        [Fact]
+        public async Task CreateMembership_ShouldReturn_Ok()
+        {
+            var request = new CreateMembershipRequest("romulan");
+            var response = await _client.PostRequestAsStringContent("/Membership", request);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            _output.WriteLine(content);
+            var allMembers = _membershipRepository.GetMemberships();
+            allMembers.Select(m => m.Username).ShouldContain(request.Username);
+        }
+    }
+
+    public static class HttpClientExtensions
+    {
+        public static Task<HttpResponseMessage> PostRequestAsStringContent(
+            this HttpClient client,
+            string url,
+            object request)
+        {
+            var jsonString = JsonConvert.SerializeObject(request);
+            var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+            return client.PostAsync(url, content);
         }
     }
 }

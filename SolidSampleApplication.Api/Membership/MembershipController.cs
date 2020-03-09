@@ -33,5 +33,11 @@ namespace SolidSampleApplication.Api.Membership
         {
             return (await _mediator.Send(new GetMembershipRequest(id))).ActionResult;
         }
+
+        [HttpPost]
+        public async Task<ActionResult> CreateMembership(CreateMembershipRequest request)
+        {
+            return (await _mediator.Send(request)).ActionResult;
+        }
     }
 }

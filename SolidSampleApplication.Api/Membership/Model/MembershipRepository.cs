@@ -10,14 +10,16 @@ namespace SolidSampleApplication.Api.Membership
 
         Membership GetMembership(Guid membershipId);
 
+        Membership CreateMembership(string username);
+
         MembershipTotalPoints GetMembershipTotalPoints(Guid membershipId);
     }
 
     public class MembershipRepository : IMembershipRepository
     {
-        private readonly IEnumerable<MembershipPoint> _membershipPoints;
+        private IEnumerable<MembershipPoint> _membershipPoints;
 
-        private readonly IEnumerable<Membership> _memberships;
+        private IEnumerable<Membership> _memberships;
 
         public MembershipRepository()
         {
@@ -67,6 +69,15 @@ namespace SolidSampleApplication.Api.Membership
             var membership = _memberships.ToList().FirstOrDefault(m => m.Id == membershipId);
             var membershipPoints = _membershipPoints.ToList().Where(mp => mp.MembershipId == membershipId);
             return new MembershipTotalPoints(membership, membershipPoints);
+        }
+
+        public Membership CreateMembership(string username)
+        {
+            var newMembership = Membership.New(MembershipType.Level1, username);
+            var membershipList = _memberships.ToList();
+            membershipList.Add(newMembership);
+            _memberships = membershipList;
+            return newMembership;
         }
     }
 }
