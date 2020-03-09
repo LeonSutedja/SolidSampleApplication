@@ -7,8 +7,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Shouldly;
+using SolidSampleApplication.Api.Membership;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
@@ -48,10 +50,12 @@ namespace SolidSampleApplication.Api.Test
         private readonly ExampleAppTestFixture _fixture;
         private readonly ITestOutputHelper _output;
         private readonly HttpClient _client;
+        private readonly IMembershipRepository _membershipRepository;
 
         public MembershipTests(ExampleAppTestFixture fixture, ITestOutputHelper output)
         {
             fixture.Output = output;
+            _membershipRepository = (IMembershipRepository)fixture.Services.GetService(typeof(IMembershipRepository));
             _client = fixture.CreateClient();
             _fixture = fixture;
             _output = output;
@@ -90,20 +94,11 @@ namespace SolidSampleApplication.Api.Test
         }
 
         [Fact]
-        public async Task GetAllMembershipWithId_ShouldReturn_Ok()
+        public async Task GetMembershipWithId_ShouldReturn_Ok()
         {
-            var response = await _client.GetAsync("/Membership");
-            response.EnsureSuccessStatusCode();
-
-            var content = await response.Content.ReadAsStringAsync();
-            var idLists = new List<string>();
-
-            ActionJsonStringList(content, (membership, index) =>
-            {
-                idLists.Add(membership.id.ToString());
-            });
-
-            idLists.ShouldNotBeEmpty();
+            var idLists = _membershipRepository.GetMemberships()
+                .ToList()
+                .Select(m => m.Id);
 
             foreach (var id in idLists)
             {
