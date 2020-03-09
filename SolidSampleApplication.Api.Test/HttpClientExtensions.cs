@@ -16,5 +16,15 @@ namespace SolidSampleApplication.Api.Test
             var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
             return client.PostAsync(url, content);
         }
+
+        public static Task<HttpResponseMessage> PutRequestAsStringContent(
+            this HttpClient client,
+            string url,
+            object request)
+        {
+            var jsonString = JsonConvert.SerializeObject(request);
+            var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+            return client.PutAsync(url, content);
+        }
     }
 }

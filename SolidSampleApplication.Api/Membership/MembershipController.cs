@@ -39,5 +39,11 @@ namespace SolidSampleApplication.Api.Membership
         {
             return (await _mediator.Send(request)).ActionResult;
         }
+
+        [HttpPut]
+        public async Task<ActionResult> EarnPoints(EarnPointsMembershipRequest request)
+        {
+            return (await _mediator.Send(request)).ActionResult;
+        }
     }
 }

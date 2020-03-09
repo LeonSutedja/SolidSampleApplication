@@ -14,6 +14,8 @@ namespace SolidSampleApplication.Infrastructure.Repository
         Membership CreateMembership(string username);
 
         MembershipTotalPoints GetMembershipTotalPoints(Guid membershipId);
+
+        MembershipTotalPoints EarnPoints(Guid id, MembershipPointsType type, double points);
     }
 
     public class MembershipRepository : IMembershipRepository
@@ -79,6 +81,15 @@ namespace SolidSampleApplication.Infrastructure.Repository
             membershipList.Add(newMembership);
             _memberships = membershipList;
             return newMembership;
+        }
+
+        public MembershipTotalPoints EarnPoints(Guid id, MembershipPointsType type, double points)
+        {
+            var point = MembershipPoint.New(id, points, type);
+            var membershipPoints = _membershipPoints.ToList();
+            membershipPoints.Add(point);
+            _membershipPoints = membershipPoints;
+            return GetMembershipTotalPoints(id);
         }
     }
 }

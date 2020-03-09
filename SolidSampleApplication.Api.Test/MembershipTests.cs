@@ -84,8 +84,30 @@ namespace SolidSampleApplication.Api.Test
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             _output.WriteLine(content);
+
+            var jsonObject = JObject.Parse(content);
+            jsonObject.ShouldContainKeyAndValue("username", "romulan");
+            jsonObject.ShouldContainKey("id");
+            jsonObject.ShouldContainKey("type");
             var allMembers = _membershipRepository.GetMemberships();
             allMembers.Select(m => m.Username).ShouldContain(request.Username);
+        }
+
+        [Fact]
+        public async Task EarnPoints_ShouldReturn_Ok()
+        {
+            var member = _membershipRepository.GetMemberships().ToList().FirstOrDefault();
+            var currentPoint = _membershipRepository.GetMembershipTotalPoints(member.Id).TotalPoints;
+            var pointsToAdd = 50;
+            var request = new EarnPointsMembershipRequest(member.Id, Core.MembershipPointsType.Movie, pointsToAdd);
+            var response = await _client.PutRequestAsStringContent("/Membership", request);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            _output.WriteLine(content);
+
+            var jsonObject = JObject.Parse(content);
+            jsonObject.ShouldContainKeyAndValue("username", member.Username);
+            jsonObject.ShouldContainKeyAndValue("totalPoints", pointsToAdd + (int)currentPoint);
         }
     }
 }
