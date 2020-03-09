@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -15,14 +16,23 @@ using Xunit.Abstractions;
 
 namespace SolidSampleApplication.Api.Test
 {
-    public class ExampleAppTestFixture : WebApplicationFactory<Program>
+    public class ExampleAppTestFixture : WebApplicationFactory<TestStartup>
     {
         public ITestOutputHelper Output { get; set; }
+
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll(typeof(IHostedService));
+            });
+        }
 
         // Uses the generic host
         protected override IWebHostBuilder CreateWebHostBuilder()
         {
-            var builder = base.CreateWebHostBuilder();
+            var builder = WebHost.CreateDefaultBuilder();
+            builder.UseStartup<TestStartup>();
             builder.ConfigureLogging(logging =>
             {
                 logging.ClearProviders(); // Remove other loggers
@@ -30,14 +40,6 @@ namespace SolidSampleApplication.Api.Test
             });
 
             return builder;
-        }
-
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            builder.ConfigureTestServices((services) =>
-            {
-                services.RemoveAll(typeof(IHostedService));
-            });
         }
     }
 

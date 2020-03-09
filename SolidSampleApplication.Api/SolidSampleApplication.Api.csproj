@@ -12,5 +12,9 @@
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SolidSampleApplication.Infrastucture\SolidSampleApplication.Infrastucture.csproj" />
+  </ItemGroup>
+
 
 </Project>

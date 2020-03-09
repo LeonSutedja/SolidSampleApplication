@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SolidSampleApplication.Api.Membership;
+using System.Linq;
 
 namespace SolidSampleApplication.Api
 {
@@ -20,9 +21,17 @@ namespace SolidSampleApplication.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-            services.AddMediatR(typeof(Startup).Assembly);
+            var mainAssembly = typeof(Startup).Assembly;
+            var namespaceToCheck = "SolidSampleApplication";
+            var allAssembliesName = mainAssembly
+                .GetReferencedAssemblies()
+                .Where(a => a.Name.ToLower().Contains(namespaceToCheck.ToLower()))
+                .ToList();
 
+            // the way to add and register
+            // controller from another assemblies.
+            services.AddControllers().AddApplicationPart(mainAssembly);
+            services.AddMediatR(mainAssembly);
             services.AddSingleton<IMembershipRepository, MembershipRepository>();
         }
 
@@ -35,9 +44,7 @@ namespace SolidSampleApplication.Api
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
