@@ -14,8 +14,8 @@ namespace SolidSampleApplication.Api.Test
     public class MembershipTests : IClassFixture<DefaultWebHostTestFixture>, IDisposable
     {
         private readonly DefaultWebHostTestFixture _fixture;
-        private readonly ITestOutputHelper _output;
         private readonly HttpClient _client;
+        private readonly ITestOutputHelper _output;
         private readonly IMembershipRepository _membershipRepository;
 
         public MembershipTests(DefaultWebHostTestFixture fixture, ITestOutputHelper output)

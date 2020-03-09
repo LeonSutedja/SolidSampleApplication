@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 
-namespace SolidSampleApplication.Infrastucture
+namespace SolidSampleApplication.Infrastructure.Shared
 {
     public class DefaultResponse
     {

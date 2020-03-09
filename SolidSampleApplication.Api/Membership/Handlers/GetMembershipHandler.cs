@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using SolidSampleApplication.Infrastructure.Repository;
-using SolidSampleApplication.Infrastucture;
+using SolidSampleApplication.Infrastructure.Shared;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
