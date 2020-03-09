@@ -1,4 +1,4 @@
-﻿namespace SolidSampleApplication.Api.Membership
+﻿namespace SolidSampleApplication.Core
 {
     public enum MembershipPointsType
     {

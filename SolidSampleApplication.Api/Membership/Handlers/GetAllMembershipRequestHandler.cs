@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastucture;
 using System.Threading;
 using System.Threading.Tasks;

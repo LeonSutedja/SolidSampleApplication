@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SolidSampleApplication.Api.Membership
+namespace SolidSampleApplication.Core
 {
     public class MembershipPoint
     {
