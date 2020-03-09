@@ -6,10 +6,10 @@ namespace SolidSampleApplication.Api.Membership
 {
     public class MembershipTotalPoints
     {
-        public Guid MembershipId { get; set; }
-        public MembershipType MembershipType { get; set; }
-        public string Username { get; set; }
-        public double TotalPoints { get; set; }
+        public Guid MembershipId { get; private set; }
+        public MembershipType MembershipType { get; private set; }
+        public string Username { get; private set; }
+        public double TotalPoints { get; private set; }
 
         public MembershipTotalPoints(Membership membership, IEnumerable<MembershipPoint> points)
         {
