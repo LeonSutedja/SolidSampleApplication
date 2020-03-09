@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SolidSampleApplication.Infrastucture;
 using System;
 using System.Threading.Tasks;
 
@@ -32,7 +31,6 @@ namespace SolidSampleApplication.Api.Membership
         [Route("{id}")]
         public async Task<ActionResult> GetMember(Guid id)
         {
-            var newTestClass = new TestClass();
             return (await _mediator.Send(new GetMembershipRequest(id))).ActionResult;
         }
     }

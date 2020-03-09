@@ -22,7 +22,6 @@ namespace SolidSampleApplication.Api
         {
             services.AddControllers();
             services.AddMediatR(typeof(Startup).Assembly);
-
             services.AddSingleton<IMembershipRepository, MembershipRepository>();
         }
 

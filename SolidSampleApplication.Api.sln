@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidSampleApplication.Api.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidSampleApplication.Infrastucture", "SolidSampleApplication.Infrastucture\SolidSampleApplication.Infrastucture.csproj", "{200EFFC1-4B1F-49F2-9D0E-6B244B22AB95}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidSampleApplication.Core", "SolidSampleApplication.Core\SolidSampleApplication.Core.csproj", "{8DDF3277-C7AB-4550-98A2-56689546D0C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{200EFFC1-4B1F-49F2-9D0E-6B244B22AB95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{200EFFC1-4B1F-49F2-9D0E-6B244B22AB95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{200EFFC1-4B1F-49F2-9D0E-6B244B22AB95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DDF3277-C7AB-4550-98A2-56689546D0C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DDF3277-C7AB-4550-98A2-56689546D0C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DDF3277-C7AB-4550-98A2-56689546D0C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DDF3277-C7AB-4550-98A2-56689546D0C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

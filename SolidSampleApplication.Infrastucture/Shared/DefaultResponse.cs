@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 
-namespace SolidSampleApplication.Api.Membership
+namespace SolidSampleApplication.Infrastucture
 {
     public class DefaultResponse
     {
