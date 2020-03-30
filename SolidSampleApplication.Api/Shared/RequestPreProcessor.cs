@@ -1,5 +1,6 @@
 ﻿using MediatR.Pipeline;
 using Microsoft.Extensions.Logging;
+using SolidSampleApplication.Infrastructure;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,8 +17,8 @@ namespace SolidSampleApplication.Api.Shared
 
         public async Task Process(T request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Preprocessor request");
-            await Task.Delay(1000);
+            var requestJson = request.ToJson();
+            _logger.LogInformation(requestJson);
         }
     }
 }
