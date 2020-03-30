@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SolidSampleApplication.Api.Healthcheck;
+using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.Repository;
 using System.Linq;
 
@@ -33,6 +35,7 @@ namespace SolidSampleApplication.Api
             services.AddControllers().AddApplicationPart(mainAssembly);
             services.AddMediatR(mainAssembly);
             services.AddSingleton<IMembershipRepository, MembershipRepository>();
+            services.AddEnumerableInterfacesAsSingleton<IHealthcheckSystem>(mainAssembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
