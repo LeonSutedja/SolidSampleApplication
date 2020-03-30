@@ -11,38 +11,35 @@ namespace SolidSampleApplication.Api.Healthcheck
     public class HealthcheckController : Controller
     {
         private readonly IMediator _mediator;
+        private readonly IEnumerable<IHealthcheckSystem> healthCheckList;
 
-        public HealthcheckController(IMediator mediator)
+        public HealthcheckController(IMediator mediator, IEnumerable<IHealthcheckSystem> healthCheckList)
         {
             _mediator = mediator;
+            this.healthCheckList = healthCheckList;
         }
 
         [HttpGet]
         public ActionResult GetHealthcheck(string system, bool detail)
         {
-            var systemList = new List<IHealthcheckSystem>();
-            systemList.Add(new DatabaseHealthcheck());
-            systemList.Add(new ConfigurationHealthcheck());
-            systemList.Add(new MediatorHealthcheck());
-
             if (detail)
             {
                 if (!string.IsNullOrEmpty(system))
                 {
-                    var systemToCheck = systemList.FirstOrDefault(s => s.Name.Equals(system, StringComparison.InvariantCultureIgnoreCase));
+                    var systemToCheck = healthCheckList.FirstOrDefault(s => s.Name.Equals(system, StringComparison.InvariantCultureIgnoreCase));
                     if (systemToCheck == null)
                         return BadRequest();
                     var result = systemToCheck.PerformCheck();
                     return new OkObjectResult(result);
                 }
-                var results = systemList.Select(sl => sl.PerformCheck());
+                var results = healthCheckList.Select(sl => sl.PerformCheck());
                 var hcResponse = new HealthcheckResponse(results);
                 return new OkObjectResult(hcResponse);
             }
 
             if (!string.IsNullOrEmpty(system))
             {
-                var systemToCheck = systemList.FirstOrDefault(s => s.Name.Equals(system, StringComparison.InvariantCultureIgnoreCase));
+                var systemToCheck = healthCheckList.FirstOrDefault(s => s.Name.Equals(system, StringComparison.InvariantCultureIgnoreCase));
                 if (systemToCheck == null)
                     return BadRequest();
                 var result = systemToCheck.PerformCheck();
