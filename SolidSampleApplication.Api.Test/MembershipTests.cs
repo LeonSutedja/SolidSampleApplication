@@ -77,6 +77,14 @@ namespace SolidSampleApplication.Api.Test
         }
 
         [Fact]
+        public async Task CreateMembershipFluentValidation_ShouldReturn_BadRequest()
+        {
+            var request = new CreateMembershipRequest("");
+            var response = await _client.PostRequestAsStringContent("/Membership", request);
+            response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
         public async Task CreateMembership_ShouldReturn_Ok()
         {
             var request = new CreateMembershipRequest("romulan");

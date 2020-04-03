@@ -7,7 +7,13 @@ namespace SolidSampleApplication.Infrastructure.Shared
     {
         public static DefaultResponse Success(object output = null) => new DefaultResponse(new OkObjectResult(output));
 
-        public static DefaultResponse Failed(object requestObject, Exception e) => new DefaultResponse(new BadRequestObjectResult(requestObject), 1, e.Message, false);
+        public static DefaultResponse Failed(object requestObject, Exception e = null)
+        {
+            if (e != null)
+                return new DefaultResponse(new BadRequestObjectResult(requestObject), 1, e.Message, false);
+
+            return new DefaultResponse(new BadRequestObjectResult(requestObject), 1, string.Empty, false);
+        }
 
         public ActionResult ActionResult { get; private set; }
         public int ErrorId { get; private set; }
@@ -18,7 +24,7 @@ namespace SolidSampleApplication.Infrastructure.Shared
         {
             ActionResult = actionResult ?? throw new ArgumentNullException(nameof(actionResult));
             ErrorId = errorId;
-            ErrorDescription = errorDescription ?? throw new ArgumentNullException(nameof(errorDescription));
+            ErrorDescription = errorDescription;
             IsSuccess = isSuccess;
         }
     }

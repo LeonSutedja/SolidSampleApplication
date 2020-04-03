@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastructure.Shared;
@@ -66,6 +67,16 @@ namespace SolidSampleApplication.Api.Membership
             Id = id;
             Type = type;
             Points = points;
+        }
+    }
+
+    public class EarnPointsMembershipHandlerValidator : AbstractValidator<EarnPointsMembershipRequest>
+    {
+        public EarnPointsMembershipHandlerValidator()
+        {
+            RuleFor(x => x.Id).NotNull();
+            RuleFor(x => x.Points).NotNull();
+            RuleFor(x => x.Type).NotNull();
         }
     }
 

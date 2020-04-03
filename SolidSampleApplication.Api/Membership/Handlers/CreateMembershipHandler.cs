@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastructure.Shared;
 using System;
@@ -33,6 +34,15 @@ namespace SolidSampleApplication.Api.Membership
         public CreateMembershipRequest(string username)
         {
             Username = username;
+        }
+    }
+
+    public class CreateMembershipRequestValidator : AbstractValidator<CreateMembershipRequest>
+    {
+        public CreateMembershipRequestValidator()
+        {
+            RuleFor(x => x.Username).NotNull();
+            RuleFor(x => x.Username).Length(3, 10);
         }
     }
 
