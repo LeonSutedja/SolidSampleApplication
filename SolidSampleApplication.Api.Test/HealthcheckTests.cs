@@ -1,8 +1,6 @@
 using Newtonsoft.Json.Linq;
 using Shouldly;
 using SolidSampleApplication.Api.Healthcheck;
-using SolidSampleApplication.Api.Membership;
-using SolidSampleApplication.Infrastructure.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
