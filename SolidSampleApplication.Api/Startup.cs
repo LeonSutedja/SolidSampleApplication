@@ -32,12 +32,16 @@ namespace SolidSampleApplication.Api
             var mainAssembly = typeof(Startup).GetTypeInfo().Assembly;
             services.AddControllers();
             services.AddMediatR(mainAssembly);
-            services.AddSingleton<IMembershipRepository, MembershipRepository>();
 
             services.AddEnumerableInterfacesAsSingleton<IHealthcheckSystem>(mainAssembly);
 
+            // fluent validation generic registration
             services.AddMvc()
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateMembershipRequestValidator>());
+
+            // As sqllite db context is scoped, repository must become scoped as well
+            services.AddScoped<IMembershipRepository, MembershipRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             // we are using sql lite in-memory database for this sample application purpose
             // for in-memory relational database, we use sqllite in-memory as opposed to the ef core in-memory provider.

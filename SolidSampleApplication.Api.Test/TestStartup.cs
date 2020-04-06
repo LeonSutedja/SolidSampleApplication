@@ -3,6 +3,8 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,6 +13,7 @@ using SolidSampleApplication.Api.Membership;
 using SolidSampleApplication.Api.Shared;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.Repository;
+using SolidSampleApplication.Infrastucture;
 using System.Linq;
 
 namespace SolidSampleApplication.Api
@@ -38,8 +41,10 @@ namespace SolidSampleApplication.Api
             // controller from another assemblies.
             services.AddControllers().AddApplicationPart(mainAssembly);
             services.AddMediatR(mainAssembly);
-            services.AddSingleton<IMembershipRepository, MembershipRepository>();
             services.AddEnumerableInterfacesAsSingleton<IHealthcheckSystem>(mainAssembly);
+
+            services.AddSingleton<IMembershipRepository, MembershipRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             //services.AddMvc()
             //    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateMembershipRequestValidator>());
@@ -47,6 +52,15 @@ namespace SolidSampleApplication.Api
             services.AddTransient<IValidator<CreateMembershipRequest>, CreateMembershipRequestValidator>();
             services.AddTransient<IValidator<EarnPointsMembershipRequest>, EarnPointsMembershipHandlerValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
+
+            // we are using sql lite in-memory database for this sample application purpose
+            // for in-memory relational database, we use sqllite in-memory as opposed to the ef core in-memory provider.
+            // the inmemorysqllite is require to keep the db connection always open.
+            // when the db connection is closed, the db will be destroyed.
+            var inMemorySqlite = new SqliteConnection("Data Source=:memory:");
+            inMemorySqlite.Open();
+            services.AddDbContext<SimpleEventStoreDbContext>(
+                options => options.UseSqlite(inMemorySqlite));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,6 +79,15 @@ namespace SolidSampleApplication.Api
             {
                 endpoints.MapControllers();
             });
+
+            // NOTE: this must go at the end of Configure
+            // ensure db is created
+            var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+            using (var serviceScope = serviceScopeFactory.CreateScope())
+            {
+                var dbContext = serviceScope.ServiceProvider.GetService<SimpleEventStoreDbContext>();
+                dbContext.Database.EnsureCreated();
+            }
         }
     }
 }

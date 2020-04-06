@@ -38,18 +38,21 @@ namespace SolidSampleApplication.Infrastucture
                       apocalypso.Id.ToString(),
                       apocalypso.GetType().Name,
                       apocalypso.ToJson(),
+                      1,
                       DateTime.Now.AddDays(-30),
                       requestedBy),
                    SimpleApplicationEvent.New(
                       apollo.Id.ToString(),
                       apollo.GetType().Name,
                       apollo.ToJson(),
+                      1,
                       DateTime.Now.AddDays(-29),
                       requestedBy),
                    SimpleApplicationEvent.New(
                       aphrodite.Id.ToString(),
                       aphrodite.GetType().Name,
                       aphrodite.ToJson(),
+                      1,
                       DateTime.Now.AddDays(-28),
                       requestedBy)
               );
