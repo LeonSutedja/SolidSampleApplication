@@ -39,25 +39,8 @@ namespace SolidSampleApplication.Infrastructure.Repository
 
         private IEnumerable<Customer> _initializeCustomersFromEventStore(SimpleEventStoreDbContext context)
         {
-            var registeredCustomersApplicationEvents = context.ApplicationEvents.Where(ae => ae.EntityType.Equals(typeof(CustomerRegisteredEvent).Name));
-            var allCustomers = registeredCustomersApplicationEvents
-                .Select(ev => ev.EntityJson)
-                .Select(json => json.FromJson<CustomerRegisteredEvent>())
-                .Select(evObject => evObject.ApplyToEntity(null))
-                .ToList();
-
-            var nameChangedApplicationEvents = context.ApplicationEvents
-                .Where(ae => ae.EntityType.Equals(typeof(CustomerNameChangedEvent).Name))
-                .OrderBy(ae => ae.RequestedTime);
-            var allNameChangedEvents = nameChangedApplicationEvents
-                .Select(ev => ev.EntityJson)
-                .Select(json => json.FromJson<CustomerNameChangedEvent>());
-            foreach (var ev in allNameChangedEvents)
-            {
-                var customer = allCustomers.First(c => c.Id == ev.CustomerId);
-                ev.ApplyToEntity(customer);
-            }
-
+            var genericFactory = new GenericEntityFactory<Customer>(context);
+            var allCustomers = genericFactory.GetAllEntities<CustomerRegisteredEvent, CustomerNameChangedEvent>();
             return allCustomers;
         }
 
@@ -69,7 +52,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
                     ae.EntityType.Equals(typeof(CustomerNameChangedEvent).Name)))
                 .OrderBy(e => e.RequestedTime);
             var registrationEvent = allCustomerEvents.FirstOrDefault(e => e.EntityType.Equals(typeof(CustomerRegisteredEvent).Name));
-            var customer = registrationEvent.EntityJson.FromJson<CustomerRegisteredEvent>().ApplyToEntity(null);
+            var customer = registrationEvent.EntityJson.FromJson<ISimpleEvent<Customer>>().ApplyToEntity(null);
 
             var nameChangedApplicationEvents = allCustomerEvents
                 .Where(ae => ae.EntityType.Equals(typeof(CustomerNameChangedEvent).Name))
