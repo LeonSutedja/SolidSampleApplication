@@ -11,7 +11,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
 
         Membership GetMembership(Guid membershipId);
 
-        Membership CreateMembership(string username);
+        Membership CreateMembership(Guid customerId);
 
         MembershipTotalPoints GetMembershipTotalPoints(Guid membershipId);
 
@@ -28,7 +28,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
         {
             var memberships = new List<Membership>();
             var memberPoints = new List<MembershipPoint>();
-            var newMember1 = Membership.New(MembershipType.Level1, "john");
+            var newMember1 = Membership.New(MembershipType.Level1, Guid.NewGuid());
             memberships.Add(newMember1);
             var member1Points = new List<MembershipPoint>()
             {
@@ -39,7 +39,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
             };
             memberPoints.AddRange(member1Points);
 
-            var newMember2 = Membership.New(MembershipType.Level3, "martha");
+            var newMember2 = Membership.New(MembershipType.Level3, Guid.NewGuid());
             memberships.Add(newMember2);
             var member2Points = new List<MembershipPoint>()
             {
@@ -74,9 +74,9 @@ namespace SolidSampleApplication.Infrastructure.Repository
             return new MembershipTotalPoints(membership, membershipPoints);
         }
 
-        public Membership CreateMembership(string username)
+        public Membership CreateMembership(Guid customerId)
         {
-            var newMembership = Membership.New(MembershipType.Level1, username);
+            var newMembership = Membership.New(MembershipType.Level1, customerId);
             var membershipList = _memberships.ToList();
             membershipList.Add(newMembership);
             _memberships = membershipList;

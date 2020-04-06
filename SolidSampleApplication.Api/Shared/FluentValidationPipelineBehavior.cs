@@ -11,15 +11,15 @@ namespace SolidSampleApplication.Api.Shared
     {
         private readonly IValidator<TRequest> _fluentValidator;
 
-        public FluentValidationPipelineBehavior(IValidator<TRequest> fluentValidator)
-        {
-            _fluentValidator = fluentValidator;
-        }
-
         // not everything will need a fluent validator. If the validator does not exists, the microsoft ioc container will use this constructor instead.
         // Neat! - https://stackoverflow.com/questions/42881062/how-to-allow-for-optional-services-with-microsoft-extension-dependencyinjection
         public FluentValidationPipelineBehavior()
         {
+        }
+
+        public FluentValidationPipelineBehavior(IValidator<TRequest> fluentValidator)
+        {
+            _fluentValidator = fluentValidator;
         }
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)

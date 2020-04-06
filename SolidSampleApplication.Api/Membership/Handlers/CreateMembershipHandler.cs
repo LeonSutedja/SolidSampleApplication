@@ -11,18 +11,18 @@ namespace SolidSampleApplication.Api.Membership
     public class CreateMembershipRequest : IRequest<DefaultResponse>
     {
         // A way to make this value immutable, whilst at the same time able to be mapped from the controller
-        private string _username { get; set; }
+        private Guid? _customerId { get; set; }
 
-        public string Username
+        public Guid? CustomerId
         {
             get
             {
-                return _username;
+                return _customerId;
             }
             set
             {
-                if (_username != null) throw new Exception("Value has already been set");
-                _username = value;
+                if (_customerId != null) throw new Exception($"Value has already been set {_customerId.ToString()}");
+                _customerId = value;
             }
         }
 
@@ -31,9 +31,9 @@ namespace SolidSampleApplication.Api.Membership
         {
         }
 
-        public CreateMembershipRequest(string username)
+        public CreateMembershipRequest(Guid customerId)
         {
-            Username = username;
+            CustomerId = customerId;
         }
     }
 
@@ -41,8 +41,7 @@ namespace SolidSampleApplication.Api.Membership
     {
         public CreateMembershipRequestValidator()
         {
-            RuleFor(x => x.Username).NotNull();
-            RuleFor(x => x.Username).Length(3, 10);
+            RuleFor(x => x.CustomerId).NotNull();
         }
     }
 
@@ -57,7 +56,7 @@ namespace SolidSampleApplication.Api.Membership
 
         public async Task<DefaultResponse> Handle(CreateMembershipRequest request, CancellationToken cancellationToken)
         {
-            var member = _repository.CreateMembership(request.Username);
+            var member = _repository.CreateMembership(request.CustomerId.Value);
             return DefaultResponse.Success(member);
         }
     }

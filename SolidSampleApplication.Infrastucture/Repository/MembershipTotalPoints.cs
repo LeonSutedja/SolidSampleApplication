@@ -12,11 +12,20 @@ namespace SolidSampleApplication.Infrastructure.Repository
         public string Username { get; private set; }
         public double TotalPoints { get; private set; }
 
+        // hack, will need to be deleted later.
         public MembershipTotalPoints(Membership membership, IEnumerable<MembershipPoint> points)
         {
             MembershipId = membership.Id;
             MembershipType = membership.Type;
-            Username = membership.Username;
+            Username = string.Empty;
+            TotalPoints = points.Sum(p => p.Amount);
+        }
+
+        public MembershipTotalPoints(Customer customer, Membership membership, IEnumerable<MembershipPoint> points)
+        {
+            MembershipId = membership.Id;
+            MembershipType = membership.Type;
+            Username = string.Empty;
             TotalPoints = points.Sum(p => p.Amount);
         }
     }
