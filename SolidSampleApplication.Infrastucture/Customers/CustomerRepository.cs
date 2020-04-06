@@ -45,13 +45,15 @@ namespace SolidSampleApplication.Infrastructure.Repository
                 .Select(evObject => evObject.ApplyToEntity(null))
                 .ToList();
 
-            var nameChangedApplicationEvents = context.ApplicationEvents.Where(ae => ae.EntityType.Equals(typeof(CustomerNameChangedEvent).Name));
+            var nameChangedApplicationEvents = context.ApplicationEvents
+                .Where(ae => ae.EntityType.Equals(typeof(CustomerNameChangedEvent).Name))
+                .OrderBy(ae => ae.RequestedTime);
             var allNameChangedEvents = nameChangedApplicationEvents
                 .Select(ev => ev.EntityJson)
                 .Select(json => json.FromJson<CustomerNameChangedEvent>());
             foreach (var ev in allNameChangedEvents)
             {
-                var customer = allCustomers.FirstOrDefault(c => c.Id == ev.CustomerId);
+                var customer = allCustomers.First(c => c.Id == ev.CustomerId);
                 ev.ApplyToEntity(customer);
             }
 
