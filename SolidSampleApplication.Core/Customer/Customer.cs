@@ -4,6 +4,9 @@ namespace SolidSampleApplication.Core
 {
     public class Customer
     {
+        public static Customer Registration(string username, string firstname, string lastname, string email)
+            => new Customer(Guid.NewGuid(), username, firstname, lastname, email);
+
         public Guid Id { get; private set; }
         public string Username { get; private set; }
         public string FirstName { get; private set; }

@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,8 +41,12 @@ namespace SolidSampleApplication.Api
 
             // we are using sql lite in-memory database for this sample application purpose
             // for in-memory relational database, we use sqllite in-memory as opposed to the ef core in-memory provider.
+            // the inmemorysqllite is require to keep the db connection always open.
+            // when the db connection is closed, the db will be destroyed.
+            var inMemorySqlite = new SqliteConnection("Data Source=:memory:");
+            inMemorySqlite.Open();
             services.AddDbContext<EventStoreDbContext>(
-                options => options.UseSqlite("DataSource=:memory:"));
+                options => options.UseSqlite(inMemorySqlite));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,6 +67,15 @@ namespace SolidSampleApplication.Api
             {
                 endpoints.MapControllers();
             });
+
+            // NOTE: this must go at the end of Configure
+            // ensure db is created
+            var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+            using (var serviceScope = serviceScopeFactory.CreateScope())
+            {
+                var dbContext = serviceScope.ServiceProvider.GetService<EventStoreDbContext>();
+                dbContext.Database.EnsureCreated();
+            }
         }
     }
 }
