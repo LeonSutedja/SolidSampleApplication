@@ -30,9 +30,9 @@ namespace SolidSampleApplication.Infrastucture
         public void SeedApplicationEvent(ModelBuilder modelBuilder)
         {
             var requestedBy = "SeedData";
-            var apocalypso = Customer.Registration("apocalypso", "Apo", "Calypso", "apocalyptic@gmail.com");
-            var apollo = Customer.Registration("apollo", "apo", "llo", "apollo13@gmail.com");
-            var aphrodite = Customer.Registration("aphrodite", "aphro", "dite", "aphrodite@gmail.com");
+            var apocalypso = new CustomerRegisteredEvent(Guid.NewGuid(), "apocalypso", "Apo", "Calypso", "apocalyptic@gmail.com");
+            var apollo = new CustomerRegisteredEvent(Guid.NewGuid(), "apollo", "apo", "llo", "apollo13@gmail.com");
+            var aphrodite = new CustomerRegisteredEvent(Guid.NewGuid(), "aphrodite", "aphro", "dite", "aphrodite@gmail.com");
             modelBuilder.Entity<SimpleApplicationEvent>().HasData(
                   SimpleApplicationEvent.New(
                       apocalypso.Id.ToString(),

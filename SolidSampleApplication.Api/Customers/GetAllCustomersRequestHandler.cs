@@ -4,7 +4,7 @@ using SolidSampleApplication.Infrastructure.Shared;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SolidSampleApplication.Api.Membership
+namespace SolidSampleApplication.Api.Customers
 {
     public class GetAllCustomersRequest : IRequest<DefaultResponse>
     {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace SolidSampleApplication.Api.Membership
+namespace SolidSampleApplication.Api.Customers
 {
     [ApiController]
     [Route("[controller]")]
