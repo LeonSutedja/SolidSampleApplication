@@ -7,7 +7,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
 {
     public interface ICustomerRepository
     {
-        IEnumerable<Customer> GetCustomers();
+        Task<IEnumerable<Customer>> GetCustomers();
 
         Customer GetCustomers(Guid customerId);
 

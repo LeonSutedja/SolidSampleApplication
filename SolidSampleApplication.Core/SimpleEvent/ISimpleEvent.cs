@@ -5,4 +5,9 @@
     {
         T ApplyToEntity(T entity);
     }
+
+    public interface IEntityEvent
+    {
+        int Version { get; }
+    }
 }

@@ -2,7 +2,7 @@
 
 namespace SolidSampleApplication.Core
 {
-    public class Customer
+    public class Customer : IEntityEvent
     {
         public static Customer Registration(string username, string firstname, string lastname, string email)
             => new Customer(Guid.NewGuid(), username, firstname, lastname, email);
@@ -12,6 +12,9 @@ namespace SolidSampleApplication.Core
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+
+        // How many times this entity gets updated
+        public int Version { get; set; }
 
         protected Customer()
         {
@@ -24,12 +27,14 @@ namespace SolidSampleApplication.Core
             FirstName = firstName ?? throw new ArgumentNullException(nameof(firstName));
             LastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
             Email = email ?? throw new ArgumentNullException(nameof(email));
+            Version = 1;
         }
 
         public void ChangeName(string firstName, string lastName)
         {
             FirstName = firstName;
             LastName = lastName;
+            Version++;
         }
     }
 }

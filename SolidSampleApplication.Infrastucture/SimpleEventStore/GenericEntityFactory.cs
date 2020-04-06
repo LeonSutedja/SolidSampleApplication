@@ -1,8 +1,9 @@
-﻿using SolidSampleApplication.Core;
+﻿using Microsoft.EntityFrameworkCore;
+using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastucture;
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Infrastructure
 {
@@ -15,14 +16,14 @@ namespace SolidSampleApplication.Infrastructure
             _context = context;
         }
 
-        public IEnumerable<TEntity> GetAllEntities<TCreationEvent, TEvent>(int max = 1000)
+        public async Task<IEnumerable<TEntity>> GetAllEntities<TCreationEvent, TEvent>(int max = 1000)
             where TCreationEvent : ISimpleEvent<TEntity>
             where TEvent : ISimpleEvent<TEntity>
         {
             var tCreationEventName = typeof(TCreationEvent).Name;
             var tEventName = typeof(TEvent).Name;
 
-            var distinctEntityIds = _context.ApplicationEvents
+            var distinctEntityIds = await _context.ApplicationEvents
                 .Where(ae =>
                         ae.EntityType.Equals(tCreationEventName) ||
                         ae.EntityType.Equals(tEventName))
@@ -30,14 +31,14 @@ namespace SolidSampleApplication.Infrastructure
                 .Select(ae => ae.EntityId)
                 .Distinct()
                 .Take(max)
-                .ToList();
+                .ToListAsync();
 
-            var allEvents = _context.ApplicationEvents
+            var allEvents = (await _context.ApplicationEvents
                    .Where(ae =>
                         distinctEntityIds.Contains(ae.EntityId) &&
                         (ae.EntityType.Equals(tCreationEventName) ||
                         ae.EntityType.Equals(tEventName)))
-                   .ToList()
+                   .ToListAsync())
                    .GroupBy(ae => ae.EntityId);
 
             var entityList = new List<TEntity>();

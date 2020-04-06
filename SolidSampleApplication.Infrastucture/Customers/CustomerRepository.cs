@@ -16,9 +16,10 @@ namespace SolidSampleApplication.Infrastructure.Repository
             _context = context;
         }
 
-        public IEnumerable<Customer> GetCustomers()
+        public async Task<IEnumerable<Customer>> GetCustomers()
         {
-            var allCustomers = _initializeCustomersFromEventStore(_context);
+            var genericFactory = new GenericEntityFactory<Customer>(_context);
+            var allCustomers = await genericFactory.GetAllEntities<CustomerRegisteredEvent, CustomerNameChangedEvent>();
             return allCustomers;
         }
 
@@ -35,13 +36,6 @@ namespace SolidSampleApplication.Infrastructure.Repository
             _context.ApplicationEvents.Add(simpleEvent);
             await _context.SaveChangesAsync();
             return customerRegisteredEvent.ApplyToEntity(null);
-        }
-
-        private IEnumerable<Customer> _initializeCustomersFromEventStore(SimpleEventStoreDbContext context)
-        {
-            var genericFactory = new GenericEntityFactory<Customer>(context);
-            var allCustomers = genericFactory.GetAllEntities<CustomerRegisteredEvent, CustomerNameChangedEvent>();
-            return allCustomers;
         }
 
         private Customer _getCustomerFromEventStore(SimpleEventStoreDbContext context, Guid customerId)

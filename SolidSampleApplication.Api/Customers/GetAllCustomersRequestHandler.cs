@@ -20,6 +20,6 @@ namespace SolidSampleApplication.Api.Customers
         }
 
         public async Task<DefaultResponse> Handle(GetAllCustomersRequest request, CancellationToken cancellationToken)
-            => DefaultResponse.Success(_repository.GetCustomers());
+            => DefaultResponse.Success(await _repository.GetCustomers());
     }
 }

@@ -38,6 +38,8 @@ namespace SolidSampleApplication.Infrastucture
             var aphroditeNameChanged = new CustomerNameChangedEvent(aphrodite.Id, "Aphrod", "Ite");
             var apocalypsoNameChanged2 = new CustomerNameChangedEvent(apocalypso.Id, "Apo", "Calypso");
 
+            var apocalypsoNameChanged3 = new CustomerNameChangedEvent(apocalypso.Id, "Apocalyptic", "Calypso");
+
             modelBuilder.Entity<SimpleApplicationEvent>().HasData(
                   SimpleApplicationEvent.New(
                       apocalypso.Id.ToString(),
@@ -80,6 +82,13 @@ namespace SolidSampleApplication.Infrastucture
                       apocalypsoNameChanged2.ToJson(),
                       1,
                       DateTime.Now.AddDays(-20),
+                      requestedBy),
+                   SimpleApplicationEvent.New(
+                      apocalypsoNameChanged3.Id.ToString(),
+                      apocalypsoNameChanged3.GetType().Name,
+                      apocalypsoNameChanged3.ToJson(),
+                      1,
+                      DateTime.Now.AddDays(-10),
                       requestedBy)
               );
         }
