@@ -36,8 +36,8 @@ namespace SolidSampleApplication.Infrastucture
 
             var apocalypsoNameChanged = new CustomerNameChangedEvent(apocalypso.Id, "Apocal", "Lypso");
             var aphroditeNameChanged = new CustomerNameChangedEvent(aphrodite.Id, "Aphrod", "Ite");
-
             var apocalypsoNameChanged2 = new CustomerNameChangedEvent(apocalypso.Id, "Apo", "Calypso");
+
             modelBuilder.Entity<SimpleApplicationEvent>().HasData(
                   SimpleApplicationEvent.New(
                       apocalypso.Id.ToString(),

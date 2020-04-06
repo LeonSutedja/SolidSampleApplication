@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using SolidSampleApplication.Core;
+﻿using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastucture;
 using System;
 using System.Collections.Generic;
@@ -11,29 +10,31 @@ namespace SolidSampleApplication.Infrastructure.Repository
     public class CustomerRepository : ICustomerRepository
     {
         private readonly SimpleEventStoreDbContext _context;
-        private IEnumerable<Customer> _customers;
 
         public CustomerRepository(SimpleEventStoreDbContext context)
         {
             _context = context;
-            _customers = _initializeCustomersFromEventStore(context);
         }
 
         public IEnumerable<Customer> GetCustomers()
         {
-            return _customers;
+            var allCustomers = _initializeCustomersFromEventStore(_context);
+            return allCustomers;
         }
 
         public Customer GetCustomers(Guid customerId)
-            => _customers.FirstOrDefault(m => m.Id == customerId);
+            => _getCustomerFromEventStore(_context, customerId);
 
         public async Task<Customer> RegisterCustomer(string username, string firstname, string lastname, string email)
         {
-            var customer = new Customer(Guid.NewGuid(), username, firstname, lastname, email);
-            var simpleEvent = SimpleApplicationEvent.New(customer.Id.ToString(), customer.GetType().Name, customer.ToJson(), 1, DateTime.Now, "Sample");
+            var customerRegisteredEvent = new CustomerRegisteredEvent(Guid.NewGuid(), username, firstname, lastname, email);
+            var simpleEvent = SimpleApplicationEvent.New(
+                customerRegisteredEvent.Id.ToString(),
+                customerRegisteredEvent.GetType().Name,
+                customerRegisteredEvent.ToJson(), 1, DateTime.Now, "Sample");
             _context.ApplicationEvents.Add(simpleEvent);
             await _context.SaveChangesAsync();
-            return customer;
+            return customerRegisteredEvent.ApplyToEntity(null);
         }
 
         private IEnumerable<Customer> _initializeCustomersFromEventStore(SimpleEventStoreDbContext context)
@@ -58,6 +59,30 @@ namespace SolidSampleApplication.Infrastructure.Repository
             }
 
             return allCustomers;
+        }
+
+        private Customer _getCustomerFromEventStore(SimpleEventStoreDbContext context, Guid customerId)
+        {
+            var allCustomerEvents = context.ApplicationEvents
+                .Where(ae => ae.EntityId.Equals(customerId) &&
+                (ae.EntityType.Equals(typeof(CustomerRegisteredEvent).Name) ||
+                    ae.EntityType.Equals(typeof(CustomerNameChangedEvent).Name)))
+                .OrderBy(e => e.RequestedTime);
+            var registrationEvent = allCustomerEvents.FirstOrDefault(e => e.EntityType.Equals(typeof(CustomerRegisteredEvent).Name));
+            var customer = registrationEvent.EntityJson.FromJson<CustomerRegisteredEvent>().ApplyToEntity(null);
+
+            var nameChangedApplicationEvents = allCustomerEvents
+                .Where(ae => ae.EntityType.Equals(typeof(CustomerNameChangedEvent).Name))
+                .OrderBy(ae => ae.RequestedTime);
+            var nameChangedEvents = nameChangedApplicationEvents
+                .Select(ev => ev.EntityJson)
+                .Select(json => json.FromJson<CustomerNameChangedEvent>());
+
+            foreach (var ev in nameChangedEvents)
+            {
+                ev.ApplyToEntity(customer);
+            }
+            return customer;
         }
     }
 }
