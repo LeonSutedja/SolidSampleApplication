@@ -7,11 +7,11 @@ namespace SolidSampleApplication.Core
         public static Customer Registration(string username, string firstname, string lastname, string email)
             => new Customer(Guid.NewGuid(), username, firstname, lastname, email);
 
-        public Guid Id { get; private set; }
-        public string Username { get; private set; }
-        public string FirstName { get; private set; }
-        public string LastName { get; private set; }
-        public string Email { get; private set; }
+        public Guid Id { get; set; }
+        public string Username { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
 
         protected Customer()
         {
@@ -24,6 +24,12 @@ namespace SolidSampleApplication.Core
             FirstName = firstName ?? throw new ArgumentNullException(nameof(firstName));
             LastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
             Email = email ?? throw new ArgumentNullException(nameof(email));
+        }
+
+        public void ChangeName(string firstName, string lastName)
+        {
+            FirstName = firstName;
+            LastName = lastName;
         }
     }
 }

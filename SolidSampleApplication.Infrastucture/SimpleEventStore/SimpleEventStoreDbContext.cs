@@ -33,6 +33,9 @@ namespace SolidSampleApplication.Infrastucture
             var apocalypso = new CustomerRegisteredEvent(Guid.NewGuid(), "apocalypso", "Apo", "Calypso", "apocalyptic@gmail.com");
             var apollo = new CustomerRegisteredEvent(Guid.NewGuid(), "apollo", "apo", "llo", "apollo13@gmail.com");
             var aphrodite = new CustomerRegisteredEvent(Guid.NewGuid(), "aphrodite", "aphro", "dite", "aphrodite@gmail.com");
+
+            var apocalypsoNameChanged = new CustomerNameChangedEvent(apocalypso.Id, "Apocal", "Lypso");
+            var aphroditeNameChanged = new CustomerNameChangedEvent(aphrodite.Id, "Aphrod", "Ite");
             modelBuilder.Entity<SimpleApplicationEvent>().HasData(
                   SimpleApplicationEvent.New(
                       apocalypso.Id.ToString(),
@@ -54,6 +57,20 @@ namespace SolidSampleApplication.Infrastucture
                       aphrodite.ToJson(),
                       1,
                       DateTime.Now.AddDays(-28),
+                      requestedBy),
+                   SimpleApplicationEvent.New(
+                      apocalypsoNameChanged.CustomerId.ToString(),
+                      apocalypsoNameChanged.GetType().Name,
+                      apocalypsoNameChanged.ToJson(),
+                      1,
+                      DateTime.Now.AddDays(-25),
+                      requestedBy),
+                   SimpleApplicationEvent.New(
+                      aphroditeNameChanged.CustomerId.ToString(),
+                      aphroditeNameChanged.GetType().Name,
+                      aphroditeNameChanged.ToJson(),
+                      1,
+                      DateTime.Now.AddDays(-25),
                       requestedBy)
               );
         }

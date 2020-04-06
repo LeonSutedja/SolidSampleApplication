@@ -16,12 +16,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
         public CustomerRepository(SimpleEventStoreDbContext context)
         {
             _context = context;
-            var registeredCustomersEvent = _context.ApplicationEvents.Where(ae => ae.EntityType.Equals(typeof(CustomerRegisteredEvent).Name));
-            var allCustomers = registeredCustomersEvent
-                .Select(ev => ev.EntityJson)
-                .Select(json => json.FromJson<CustomerRegisteredEvent>())
-                .Select(evObject => evObject.ToCustomer());
-            _customers = allCustomers.ToList();
+            _customers = _initializeCustomersFromEventStore(context);
         }
 
         public IEnumerable<Customer> GetCustomers()
@@ -39,6 +34,28 @@ namespace SolidSampleApplication.Infrastructure.Repository
             _context.ApplicationEvents.Add(simpleEvent);
             await _context.SaveChangesAsync();
             return customer;
+        }
+
+        private IEnumerable<Customer> _initializeCustomersFromEventStore(SimpleEventStoreDbContext context)
+        {
+            var registeredCustomersApplicationEvents = context.ApplicationEvents.Where(ae => ae.EntityType.Equals(typeof(CustomerRegisteredEvent).Name));
+            var allCustomers = registeredCustomersApplicationEvents
+                .Select(ev => ev.EntityJson)
+                .Select(json => json.FromJson<CustomerRegisteredEvent>())
+                .Select(evObject => evObject.ApplyToEntity(null))
+                .ToList();
+
+            var nameChangedApplicationEvents = context.ApplicationEvents.Where(ae => ae.EntityType.Equals(typeof(CustomerNameChangedEvent).Name));
+            var allNameChangedEvents = nameChangedApplicationEvents
+                .Select(ev => ev.EntityJson)
+                .Select(json => json.FromJson<CustomerNameChangedEvent>());
+            foreach (var ev in allNameChangedEvents)
+            {
+                var customer = allCustomers.FirstOrDefault(c => c.Id == ev.CustomerId);
+                ev.ApplyToEntity(customer);
+            }
+
+            return allCustomers;
         }
     }
 }
