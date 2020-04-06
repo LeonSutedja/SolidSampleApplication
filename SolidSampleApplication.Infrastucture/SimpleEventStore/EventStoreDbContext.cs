@@ -5,41 +5,14 @@ using System;
 
 namespace SolidSampleApplication.Infrastucture
 {
-    public class ApplicationEvent
+    public class SimpleEventStoreDbContext : DbContext
     {
-        public static ApplicationEvent New(string entityId, string entityType, string entityJson, DateTime requestedTime, string requestedBy)
-            => new ApplicationEvent(Guid.NewGuid(), entityId, entityType, entityJson, requestedTime, requestedBy);
+        public DbSet<SimpleApplicationEvent> ApplicationEvents { get; set; }
 
-        public Guid Id { get; private set; }
-        public string EntityId { get; private set; }
-        public string EntityType { get; private set; }
-        public string EntityJson { get; private set; }
-        public DateTime RequestedTime { get; private set; }
-        public string RequestedBy { get; private set; }
-
-        protected ApplicationEvent()
-        {
-        }
-
-        protected ApplicationEvent(Guid id, string entityId, string entityType, string entityJson, DateTime requestedTime, string requestedBy)
-        {
-            Id = id;
-            EntityId = entityId;
-            EntityType = entityType ?? throw new ArgumentNullException(nameof(entityType));
-            EntityJson = entityJson ?? throw new ArgumentNullException(nameof(entityJson));
-            RequestedTime = requestedTime;
-            RequestedBy = requestedBy ?? throw new ArgumentNullException(nameof(requestedBy));
-        }
-    }
-
-    public class EventStoreDbContext : DbContext
-    {
-        public DbSet<ApplicationEvent> ApplicationEvents { get; set; }
-
-        public EventStoreDbContext()
+        public SimpleEventStoreDbContext()
         { }
 
-        public EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
+        public SimpleEventStoreDbContext(DbContextOptions<SimpleEventStoreDbContext> options)
             : base(options)
         { }
 
@@ -60,20 +33,20 @@ namespace SolidSampleApplication.Infrastucture
             var apocalypso = Customer.Registration("apocalypso", "Apo", "Calypso", "apocalyptic@gmail.com");
             var apollo = Customer.Registration("apollo", "apo", "llo", "apollo13@gmail.com");
             var aphrodite = Customer.Registration("aphrodite", "aphro", "dite", "aphrodite@gmail.com");
-            modelBuilder.Entity<ApplicationEvent>().HasData(
-                  ApplicationEvent.New(
+            modelBuilder.Entity<SimpleApplicationEvent>().HasData(
+                  SimpleApplicationEvent.New(
                       apocalypso.Id.ToString(),
                       apocalypso.GetType().Name,
                       apocalypso.ToJson(),
                       DateTime.Now.AddDays(-30),
                       requestedBy),
-                   ApplicationEvent.New(
+                   SimpleApplicationEvent.New(
                       apollo.Id.ToString(),
                       apollo.GetType().Name,
                       apollo.ToJson(),
                       DateTime.Now.AddDays(-29),
                       requestedBy),
-                   ApplicationEvent.New(
+                   SimpleApplicationEvent.New(
                       aphrodite.Id.ToString(),
                       aphrodite.GetType().Name,
                       aphrodite.ToJson(),

@@ -45,7 +45,7 @@ namespace SolidSampleApplication.Api
             // when the db connection is closed, the db will be destroyed.
             var inMemorySqlite = new SqliteConnection("Data Source=:memory:");
             inMemorySqlite.Open();
-            services.AddDbContext<EventStoreDbContext>(
+            services.AddDbContext<SimpleEventStoreDbContext>(
                 options => options.UseSqlite(inMemorySqlite));
         }
 
@@ -73,7 +73,7 @@ namespace SolidSampleApplication.Api
             var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
             using (var serviceScope = serviceScopeFactory.CreateScope())
             {
-                var dbContext = serviceScope.ServiceProvider.GetService<EventStoreDbContext>();
+                var dbContext = serviceScope.ServiceProvider.GetService<SimpleEventStoreDbContext>();
                 dbContext.Database.EnsureCreated();
             }
         }

@@ -13,9 +13,9 @@ namespace SolidSampleApplication.Api.Membership
 
     public class GetAllApplicationEventRequestHandler : IRequestHandler<GetAllApplicationEventRequest, DefaultResponse>
     {
-        private readonly EventStoreDbContext _eventStoreDbContext;
+        private readonly SimpleEventStoreDbContext _eventStoreDbContext;
 
-        public GetAllApplicationEventRequestHandler(EventStoreDbContext eventStoreDbContext)
+        public GetAllApplicationEventRequestHandler(SimpleEventStoreDbContext eventStoreDbContext)
         {
             _eventStoreDbContext = eventStoreDbContext;
         }
