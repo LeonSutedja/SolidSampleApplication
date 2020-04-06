@@ -29,10 +29,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
         public async Task<Customer> RegisterCustomer(string username, string firstname, string lastname, string email)
         {
             var customerRegisteredEvent = new CustomerRegisteredEvent(Guid.NewGuid(), username, firstname, lastname, email);
-            var simpleEvent = SimpleApplicationEvent.New(
-                customerRegisteredEvent.Id.ToString(),
-                customerRegisteredEvent.GetType().Name,
-                customerRegisteredEvent.ToJson(), 1, DateTime.Now, "Sample");
+            var simpleEvent = SimpleApplicationEvent.New(customerRegisteredEvent, 1, DateTime.Now, "Sample");
             _context.ApplicationEvents.Add(simpleEvent);
             await _context.SaveChangesAsync();
             return customerRegisteredEvent.ApplyToEntity(null);

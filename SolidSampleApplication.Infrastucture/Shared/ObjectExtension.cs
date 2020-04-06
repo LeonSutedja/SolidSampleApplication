@@ -9,5 +9,18 @@ namespace SolidSampleApplication.Infrastructure
 
         public static T FromJson<T>(this string toDeserialized)
             => JsonConvert.DeserializeObject<T>(toDeserialized);
+
+        public static string TryGetId<T>(this T item, string defaultReturn)
+        {
+            if (item == null) return defaultReturn;
+            try
+            {
+                return ((dynamic)item).Id.ToString();
+            }
+            catch
+            {
+                return defaultReturn;
+            }
+        }
     }
 }

@@ -41,55 +41,13 @@ namespace SolidSampleApplication.Infrastucture
             var apocalypsoNameChanged3 = new CustomerNameChangedEvent(apocalypso.Id, "Apocalyptic", "Calypso");
 
             modelBuilder.Entity<SimpleApplicationEvent>().HasData(
-                  SimpleApplicationEvent.New(
-                      apocalypso.Id.ToString(),
-                      apocalypso.GetType().Name,
-                      apocalypso.ToJson(),
-                      1,
-                      DateTime.Now.AddDays(-30),
-                      requestedBy),
-                   SimpleApplicationEvent.New(
-                      apollo.Id.ToString(),
-                      apollo.GetType().Name,
-                      apollo.ToJson(),
-                      1,
-                      DateTime.Now.AddDays(-29),
-                      requestedBy),
-                   SimpleApplicationEvent.New(
-                      aphrodite.Id.ToString(),
-                      aphrodite.GetType().Name,
-                      aphrodite.ToJson(),
-                      1,
-                      DateTime.Now.AddDays(-28),
-                      requestedBy),
-                   SimpleApplicationEvent.New(
-                      apocalypsoNameChanged.Id.ToString(),
-                      apocalypsoNameChanged.GetType().Name,
-                      apocalypsoNameChanged.ToJson(),
-                      1,
-                      DateTime.Now.AddDays(-25),
-                      requestedBy),
-                   SimpleApplicationEvent.New(
-                      aphroditeNameChanged.Id.ToString(),
-                      aphroditeNameChanged.GetType().Name,
-                      aphroditeNameChanged.ToJson(),
-                      1,
-                      DateTime.Now.AddDays(-25),
-                      requestedBy),
-                   SimpleApplicationEvent.New(
-                      apocalypsoNameChanged2.Id.ToString(),
-                      apocalypsoNameChanged2.GetType().Name,
-                      apocalypsoNameChanged2.ToJson(),
-                      1,
-                      DateTime.Now.AddDays(-20),
-                      requestedBy),
-                   SimpleApplicationEvent.New(
-                      apocalypsoNameChanged3.Id.ToString(),
-                      apocalypsoNameChanged3.GetType().Name,
-                      apocalypsoNameChanged3.ToJson(),
-                      1,
-                      DateTime.Now.AddDays(-10),
-                      requestedBy)
+                  SimpleApplicationEvent.New(apocalypso, 1, DateTime.Now.AddDays(-30), requestedBy),
+                   SimpleApplicationEvent.New(apollo, 1, DateTime.Now.AddDays(-29), requestedBy),
+                   SimpleApplicationEvent.New(aphrodite, 1, DateTime.Now.AddDays(-28), requestedBy),
+                   SimpleApplicationEvent.New(apocalypsoNameChanged, 1, DateTime.Now.AddDays(-25), requestedBy),
+                   SimpleApplicationEvent.New(aphroditeNameChanged, 1, DateTime.Now.AddDays(-25), requestedBy),
+                   SimpleApplicationEvent.New(apocalypsoNameChanged2, 1, DateTime.Now.AddDays(-20), requestedBy),
+                   SimpleApplicationEvent.New(apocalypsoNameChanged3, 1, DateTime.Now.AddDays(-10), requestedBy)
               );
         }
     }

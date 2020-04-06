@@ -1,11 +1,15 @@
-﻿using System;
+﻿using SolidSampleApplication.Infrastructure;
+using System;
 
 namespace SolidSampleApplication.Infrastucture
 {
     public class SimpleApplicationEvent
     {
-        public static SimpleApplicationEvent New(string entityId, string entityType, string entityJson, int entityTypeVersion, DateTime requestedTime, string requestedBy)
-            => new SimpleApplicationEvent(Guid.NewGuid(), entityId, entityType, entityJson, entityTypeVersion, requestedTime, requestedBy);
+        public static SimpleApplicationEvent New<TEntity>(TEntity entity, int entityTypeVersion, DateTime requestedTime, string requestedBy)
+        {
+            var stringifyId = entity.TryGetId("No Id");
+            return new SimpleApplicationEvent(Guid.NewGuid(), stringifyId, entity.GetType().Name, entity.ToJson(), entityTypeVersion, requestedTime, requestedBy);
+        }
 
         public Guid Id { get; private set; }
         public string EntityId { get; private set; }
