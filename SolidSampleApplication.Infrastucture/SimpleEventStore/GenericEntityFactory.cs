@@ -63,15 +63,16 @@ namespace SolidSampleApplication.Infrastructure
             return entityList;
         }
 
-        public TEntity GetEntity<TCreationEvent, TEvent>(string entityId)
+        public async Task<TEntity> GetEntity<TCreationEvent, TEvent>(string entityId)
             where TCreationEvent : ISimpleEvent<TEntity>
             where TEvent : ISimpleEvent<TEntity>
         {
-            var allEvents = _context.ApplicationEvents
+            var allEvents = await _context.ApplicationEvents
                    .Where(ae => ae.EntityId.Equals(entityId) &&
                     (ae.EntityType.Equals(typeof(TCreationEvent).Name) ||
                        ae.EntityType.Equals(typeof(TEvent).Name)))
-                   .OrderBy(e => e.RequestedTime);
+                   .OrderBy(e => e.RequestedTime)
+                   .ToListAsync();
 
             var creationEvents = allEvents.FirstOrDefault(e => e.EntityType.Equals(typeof(TCreationEvent).Name));
             var entity = creationEvents.EntityJson.FromJson<TCreationEvent>().ApplyToEntity(null);
@@ -83,11 +84,7 @@ namespace SolidSampleApplication.Infrastructure
                 .Select(ev => ev.EntityJson)
                 .Select(json => json.FromJson<TEvent>());
 
-            foreach (var ev in nameChangedEvents)
-            {
-                ev.ApplyToEntity(entity);
-            }
-
+            nameChangedEvents.ToList().ForEach((ev) => ev.ApplyToEntity(entity));
             return entity;
         }
     }

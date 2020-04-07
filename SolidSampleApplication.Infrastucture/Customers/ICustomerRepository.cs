@@ -9,7 +9,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
     {
         Task<IEnumerable<Customer>> GetCustomers();
 
-        Customer GetCustomers(Guid customerId);
+        Task<Customer> GetCustomer(Guid customerId);
 
         Task<Customer> RegisterCustomer(string username, string firstname, string lastname, string email);
 

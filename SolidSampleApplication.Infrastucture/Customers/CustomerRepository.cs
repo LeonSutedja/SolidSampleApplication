@@ -23,8 +23,12 @@ namespace SolidSampleApplication.Infrastructure.Repository
             return allCustomers;
         }
 
-        public Customer GetCustomers(Guid customerId)
-            => _getCustomerFromEventStore(_context, customerId);
+        public async Task<Customer> GetCustomer(Guid customerId)
+        {
+            var genericFactory = new GenericEntityFactory<Customer>(_context);
+            var customer = await genericFactory.GetEntity<CustomerRegisteredEvent, CustomerNameChangedEvent>(customerId.ToString());
+            return customer;
+        }
 
         public async Task<Customer> RegisterCustomer(string username, string firstname, string lastname, string email)
         {
@@ -41,7 +45,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
             var simpleEvent = SimpleApplicationEvent.New(updatedEvent, 1, DateTime.Now, "Sample");
             await _context.ApplicationEvents.AddAsync(simpleEvent);
             await _context.SaveChangesAsync();
-            return GetCustomers(customerId);
+            return await GetCustomer(customerId);
         }
 
         private Customer _getCustomerFromEventStore(SimpleEventStoreDbContext context, Guid customerId)
