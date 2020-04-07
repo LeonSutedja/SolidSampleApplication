@@ -12,5 +12,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
         Customer GetCustomers(Guid customerId);
 
         Task<Customer> RegisterCustomer(string username, string firstname, string lastname, string email);
+
+        Task<Customer> ChangeCustomerName(Guid customerId, string firstname, string lastname);
     }
 }

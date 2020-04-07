@@ -20,5 +20,11 @@ namespace SolidSampleApplication.Api.Customers
         {
             return (await _mediator.Send(new GetAllCustomersRequest())).ActionResult;
         }
+
+        [HttpPut]
+        public async Task<ActionResult> EarnPoints(ChangeNameCustomerRequest request)
+        {
+            return (await _mediator.Send(request)).ActionResult;
+        }
     }
 }
