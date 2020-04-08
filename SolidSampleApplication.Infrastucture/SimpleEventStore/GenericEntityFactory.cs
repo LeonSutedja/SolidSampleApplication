@@ -16,7 +16,7 @@ namespace SolidSampleApplication.Infrastructure
             _context = context;
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllEntities<TCreationEvent, TEvent>(int max = 1000)
+        public async Task<IEnumerable<TEntity>> GetAllEntities<TCreationEvent, TEvent>(int max = 200)
             where TCreationEvent : ISimpleEvent<TEntity>
             where TEvent : ISimpleEvent<TEntity>
         {
@@ -36,28 +36,27 @@ namespace SolidSampleApplication.Infrastructure
             var allEvents = (await _context.ApplicationEvents
                    .Where(ae =>
                         distinctEntityIds.Contains(ae.EntityId) &&
-                        (ae.EntityType.Equals(tCreationEventName) ||
-                        ae.EntityType.Equals(tEventName)))
+                            (ae.EntityType.Equals(tCreationEventName) ||
+                            ae.EntityType.Equals(tEventName)))
                    .ToListAsync())
                    .GroupBy(ae => ae.EntityId);
 
             var entityList = new List<TEntity>();
             foreach (var entityEvents in allEvents)
             {
-                var key = entityEvents.Key;
+                var entityId = entityEvents.Key;
                 var orderedEvents = entityEvents.OrderBy(e => e.RequestedTime);
-                TEntity entity = null;
-                foreach (var ev in orderedEvents)
-                {
-                    if (ev.EntityType.Equals(tCreationEventName))
-                    {
-                        entity = ev.EntityJson.FromJson<TCreationEvent>().ApplyToEntity(null);
-                    }
-                    if (ev.EntityType.Equals(tEventName))
-                    {
-                        entity = ev.EntityJson.FromJson<TEvent>().ApplyToEntity(entity);
-                    }
-                }
+
+                var creationEvents = entityEvents.FirstOrDefault(e => e.EntityType.Equals(typeof(TCreationEvent).Name));
+                var entity = creationEvents.EntityJson.FromJson<TCreationEvent>().ApplyToEntity(null);
+                var otherEvents = entityEvents
+                    .Where(e => e.EntityType.Equals(typeof(TEvent).Name))
+                    .OrderBy(t => t.RequestedTime);
+                otherEvents
+                    .Select(e => e.EntityJson.FromJson<TEvent>())
+                    .ToList()
+                    .ForEach(ev => ev.ApplyToEntity(entity));
+
                 entityList.Add(entity);
             }
             return entityList;
@@ -80,11 +79,12 @@ namespace SolidSampleApplication.Infrastructure
             var nameChangedApplicationEvents = allEvents
                 .Where(ae => ae.EntityType.Equals(typeof(TEvent).Name))
                 .OrderBy(ae => ae.RequestedTime);
-            var nameChangedEvents = nameChangedApplicationEvents
+            nameChangedApplicationEvents
                 .Select(ev => ev.EntityJson)
-                .Select(json => json.FromJson<TEvent>());
+                .Select(json => json.FromJson<TEvent>())
+                .ToList()
+                .ForEach((ev) => ev.ApplyToEntity(entity));
 
-            nameChangedEvents.ToList().ForEach((ev) => ev.ApplyToEntity(entity));
             return entity;
         }
     }

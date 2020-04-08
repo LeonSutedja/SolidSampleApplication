@@ -47,31 +47,5 @@ namespace SolidSampleApplication.Infrastructure.Repository
             await _context.SaveChangesAsync();
             return await GetCustomer(customerId);
         }
-
-        private Customer _getCustomerFromEventStore(SimpleEventStoreDbContext context, Guid customerId)
-        {
-            var customerIdStringify = customerId.ToString();
-            var allCustomerEvents = context.ApplicationEvents
-                .Where(ae => ae.EntityId.Equals(customerIdStringify) &&
-                (ae.EntityType.Equals(typeof(CustomerRegisteredEvent).Name) ||
-                    ae.EntityType.Equals(typeof(CustomerNameChangedEvent).Name)))
-                .OrderBy(e => e.RequestedTime)
-                .ToList();
-            var registrationEvent = allCustomerEvents.FirstOrDefault(e => e.EntityType.Equals(typeof(CustomerRegisteredEvent).Name));
-            var customer = registrationEvent.EntityJson.FromJson<CustomerRegisteredEvent>().ApplyToEntity(null);
-
-            var nameChangedApplicationEvents = allCustomerEvents
-                .Where(ae => ae.EntityType.Equals(typeof(CustomerNameChangedEvent).Name))
-                .OrderBy(ae => ae.RequestedTime);
-            var nameChangedEvents = nameChangedApplicationEvents
-                .Select(ev => ev.EntityJson)
-                .Select(json => json.FromJson<CustomerNameChangedEvent>());
-
-            foreach (var ev in nameChangedEvents)
-            {
-                ev.ApplyToEntity(customer);
-            }
-            return customer;
-        }
     }
 }

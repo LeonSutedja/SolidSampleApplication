@@ -82,11 +82,11 @@ namespace SolidSampleApplication.Api.Test
             content.ShouldNotBeEmpty();
             _output.WriteLine(content);
 
-            var dynamicJson = content.FromJson<dynamic>();
-            ((string)dynamicJson.id).ShouldBe(request.CustomerId.ToString());
-            ((string)dynamicJson.username).ShouldBe(customer.Username);
-            ((string)dynamicJson.firstName).ShouldBe(request.FirstName);
-            ((string)dynamicJson.lastName).ShouldBe(request.LastName);
+            var jsonObject = JObject.Parse(content);
+            jsonObject.ShouldContainKeyAndValue("id", request.CustomerId.ToString());
+            jsonObject.ShouldContainKeyAndValue("username", customer.Username);
+            jsonObject.ShouldContainKeyAndValue("firstName", request.FirstName);
+            jsonObject.ShouldContainKeyAndValue("lastName", request.LastName);
         }
     }
 }
