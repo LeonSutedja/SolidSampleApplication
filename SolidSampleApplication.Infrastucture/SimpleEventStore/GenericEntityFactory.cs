@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Infrastructure
 {
-    public class GenericEntityFactory<TEntity> where TEntity : class
+    public class GenericEntityFactory<TEntity> where TEntity : IEntityEvent, new()
     {
         private readonly SimpleEventStoreDbContext _context;
 
@@ -17,12 +17,13 @@ namespace SolidSampleApplication.Infrastructure
         }
 
         public async Task<IEnumerable<TEntity>> GetAllEntities<TCreationEvent, TEvent>(int max = 200)
-            where TCreationEvent : ISimpleEvent<TEntity>
-            where TEvent : ISimpleEvent<TEntity>
+            where TCreationEvent : ISimpleEvent
+            where TEvent : ISimpleEvent
         {
             var tCreationEventName = typeof(TCreationEvent).Name;
             var tEventName = typeof(TEvent).Name;
 
+            // We get all the list first from applicationEvents
             var distinctEntityIds = await _context.ApplicationEvents
                 .Where(ae =>
                         ae.EntityType.Equals(tCreationEventName) ||
@@ -44,27 +45,21 @@ namespace SolidSampleApplication.Infrastructure
             var entityList = new List<TEntity>();
             foreach (var entityEvents in allEvents)
             {
-                var entityId = entityEvents.Key;
-                var orderedEvents = entityEvents.OrderBy(e => e.RequestedTime);
-
-                var creationEvents = entityEvents.FirstOrDefault(e => e.EntityType.Equals(typeof(TCreationEvent).Name));
-                var entity = creationEvents.EntityJson.FromJson<TCreationEvent>().ApplyToEntity(null);
-                var otherEvents = entityEvents
-                    .Where(e => e.EntityType.Equals(typeof(TEvent).Name))
-                    .OrderBy(t => t.RequestedTime);
-                otherEvents
-                    .Select(e => e.EntityJson.FromJson<TEvent>())
-                    .ToList()
-                    .ForEach(ev => ev.ApplyToEntity(entity));
-
+                // Currently, we try to avoid using reflection (Activator.CreateInstance) to create entity.
+                // This is because of the performance impact from reflection.
+                var entity = new TEntity();
+                var creationEvent = GetSingleSimpleEventFromApplicationEvents<TCreationEvent>(entityEvents);
+                var otherEvents = GetSimpleEventsFromApplicationEvents<TEvent>(entityEvents);
+                ((IHasSimpleEvent<TCreationEvent>)entity).ApplyEvent(creationEvent);
+                otherEvents.ForEach((simpleEvent) => ((IHasSimpleEvent<TEvent>)entity).ApplyEvent(simpleEvent));
                 entityList.Add(entity);
             }
             return entityList;
         }
 
         public async Task<TEntity> GetEntity<TCreationEvent, TEvent>(string entityId)
-            where TCreationEvent : ISimpleEvent<TEntity>
-            where TEvent : ISimpleEvent<TEntity>
+            where TCreationEvent : ISimpleEvent
+            where TEvent : ISimpleEvent
         {
             var allEvents = await _context.ApplicationEvents
                    .Where(ae => ae.EntityId.Equals(entityId) &&
@@ -73,19 +68,29 @@ namespace SolidSampleApplication.Infrastructure
                    .OrderBy(e => e.RequestedTime)
                    .ToListAsync();
 
-            var creationEvents = allEvents.FirstOrDefault(e => e.EntityType.Equals(typeof(TCreationEvent).Name));
-            var entity = creationEvents.EntityJson.FromJson<TCreationEvent>().ApplyToEntity(null);
-
-            var nameChangedApplicationEvents = allEvents
-                .Where(ae => ae.EntityType.Equals(typeof(TEvent).Name))
-                .OrderBy(ae => ae.RequestedTime);
-            nameChangedApplicationEvents
-                .Select(ev => ev.EntityJson)
-                .Select(json => json.FromJson<TEvent>())
-                .ToList()
-                .ForEach((ev) => ev.ApplyToEntity(entity));
-
+            var entity = new TEntity();
+            var creationEvent = GetSingleSimpleEventFromApplicationEvents<TCreationEvent>(allEvents);
+            var otherEvents = GetSimpleEventsFromApplicationEvents<TEvent>(allEvents);
+            ((dynamic)entity).ApplyEvent(creationEvent);
+            otherEvents.ForEach((simpleEvent) => ((dynamic)entity).ApplyEvent(simpleEvent));
             return entity;
+        }
+
+        private List<TEvent> GetSimpleEventsFromApplicationEvents<TEvent>(IEnumerable<SimpleApplicationEvent> applicationEvents)
+        {
+            return applicationEvents
+                .Where(e => e.EntityType.Equals(typeof(TEvent).Name))
+                .OrderBy(t => t.RequestedTime)
+                .Select(e => e.EntityJson.FromJson<TEvent>())
+                .ToList();
+        }
+
+        private TEvent GetSingleSimpleEventFromApplicationEvents<TEvent>(IEnumerable<SimpleApplicationEvent> applicationEvents)
+        {
+            return applicationEvents
+                .FirstOrDefault(e => e.EntityType.Equals(typeof(TEvent).Name))
+                .EntityJson
+                .FromJson<TEvent>();
         }
     }
 }

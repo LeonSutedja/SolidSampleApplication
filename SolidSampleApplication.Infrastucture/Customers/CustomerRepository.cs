@@ -36,7 +36,9 @@ namespace SolidSampleApplication.Infrastructure.Repository
             var simpleEvent = SimpleApplicationEvent.New(customerRegisteredEvent, 1, DateTime.Now, "Sample");
             await _context.ApplicationEvents.AddAsync(simpleEvent);
             await _context.SaveChangesAsync();
-            return customerRegisteredEvent.ApplyToEntity(null);
+            var customer = new Customer();
+            customer.ApplyEvent(customerRegisteredEvent);
+            return customer;
         }
 
         public async Task<Customer> ChangeCustomerName(Guid customerId, string firstname, string lastname)

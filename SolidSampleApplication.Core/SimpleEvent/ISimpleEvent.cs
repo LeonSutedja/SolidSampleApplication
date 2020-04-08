@@ -1,13 +1,16 @@
 ﻿namespace SolidSampleApplication.Core
 {
-    public interface ISimpleEvent<T>
-        where T : class
+    public interface ISimpleEvent
     {
-        T ApplyToEntity(T entity);
     }
 
     public interface IEntityEvent
     {
         int Version { get; }
+    }
+
+    public interface IHasSimpleEvent<T>
+    {
+        void ApplyEvent(T simpleEvent);
     }
 }

@@ -1,22 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SolidSampleApplication.Core
 {
-    public class Customer : IEntityEvent
+    public class Customer :
+        IEntityEvent,
+        IHasSimpleEvent<CustomerRegisteredEvent>,
+        IHasSimpleEvent<CustomerNameChangedEvent>
     {
         public static Customer Registration(string username, string firstname, string lastname, string email)
             => new Customer(Guid.NewGuid(), username, firstname, lastname, email);
 
-        public Guid Id { get; set; }
-        public string Username { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
+        public Guid Id { get; private set; }
+        public string Username { get; private set; }
+        public string FirstName { get; private set; }
+        public string LastName { get; private set; }
+        public string Email { get; private set; }
 
         // How many times this entity gets updated
-        public int Version { get; set; }
+        public int Version { get; private set; }
 
-        protected Customer()
+        public Customer()
         {
         }
 
@@ -30,10 +35,20 @@ namespace SolidSampleApplication.Core
             Version = 1;
         }
 
-        public void ChangeName(string firstName, string lastName)
+        public void ApplyEvent(CustomerRegisteredEvent simpleEvent)
         {
-            FirstName = firstName;
-            LastName = lastName;
+            Id = simpleEvent.Id;
+            Username = simpleEvent.Username;
+            FirstName = simpleEvent.FirstName;
+            LastName = simpleEvent.LastName;
+            Email = simpleEvent.Email;
+            Version = 1;
+        }
+
+        public void ApplyEvent(CustomerNameChangedEvent simpleEvent)
+        {
+            FirstName = simpleEvent.FirstName;
+            LastName = simpleEvent.LastName;
             Version++;
         }
     }

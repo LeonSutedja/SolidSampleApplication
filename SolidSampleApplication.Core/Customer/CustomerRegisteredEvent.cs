@@ -2,7 +2,7 @@
 
 namespace SolidSampleApplication.Core
 {
-    public class CustomerRegisteredEvent : ISimpleEvent<Customer>
+    public class CustomerRegisteredEvent : ISimpleEvent
     {
         public Guid Id { get; private set; }
         public string Username { get; private set; }
@@ -18,8 +18,5 @@ namespace SolidSampleApplication.Core
             LastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
             Email = email ?? throw new ArgumentNullException(nameof(email));
         }
-
-        public Customer ApplyToEntity(Customer entity = null)
-            => new Customer(Id, Username, FirstName, LastName, Email);
     }
 }
