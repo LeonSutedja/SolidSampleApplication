@@ -1,8 +1,6 @@
 using Newtonsoft.Json.Linq;
 using Shouldly;
 using SolidSampleApplication.Api.Customers;
-using SolidSampleApplication.Api.Membership;
-using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.Repository;
 using System;
 using System.Linq;
@@ -87,6 +85,60 @@ namespace SolidSampleApplication.Api.Test
             jsonObject.ShouldContainKeyAndValue("username", customer.Username);
             jsonObject.ShouldContainKeyAndValue("firstName", request.FirstName);
             jsonObject.ShouldContainKeyAndValue("lastName", request.LastName);
+        }
+
+        [Fact]
+        public async Task RegisterCustomer_ShouldReturn_Ok()
+        {
+            var request = new RegisterCustomerRequest()
+            {
+                Username = "test",
+                FirstName = "NewFirstname",
+                LastName = "NewLastname",
+                Email = "email@email.com.au"
+            };
+
+            var response = await _client.PostRequestAsStringContent("/customers", request);
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            content.ShouldNotBeEmpty();
+            _output.WriteLine(content);
+
+            var jsonObject = JObject.Parse(content);
+            jsonObject.ShouldContainKeyAndValue("username", request.Username);
+            jsonObject.ShouldContainKeyAndValue("firstName", request.FirstName);
+            jsonObject.ShouldContainKeyAndValue("lastName", request.LastName);
+        }
+
+        [Theory]
+        [InlineData("", "firstname", "lastname", "email@email.com.au")]
+        [InlineData("a", "firstname", "lastname", "email@email.com.au")]
+        [InlineData("12", "firstname", "lastname", "email@email.com.au")]
+        [InlineData("username1", "", "lastname", "email@email.com.au")]
+        [InlineData("username1", "firstname", "", "email@email.com.au")]
+        [InlineData("username1", "firstname", "lastname", "")]
+        public async Task RegisterCustomer_WithInvalidRequests_Should_ReturnBadRequest(
+            string username,
+            string firstname,
+            string lastname,
+            string email)
+        {
+            var request = new RegisterCustomerRequest()
+            {
+                Username = username,
+                FirstName = firstname,
+                LastName = lastname,
+                Email = email
+            };
+
+            var response = await _client.PostRequestAsStringContent("/customers", request);
+            response.IsSuccessStatusCode.ShouldBeFalse();
+            response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+
+            var content = await response.Content.ReadAsStringAsync();
+            content.ShouldNotBeEmpty();
+            _output.WriteLine(content);
         }
     }
 }

@@ -1,4 +1,4 @@
-using FluentValidation.AspNetCore;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,8 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SolidSampleApplication.Api.Customers;
 using SolidSampleApplication.Api.Healthcheck;
 using SolidSampleApplication.Api.Membership;
+using SolidSampleApplication.Api.Shared;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastucture;
@@ -34,9 +36,16 @@ namespace SolidSampleApplication.Api
 
             services.AddEnumerableInterfacesAsSingleton<IHealthcheckSystem>(mainAssembly);
 
+            // This is the default way of registering all fluent validation abstract validator
+            //services.AddMvc()
+            //    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateMembershipRequestValidator>());
             // fluent validation generic registration
-            services.AddMvc()
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateMembershipRequestValidator>());
+            // we want to use mediatr pipeline to help with the fluent validation, rather than attaching it to the mvc.
+            // This is because, we want the mediatr pipeline to be triggered first.
+            services.AddTransient<IValidator<RegisterCustomerRequest>, RegisterCustomerRequestValidator>();
+            services.AddTransient<IValidator<CreateMembershipRequest>, CreateMembershipRequestValidator>();
+            services.AddTransient<IValidator<EarnPointsMembershipRequest>, EarnPointsMembershipHandlerValidator>();
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
 
             // As sqllite db context is scoped, repository must become scoped as well
             services.AddScoped<IMembershipRepository, MembershipRepository>();

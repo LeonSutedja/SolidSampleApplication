@@ -23,24 +23,18 @@ namespace SolidSampleApplication.Infrastructure
             var tCreationEventName = typeof(TCreationEvent).Name;
             var tEventName = typeof(TEvent).Name;
 
+            var eventList = new List<string>() { tCreationEventName, tEventName };
+
             // We get all the list first from applicationEvents
             var distinctEntityIds = await _context.ApplicationEvents
-                .Where(ae =>
-                        ae.EntityType.Equals(tCreationEventName) ||
-                        ae.EntityType.Equals(tEventName))
+                .Where(ae => eventList.Contains(ae.EntityType))
                 .OrderByDescending(ae => ae.RequestedTime)
                 .Select(ae => ae.EntityId)
                 .Distinct()
                 .Take(max)
                 .ToListAsync();
 
-            var allEvents = (await _context.ApplicationEvents
-                   .Where(ae =>
-                        distinctEntityIds.Contains(ae.EntityId) &&
-                            (ae.EntityType.Equals(tCreationEventName) ||
-                            ae.EntityType.Equals(tEventName)))
-                   .ToListAsync())
-                   .GroupBy(ae => ae.EntityId);
+            var allEvents = (await _getApplicationEvents(distinctEntityIds, eventList)).GroupBy(allEvents => allEvents.EntityId);
 
             var entityList = new List<TEntity>();
             foreach (var entityEvents in allEvents)
@@ -61,12 +55,9 @@ namespace SolidSampleApplication.Infrastructure
             where TCreationEvent : ISimpleEvent
             where TEvent : ISimpleEvent
         {
-            var allEvents = await _context.ApplicationEvents
-                   .Where(ae => ae.EntityId.Equals(entityId) &&
-                    (ae.EntityType.Equals(typeof(TCreationEvent).Name) ||
-                       ae.EntityType.Equals(typeof(TEvent).Name)))
-                   .OrderBy(e => e.RequestedTime)
-                   .ToListAsync();
+            var allEvents = await _getApplicationEvents(
+                new List<string>() { entityId },
+                new List<string>() { typeof(TCreationEvent).Name, typeof(TEvent).Name });
 
             var entity = new TEntity();
             var creationEvent = GetSingleSimpleEventFromApplicationEvents<TCreationEvent>(allEvents);
@@ -74,6 +65,16 @@ namespace SolidSampleApplication.Infrastructure
             ((dynamic)entity).ApplyEvent(creationEvent);
             otherEvents.ForEach((simpleEvent) => ((dynamic)entity).ApplyEvent(simpleEvent));
             return entity;
+        }
+
+        private async Task<IEnumerable<SimpleApplicationEvent>> _getApplicationEvents(List<string> entityIds, List<string> entityTypes)
+        {
+            var allEvents = await _context.ApplicationEvents
+                     .Where(ae => entityIds.Contains(ae.EntityId) &&
+                        entityTypes.Contains(ae.EntityType))
+                     .OrderBy(e => e.RequestedTime)
+                     .ToListAsync();
+            return allEvents;
         }
 
         private List<TEvent> GetSimpleEventsFromApplicationEvents<TEvent>(IEnumerable<SimpleApplicationEvent> applicationEvents)

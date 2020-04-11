@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastructure.Shared;
 using System.Threading;
@@ -12,6 +13,28 @@ namespace SolidSampleApplication.Api.Customers
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+    }
+
+    public class RegisterCustomerRequestValidator : AbstractValidator<RegisterCustomerRequest>
+    {
+        public RegisterCustomerRequestValidator()
+        {
+            RuleFor(x => x.Username)
+                .NotNull()
+                .MinimumLength(3)
+                .MaximumLength(20);
+            RuleFor(x => x.FirstName)
+                .NotNull()
+                .MinimumLength(3)
+                .MaximumLength(50);
+            RuleFor(x => x.LastName)
+                .NotNull()
+                .MinimumLength(3)
+                .MaximumLength(50);
+            RuleFor(x => x.Email)
+                .NotNull()
+                .EmailAddress();
+        }
     }
 
     public class RegisterCustomerRequestHandler : IRequestHandler<RegisterCustomerRequest, DefaultResponse>

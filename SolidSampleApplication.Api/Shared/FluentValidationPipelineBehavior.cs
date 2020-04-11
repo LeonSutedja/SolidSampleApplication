@@ -31,8 +31,7 @@ namespace SolidSampleApplication.Api.Shared
                     return (DefaultResponse.Failed(validationResult)) as TResponse;
             }
 
-            var response = await next();
-            return response;
+            return await next();
         }
     }
 }
