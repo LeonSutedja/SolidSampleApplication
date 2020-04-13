@@ -49,6 +49,7 @@ namespace SolidSampleApplication.Api
 
             // As sqllite db context is scoped, repository must become scoped as well
             services.AddScoped<IMembershipRepository, MembershipRepository>();
+            services.AddScoped<IAggregateMembershipRepository, AggregateMembershipRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             // we are using sql lite in-memory database for this sample application purpose

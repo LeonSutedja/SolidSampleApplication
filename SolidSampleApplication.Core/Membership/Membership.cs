@@ -4,9 +4,9 @@ namespace SolidSampleApplication.Core
 {
     public class Membership
     {
-        public static Membership New(MembershipType type, Guid customerId)
+        public static Membership New(Guid id, MembershipType type, Guid customerId)
         {
-            return new Membership(Guid.NewGuid(), type, customerId);
+            return new Membership(id, type, customerId);
         }
 
         public Guid Id { get; private set; }

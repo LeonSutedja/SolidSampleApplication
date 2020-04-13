@@ -49,10 +49,11 @@ namespace SolidSampleApplication.Api.Test
             var content = await response.Content.ReadAsStringAsync();
             content.ShouldNotBeEmpty();
             var count = 0;
+            _output.WriteLine(content);
 
-            ActionJsonStringList(content, (membership, index) =>
+            ActionJsonStringList(content, (aggregateMembership, index) =>
             {
-                _output.WriteLine($"{index} - {membership.username} {membership.type}: {membership.id}");
+                _output.WriteLine($"{index} - {aggregateMembership.membership.id}, {aggregateMembership.membership.customerId}: {aggregateMembership.membership.points}");
                 count = index;
             });
 

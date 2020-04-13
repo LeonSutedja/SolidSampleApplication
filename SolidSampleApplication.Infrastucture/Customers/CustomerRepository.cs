@@ -34,7 +34,9 @@ namespace SolidSampleApplication.Infrastructure.Repository
         {
             var customerRegisteredEvent = new CustomerRegisteredEvent(Guid.NewGuid(), username, firstname, lastname, email);
             var simpleEvent = SimpleApplicationEvent.New(customerRegisteredEvent, 1, DateTime.Now, "Sample");
-            await _context.ApplicationEvents.AddAsync(simpleEvent);
+            var membershipEvent = new MembershipCreatedEvent(Guid.NewGuid(), customerRegisteredEvent.Id);
+            var simpleMembershipEvent = SimpleApplicationEvent.New(membershipEvent, 1, DateTime.Now, "Sample");
+            await _context.ApplicationEvents.AddRangeAsync(new[] { simpleEvent, simpleMembershipEvent });
             await _context.SaveChangesAsync();
             var customer = new Customer();
             customer.ApplyEvent(customerRegisteredEvent);

@@ -28,7 +28,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
         {
             var memberships = new List<Membership>();
             var memberPoints = new List<MembershipPoint>();
-            var newMember1 = Membership.New(MembershipType.Level1, Guid.NewGuid());
+            var newMember1 = Membership.New(Guid.NewGuid(), MembershipType.Level1, Guid.NewGuid());
             memberships.Add(newMember1);
             var member1Points = new List<MembershipPoint>()
             {
@@ -39,7 +39,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
             };
             memberPoints.AddRange(member1Points);
 
-            var newMember2 = Membership.New(MembershipType.Level3, Guid.NewGuid());
+            var newMember2 = Membership.New(Guid.NewGuid(), MembershipType.Level3, Guid.NewGuid());
             memberships.Add(newMember2);
             var member2Points = new List<MembershipPoint>()
             {
@@ -76,7 +76,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
 
         public Membership CreateMembership(Guid customerId)
         {
-            var newMembership = Membership.New(MembershipType.Level1, customerId);
+            var newMembership = Membership.New(Guid.NewGuid(), MembershipType.Level1, customerId);
             var membershipList = _memberships.ToList();
             membershipList.Add(newMembership);
             _memberships = membershipList;

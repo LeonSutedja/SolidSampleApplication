@@ -24,7 +24,7 @@ namespace SolidSampleApplication.Api.Membership
         [HttpGet]
         public async Task<ActionResult> GetMemberships()
         {
-            return (await _mediator.Send(new GetAllMembershipRequest())).ActionResult;
+            return (await _mediator.Send(new GetAllAggregateMembershipRequest())).ActionResult;
         }
 
         [HttpGet]

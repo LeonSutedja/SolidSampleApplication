@@ -46,6 +46,7 @@ namespace SolidSampleApplication.Api
 
             services.AddSingleton<IMembershipRepository, MembershipRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IAggregateMembershipRepository, AggregateMembershipRepository>();
 
             //services.AddMvc()
             //    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateMembershipRequestValidator>());
