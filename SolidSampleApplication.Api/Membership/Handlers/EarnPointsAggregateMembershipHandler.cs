@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Membership
 {
-    public class EarnPointsMembershipRequest : IRequest<DefaultResponse>
+    public class EarnPointsAggregateMembershipRequest : IRequest<DefaultResponse>
     {
         // A way to make this value immutable, whilst at the same time able to be mapped from the controller
         private Guid? _id { get; set; }
@@ -58,11 +58,11 @@ namespace SolidSampleApplication.Api.Membership
         }
 
         // empty constructor require for api
-        protected EarnPointsMembershipRequest()
+        protected EarnPointsAggregateMembershipRequest()
         {
         }
 
-        public EarnPointsMembershipRequest(Guid id, MembershipPointsType type, double points)
+        public EarnPointsAggregateMembershipRequest(Guid id, MembershipPointsType type, double points)
         {
             Id = id;
             Type = type;
@@ -70,9 +70,9 @@ namespace SolidSampleApplication.Api.Membership
         }
     }
 
-    public class EarnPointsMembershipHandlerValidator : AbstractValidator<EarnPointsMembershipRequest>
+    public class EarnPointsAggregateMembershipHandlerValidator : AbstractValidator<EarnPointsAggregateMembershipRequest>
     {
-        public EarnPointsMembershipHandlerValidator()
+        public EarnPointsAggregateMembershipHandlerValidator()
         {
             RuleFor(x => x.Id).NotNull();
             RuleFor(x => x.Points).NotNull();
@@ -80,19 +80,19 @@ namespace SolidSampleApplication.Api.Membership
         }
     }
 
-    public class EarnPointsMembershipHandler : IRequestHandler<EarnPointsMembershipRequest, DefaultResponse>
+    public class EarnPointsAggregateMembershipHandler : IRequestHandler<EarnPointsAggregateMembershipRequest, DefaultResponse>
     {
-        private readonly IMembershipRepository _repository;
+        private readonly IAggregateMembershipRepository _repository;
 
-        public EarnPointsMembershipHandler(IMembershipRepository repository)
+        public EarnPointsAggregateMembershipHandler(IAggregateMembershipRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<DefaultResponse> Handle(EarnPointsMembershipRequest request, CancellationToken cancellationToken)
+        public async Task<DefaultResponse> Handle(EarnPointsAggregateMembershipRequest request, CancellationToken cancellationToken)
         {
-            var totalPoints = _repository.EarnPoints(request.Id.Value, request.Type.Value, request.Points.Value);
-            return DefaultResponse.Success(totalPoints);
+            var aggregateMembership = await _repository.EarnPoints(request.Id.Value, request.Type.Value, request.Points.Value);
+            return DefaultResponse.Success(aggregateMembership);
         }
     }
 }

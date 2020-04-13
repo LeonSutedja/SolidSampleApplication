@@ -48,16 +48,12 @@ namespace SolidSampleApplication.Api
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IAggregateMembershipRepository, AggregateMembershipRepository>();
 
-            //services.AddMvc()
-            //    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateMembershipRequestValidator>());
-
             // fluent validation generic registration
             //services.AddMvc()
             //    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateMembershipRequestValidator>());
 
             services.AddTransient<IValidator<RegisterCustomerRequest>, RegisterCustomerRequestValidator>();
-            services.AddTransient<IValidator<CreateMembershipRequest>, CreateMembershipRequestValidator>();
-            services.AddTransient<IValidator<EarnPointsMembershipRequest>, EarnPointsMembershipHandlerValidator>();
+            services.AddTransient<IValidator<EarnPointsAggregateMembershipRequest>, EarnPointsAggregateMembershipHandlerValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
 
             // we are using sql lite in-memory database for this sample application purpose

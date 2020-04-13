@@ -10,7 +10,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
     {
         Task<IEnumerable<AggregateMembership>> GetAggregateMemberships();
 
-        AggregateMembership GetMembershipDetail(Guid membershipId);
+        Task<AggregateMembership> GetMembershipDetail(Guid membershipId);
 
         Task<AggregateMembership> EarnPoints(Guid id, MembershipPointsType type, double points);
     }
@@ -27,9 +27,10 @@ namespace SolidSampleApplication.Infrastructure.Repository
         public async Task<AggregateMembership> EarnPoints(Guid id, MembershipPointsType type, double points)
         {
             var membershipPointEvent = new MembershipPointsEarnedEvent(id, points, type);
-            _context.Add(membershipPointEvent);
+            var simpleEvent = SimpleApplicationEvent.New(membershipPointEvent, 1, DateTime.Now, "Sample");
+            _context.Add(simpleEvent);
             await _context.SaveChangesAsync();
-            throw new NotImplementedException();
+            return await GetMembershipDetail(id);
         }
 
         public async Task<IEnumerable<AggregateMembership>> GetAggregateMemberships()
@@ -39,9 +40,11 @@ namespace SolidSampleApplication.Infrastructure.Repository
             return entities;
         }
 
-        public AggregateMembership GetMembershipDetail(Guid membershipId)
+        public async Task<AggregateMembership> GetMembershipDetail(Guid membershipId)
         {
-            throw new NotImplementedException();
+            var genericFactory = new GenericEntityFactory<AggregateMembership>(_context);
+            var entity = await genericFactory.GetEntity<MembershipCreatedEvent, MembershipPointsEarnedEvent>(membershipId.ToString());
+            return entity;
         }
     }
 }

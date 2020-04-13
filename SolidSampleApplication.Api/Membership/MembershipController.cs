@@ -31,17 +31,19 @@ namespace SolidSampleApplication.Api.Membership
         [Route("{id}")]
         public async Task<ActionResult> GetMember(Guid id)
         {
-            return (await _mediator.Send(new GetMembershipRequest(id))).ActionResult;
+            return (await _mediator.Send(new GetAggregateMembershipRequest(id))).ActionResult;
         }
 
-        [HttpPost]
-        public async Task<ActionResult> CreateMembership(CreateMembershipRequest request)
+        [HttpPut]
+        [Route("points")]
+        public async Task<ActionResult> EarnPoints(EarnPointsAggregateMembershipRequest request)
         {
             return (await _mediator.Send(request)).ActionResult;
         }
 
         [HttpPut]
-        public async Task<ActionResult> EarnPoints(EarnPointsMembershipRequest request)
+        [Route("upgrade")]
+        public async Task<ActionResult> Upgrade(EarnPointsAggregateMembershipRequest request)
         {
             return (await _mediator.Send(request)).ActionResult;
         }
