@@ -17,25 +17,28 @@ namespace SolidSampleApplication.Infrastructure
             _context = context;
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllEntities<TCreationEvent, TEvent>(int max = 200)
-            where TCreationEvent : ISimpleEvent
-            where TEvent : ISimpleEvent
+        public async Task<IEnumerable<TEntity>> GetAllEntities(int max = 200)
         {
-            var tCreationEventName = typeof(TCreationEvent).AssemblyQualifiedName;
-            var tEventName = typeof(TEvent).AssemblyQualifiedName;
+            var interfaces = typeof(TEntity).GetInterfaces();
+            var implementedHasSimpleEventTypes = interfaces
+                .Where(i => i.Name.Contains("IHasSimpleEvent"))
+                .Select(i => i.GenericTypeArguments.First())
+                .ToList();
 
-            var eventList = new List<string>() { tCreationEventName, tEventName };
+            var assemblyQualifiedNameTypes = implementedHasSimpleEventTypes
+                .Select(i => i.AssemblyQualifiedName)
+                .ToList();
 
             // We get all the list first from applicationEvents
             var distinctEntityIds = await _context.ApplicationEvents
-                .Where(ae => eventList.Contains(ae.EntityType))
+                .Where(ae => assemblyQualifiedNameTypes.Contains(ae.EntityType))
                 .OrderByDescending(ae => ae.RequestedTime)
                 .Select(ae => ae.EntityId)
                 .Distinct()
                 .Take(max)
                 .ToListAsync();
 
-            var allEvents = (await _getApplicationEvents(distinctEntityIds, eventList)).GroupBy(allEvents => allEvents.EntityId);
+            var allEvents = (await _getApplicationEvents(distinctEntityIds, assemblyQualifiedNameTypes)).GroupBy(allEvents => allEvents.EntityId);
 
             var entityList = new List<TEntity>();
             foreach (var entityEvents in allEvents)
@@ -43,40 +46,32 @@ namespace SolidSampleApplication.Infrastructure
                 // Currently, we try to avoid using reflection (Activator.CreateInstance) to create entity.
                 // This is because of the performance impact from reflection.
                 var entity = new TEntity();
-                var creationEvent = GetSingleSimpleEventFromApplicationEvents<TCreationEvent>(entityEvents);
-                var otherEvents = GetSimpleEventsFromApplicationEvents<TEvent>(entityEvents);
-                ((IHasSimpleEvent<TCreationEvent>)entity).ApplyEvent(creationEvent);
-                otherEvents.ForEach((simpleEvent) => ((IHasSimpleEvent<TEvent>)entity).ApplyEvent(simpleEvent));
+                var implementedHasSimpleEvents = GetSimpleEventsFromApplicationEvents(entityEvents, assemblyQualifiedNameTypes);
+                implementedHasSimpleEvents.ForEach((simpleEvent) => ((dynamic)entity).ApplyEvent(simpleEvent));
                 entityList.Add(entity);
             }
             return entityList;
         }
 
-        public async Task<TEntity> GetEntity<TCreationEvent, TEvent>(string entityId)
-            where TCreationEvent : ISimpleEvent
-            where TEvent : ISimpleEvent
+        public async Task<TEntity> GetEntity(string entityId)
         {
-            var allEvents = await _getApplicationEvents(
-                new List<string>() { entityId },
-                new List<string>() { typeof(TCreationEvent).AssemblyQualifiedName, typeof(TEvent).AssemblyQualifiedName });
+            var interfaces = typeof(TEntity).GetInterfaces();
+            var implementedHasSimpleEventTypes = interfaces
+                .Where(i => i.Name.Contains("IHasSimpleEvent"))
+                .Select(i => i.GenericTypeArguments.First())
+                .ToList();
 
-            var entity = new TEntity();
-            var otherEvents = GetSimpleEventsFromApplicationEvents<TEvent>(allEvents);
-            var creationEvent = GetSingleSimpleEventFromApplicationEvents(allEvents, typeof(TCreationEvent).AssemblyQualifiedName);
-            ((dynamic)entity).ApplyEvent(creationEvent);
-            otherEvents.ForEach((simpleEvent) => ((dynamic)entity).ApplyEvent(simpleEvent));
-            return entity;
-        }
+            var assemblyQualifiedNameTypes = implementedHasSimpleEventTypes
+                .Select(i => i.AssemblyQualifiedName)
+                .ToList();
 
-        public async Task<TEntity> GetEntity(string entityId, List<string> assemblyQualifiedNameTypes)
-        {
             var allEvents = await _getApplicationEvents(
                 new List<string>() { entityId },
                 assemblyQualifiedNameTypes);
 
             var entity = new TEntity();
-            var otherEvents = GetSimpleEventsFromApplicationEvents(allEvents, assemblyQualifiedNameTypes);
-            otherEvents.ForEach((simpleEvent) => ((dynamic)entity).ApplyEvent(simpleEvent));
+            var implementedHasSimpleEvents = GetSimpleEventsFromApplicationEvents(allEvents, assemblyQualifiedNameTypes);
+            implementedHasSimpleEvents.ForEach((simpleEvent) => ((dynamic)entity).ApplyEvent(simpleEvent));
             return entity;
         }
 
@@ -90,15 +85,6 @@ namespace SolidSampleApplication.Infrastructure
             return allEvents;
         }
 
-        private List<TEvent> GetSimpleEventsFromApplicationEvents<TEvent>(IEnumerable<SimpleApplicationEvent> applicationEvents)
-        {
-            return applicationEvents
-                .Where(e => e.EntityType.Equals(typeof(TEvent).AssemblyQualifiedName))
-                .OrderBy(t => t.RequestedTime)
-                .Select(e => e.EntityJson.FromJson<TEvent>())
-                .ToList();
-        }
-
         private List<dynamic> GetSimpleEventsFromApplicationEvents(
             IEnumerable<SimpleApplicationEvent> applicationEvents,
             List<string> assemblyQualifiedNameTypes)
@@ -109,24 +95,6 @@ namespace SolidSampleApplication.Infrastructure
                 .ToList()
                 .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
                 .ToList();
-        }
-
-        private TEvent GetSingleSimpleEventFromApplicationEvents<TEvent>(IEnumerable<SimpleApplicationEvent> applicationEvents)
-        {
-            return applicationEvents
-                .FirstOrDefault(e => e.EntityType.Equals(typeof(TEvent).AssemblyQualifiedName))
-                .EntityJson
-                .FromJson<TEvent>();
-        }
-
-        private dynamic GetSingleSimpleEventFromApplicationEvents(IEnumerable<SimpleApplicationEvent> applicationEvents, string typeName)
-        {
-            var type = Type.GetType(typeName);
-            var eventObject = applicationEvents
-                .FirstOrDefault(e => e.EntityType.Equals(typeName))
-                .EntityJson
-                .FromJson(type);
-            return eventObject;
         }
     }
 }

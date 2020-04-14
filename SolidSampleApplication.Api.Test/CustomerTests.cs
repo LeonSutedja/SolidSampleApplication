@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Shouldly;
 using SolidSampleApplication.Api.Customers;
+using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure.Repository;
 using System;
 using System.Linq;
@@ -139,6 +140,15 @@ namespace SolidSampleApplication.Api.Test
             var content = await response.Content.ReadAsStringAsync();
             content.ShouldNotBeEmpty();
             _output.WriteLine(content);
+        }
+
+        [Fact]
+        public void Test()
+        {
+            var a = new Customer();
+            var interfaces = a.GetType().GetInterfaces();
+            var hasEventInterfaces = interfaces.Where(i => i.Name.Contains("IHasSimpleEvent")).ToList();
+            var implementedEvent = hasEventInterfaces.Select(i => i.GenericTypeArguments.First()).ToList();
         }
     }
 }

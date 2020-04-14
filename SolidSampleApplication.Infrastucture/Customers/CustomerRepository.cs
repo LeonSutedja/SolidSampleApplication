@@ -19,17 +19,14 @@ namespace SolidSampleApplication.Infrastructure.Repository
         public async Task<IEnumerable<Customer>> GetCustomers()
         {
             var genericFactory = new GenericEntityFactory<Customer>(_context);
-            var allCustomers = await genericFactory.GetAllEntities<CustomerRegisteredEvent, CustomerNameChangedEvent>();
+            var allCustomers = await genericFactory.GetAllEntities();
             return allCustomers;
         }
 
         public async Task<Customer> GetCustomer(Guid customerId)
         {
             var genericFactory = new GenericEntityFactory<Customer>(_context);
-            var customer = await genericFactory.GetEntity(
-                customerId.ToString(),
-                new List<string> { typeof(CustomerRegisteredEvent).AssemblyQualifiedName, typeof(CustomerNameChangedEvent).AssemblyQualifiedName });
-            //var customer = await genericFactory.GetEntity<CustomerRegisteredEvent, CustomerNameChangedEvent>(customerId.ToString());
+            var customer = await genericFactory.GetEntity(customerId.ToString());
             return customer;
         }
 

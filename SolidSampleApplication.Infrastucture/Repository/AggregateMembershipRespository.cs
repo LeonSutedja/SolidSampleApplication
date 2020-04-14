@@ -36,14 +36,14 @@ namespace SolidSampleApplication.Infrastructure.Repository
         public async Task<IEnumerable<AggregateMembership>> GetAggregateMemberships()
         {
             var genericFactory = new GenericEntityFactory<AggregateMembership>(_context);
-            var entities = await genericFactory.GetAllEntities<MembershipCreatedEvent, MembershipPointsEarnedEvent>();
+            var entities = await genericFactory.GetAllEntities();
             return entities;
         }
 
         public async Task<AggregateMembership> GetMembershipDetail(Guid membershipId)
         {
             var genericFactory = new GenericEntityFactory<AggregateMembership>(_context);
-            var entity = await genericFactory.GetEntity<MembershipCreatedEvent, MembershipPointsEarnedEvent>(membershipId.ToString());
+            var entity = await genericFactory.GetEntity(membershipId.ToString());
             return entity;
         }
     }
