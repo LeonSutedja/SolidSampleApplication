@@ -6,15 +6,6 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Infrastructure.Repository
 {
-    public interface IAggregateMembershipRepository
-    {
-        Task<IEnumerable<AggregateMembership>> GetAggregateMemberships();
-
-        Task<AggregateMembership> GetMembershipDetail(Guid membershipId);
-
-        Task<AggregateMembership> EarnPoints(Guid id, MembershipPointsType type, double points);
-    }
-
     public class AggregateMembershipRepository : IAggregateMembershipRepository
     {
         private readonly SimpleEventStoreDbContext _context;

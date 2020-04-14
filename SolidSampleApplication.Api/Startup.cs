@@ -47,7 +47,6 @@ namespace SolidSampleApplication.Api
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
 
             // As sqllite db context is scoped, repository must become scoped as well
-            services.AddScoped<IMembershipRepository, MembershipRepository>();
             services.AddScoped<IAggregateMembershipRepository, AggregateMembershipRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
 

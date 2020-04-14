@@ -44,7 +44,6 @@ namespace SolidSampleApplication.Api
             services.AddMediatR(mainAssembly);
             services.AddEnumerableInterfacesAsSingleton<IHealthcheckSystem>(mainAssembly);
 
-            services.AddSingleton<IMembershipRepository, MembershipRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IAggregateMembershipRepository, AggregateMembershipRepository>();
 
