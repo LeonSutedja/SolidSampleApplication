@@ -44,8 +44,7 @@ namespace SolidSampleApplication.Api
             services.AddMediatR(mainAssembly);
             services.AddEnumerableInterfacesAsSingleton<IHealthcheckSystem>(mainAssembly);
 
-            services.AddScoped<ICustomerRepository, CustomerRepository>();
-            services.AddScoped<IAggregateMembershipRepository, AggregateMembershipRepository>();
+            services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");
 
             // fluent validation generic registration
             //services.AddMvc()

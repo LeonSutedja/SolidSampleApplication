@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -31,6 +32,39 @@ namespace SolidSampleApplication.Infrastructure
                 var interfaceType = t.GetInterfaces().First(i => i.GetGenericTypeDefinition() == typeof(T));
                 services.TryAddEnumerable(ServiceDescriptor.Singleton(interfaceType, t));
             }
+        }
+
+        public static void AddImplementedInterfacesNameEndsWith(this IServiceCollection services, Assembly assembly, string endsWith, ServiceLifetime serviceLifeTime = ServiceLifetime.Scoped)
+        {
+            var allAssemblies = _getAllReferencedAssemblies(assembly);
+            var allTypes = allAssemblies
+                .SelectMany(a => a.GetTypes()
+                    .Where(x =>
+                        !x.IsAbstract &&
+                        !x.IsInterface &&
+                        x.GetInterfaces().Any(i => i.Name.EndsWith(endsWith))))
+                .ToList();
+            foreach (var t in allTypes)
+            {
+                var interfaceType = t.GetInterfaces().First(i => i.Name.EndsWith(endsWith));
+                if (serviceLifeTime == ServiceLifetime.Scoped)
+                    services.TryAddEnumerable(ServiceDescriptor.Scoped(interfaceType, t));
+                if (serviceLifeTime == ServiceLifetime.Transient)
+                    services.TryAddEnumerable(ServiceDescriptor.Transient(interfaceType, t));
+                else
+                    services.TryAddEnumerable(ServiceDescriptor.Singleton(interfaceType, t));
+            }
+        }
+
+        private static List<Assembly> _getAllReferencedAssemblies(Assembly mainAssembly)
+        {
+            var assembliesName = mainAssembly
+                .GetReferencedAssemblies()
+                .Where(a => a.Name.Contains("SolidSampleApplication"))
+                .ToList();
+            var loadedAssemblies = assembliesName.Select(a => Assembly.Load(a)).ToList();
+            loadedAssemblies.Add(mainAssembly);
+            return loadedAssemblies.ToList();
         }
     }
 }
