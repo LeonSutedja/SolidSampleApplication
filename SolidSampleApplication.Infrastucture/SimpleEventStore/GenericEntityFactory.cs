@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastucture;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,8 +21,8 @@ namespace SolidSampleApplication.Infrastructure
             where TCreationEvent : ISimpleEvent
             where TEvent : ISimpleEvent
         {
-            var tCreationEventName = typeof(TCreationEvent).Name;
-            var tEventName = typeof(TEvent).Name;
+            var tCreationEventName = typeof(TCreationEvent).AssemblyQualifiedName;
+            var tEventName = typeof(TEvent).AssemblyQualifiedName;
 
             var eventList = new List<string>() { tCreationEventName, tEventName };
 
@@ -57,12 +58,24 @@ namespace SolidSampleApplication.Infrastructure
         {
             var allEvents = await _getApplicationEvents(
                 new List<string>() { entityId },
-                new List<string>() { typeof(TCreationEvent).Name, typeof(TEvent).Name });
+                new List<string>() { typeof(TCreationEvent).AssemblyQualifiedName, typeof(TEvent).AssemblyQualifiedName });
 
             var entity = new TEntity();
-            var creationEvent = GetSingleSimpleEventFromApplicationEvents<TCreationEvent>(allEvents);
             var otherEvents = GetSimpleEventsFromApplicationEvents<TEvent>(allEvents);
+            var creationEvent = GetSingleSimpleEventFromApplicationEvents(allEvents, typeof(TCreationEvent).AssemblyQualifiedName);
             ((dynamic)entity).ApplyEvent(creationEvent);
+            otherEvents.ForEach((simpleEvent) => ((dynamic)entity).ApplyEvent(simpleEvent));
+            return entity;
+        }
+
+        public async Task<TEntity> GetEntity(string entityId, List<string> assemblyQualifiedNameTypes)
+        {
+            var allEvents = await _getApplicationEvents(
+                new List<string>() { entityId },
+                assemblyQualifiedNameTypes);
+
+            var entity = new TEntity();
+            var otherEvents = GetSimpleEventsFromApplicationEvents(allEvents, assemblyQualifiedNameTypes);
             otherEvents.ForEach((simpleEvent) => ((dynamic)entity).ApplyEvent(simpleEvent));
             return entity;
         }
@@ -80,18 +93,40 @@ namespace SolidSampleApplication.Infrastructure
         private List<TEvent> GetSimpleEventsFromApplicationEvents<TEvent>(IEnumerable<SimpleApplicationEvent> applicationEvents)
         {
             return applicationEvents
-                .Where(e => e.EntityType.Equals(typeof(TEvent).Name))
+                .Where(e => e.EntityType.Equals(typeof(TEvent).AssemblyQualifiedName))
                 .OrderBy(t => t.RequestedTime)
                 .Select(e => e.EntityJson.FromJson<TEvent>())
+                .ToList();
+        }
+
+        private List<dynamic> GetSimpleEventsFromApplicationEvents(
+            IEnumerable<SimpleApplicationEvent> applicationEvents,
+            List<string> assemblyQualifiedNameTypes)
+        {
+            return applicationEvents
+                .Where(e => assemblyQualifiedNameTypes.Contains(e.EntityType))
+                .OrderBy(t => t.RequestedTime)
+                .ToList()
+                .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
                 .ToList();
         }
 
         private TEvent GetSingleSimpleEventFromApplicationEvents<TEvent>(IEnumerable<SimpleApplicationEvent> applicationEvents)
         {
             return applicationEvents
-                .FirstOrDefault(e => e.EntityType.Equals(typeof(TEvent).Name))
+                .FirstOrDefault(e => e.EntityType.Equals(typeof(TEvent).AssemblyQualifiedName))
                 .EntityJson
                 .FromJson<TEvent>();
+        }
+
+        private dynamic GetSingleSimpleEventFromApplicationEvents(IEnumerable<SimpleApplicationEvent> applicationEvents, string typeName)
+        {
+            var type = Type.GetType(typeName);
+            var eventObject = applicationEvents
+                .FirstOrDefault(e => e.EntityType.Equals(typeName))
+                .EntityJson
+                .FromJson(type);
+            return eventObject;
         }
     }
 }

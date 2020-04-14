@@ -53,7 +53,7 @@ namespace SolidSampleApplication.Api
             //    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateMembershipRequestValidator>());
 
             services.AddTransient<IValidator<RegisterCustomerRequest>, RegisterCustomerRequestValidator>();
-            services.AddTransient<IValidator<EarnPointsAggregateMembershipRequest>, EarnPointsAggregateMembershipHandlerValidator>();
+            services.AddTransient<IValidator<EarnPointsAggregateMembershipRequest>, EarnPointsAggregateMembershipRequestValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
 
             // we are using sql lite in-memory database for this sample application purpose

@@ -70,9 +70,9 @@ namespace SolidSampleApplication.Api.Membership
         }
     }
 
-    public class EarnPointsAggregateMembershipHandlerValidator : AbstractValidator<EarnPointsAggregateMembershipRequest>
+    public class EarnPointsAggregateMembershipRequestValidator : AbstractValidator<EarnPointsAggregateMembershipRequest>
     {
-        public EarnPointsAggregateMembershipHandlerValidator()
+        public EarnPointsAggregateMembershipRequestValidator()
         {
             RuleFor(x => x.Id).NotNull();
             RuleFor(x => x.Points).NotNull();

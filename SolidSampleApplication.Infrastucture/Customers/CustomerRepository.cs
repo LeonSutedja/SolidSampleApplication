@@ -26,7 +26,10 @@ namespace SolidSampleApplication.Infrastructure.Repository
         public async Task<Customer> GetCustomer(Guid customerId)
         {
             var genericFactory = new GenericEntityFactory<Customer>(_context);
-            var customer = await genericFactory.GetEntity<CustomerRegisteredEvent, CustomerNameChangedEvent>(customerId.ToString());
+            var customer = await genericFactory.GetEntity(
+                customerId.ToString(),
+                new List<string> { typeof(CustomerRegisteredEvent).AssemblyQualifiedName, typeof(CustomerNameChangedEvent).AssemblyQualifiedName });
+            //var customer = await genericFactory.GetEntity<CustomerRegisteredEvent, CustomerNameChangedEvent>(customerId.ToString());
             return customer;
         }
 

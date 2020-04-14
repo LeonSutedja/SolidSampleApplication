@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace SolidSampleApplication.Infrastructure
@@ -10,6 +11,12 @@ namespace SolidSampleApplication.Infrastructure
 
         public static T FromJson<T>(this string toDeserialized)
             => JsonConvert.DeserializeObject<T>(toDeserialized);
+
+        public static object? FromJson(this string toDeserialized, Type type)
+            => JsonConvert.DeserializeObject(toDeserialized, type);
+
+        public static object? FromJson(this string toDeserialized)
+            => JsonConvert.DeserializeObject(toDeserialized);
 
         public static string TryGetId<T>(this T item, string defaultReturn)
         {

@@ -43,7 +43,7 @@ namespace SolidSampleApplication.Api
             // we want to use mediatr pipeline to help with the fluent validation, rather than attaching it to the mvc.
             // This is because, we want the mediatr pipeline to be triggered first.
             services.AddTransient<IValidator<RegisterCustomerRequest>, RegisterCustomerRequestValidator>();
-            services.AddTransient<IValidator<EarnPointsAggregateMembershipRequest>, EarnPointsAggregateMembershipHandlerValidator>();
+            services.AddTransient<IValidator<EarnPointsAggregateMembershipRequest>, EarnPointsAggregateMembershipRequestValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
 
             // As sqllite db context is scoped, repository must become scoped as well

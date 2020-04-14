@@ -8,7 +8,7 @@ namespace SolidSampleApplication.Infrastucture
         public static SimpleApplicationEvent New<TEntity>(TEntity entity, int entityTypeVersion, DateTime requestedTime, string requestedBy)
         {
             var stringifyId = entity.TryGetId("No Id");
-            return new SimpleApplicationEvent(Guid.NewGuid(), stringifyId, entity.GetType().Name, entity.ToJson(), entityTypeVersion, requestedTime, requestedBy);
+            return new SimpleApplicationEvent(Guid.NewGuid(), stringifyId, entity.GetType().AssemblyQualifiedName, entity.ToJson(), entityTypeVersion, requestedTime, requestedBy);
         }
 
         public Guid Id { get; private set; }

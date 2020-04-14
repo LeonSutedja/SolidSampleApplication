@@ -103,7 +103,7 @@ namespace SolidSampleApplication.Api.Test
             var currentVersion = member.Version;
             var pointsToAdd = 50;
             var request = new EarnPointsAggregateMembershipRequest(member.Membership.Id, Core.MembershipPointsType.Movie, pointsToAdd);
-            var response = await _client.PutRequestAsStringContent("/Membership", request);
+            var response = await _client.PutRequestAsStringContent("/Membership/points", request);
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             _output.WriteLine(content);
