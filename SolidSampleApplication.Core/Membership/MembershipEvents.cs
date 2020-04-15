@@ -32,7 +32,7 @@ namespace SolidSampleApplication.Core
     }
 
     public class MembershipLevelUpgradeEvent : ISimpleEvent
-    {   // membership id
+    {
         public Guid Id { get; private set; }
 
         public MembershipLevelUpgradeEvent(Guid id)
@@ -42,7 +42,7 @@ namespace SolidSampleApplication.Core
     }
 
     public class MembershipLevelDowngradeEvent : ISimpleEvent
-    {   // membership id
+    {
         public Guid Id { get; private set; }
 
         public MembershipLevelDowngradeEvent(Guid id)

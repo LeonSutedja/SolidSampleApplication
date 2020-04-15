@@ -49,6 +49,10 @@ namespace SolidSampleApplication.Infrastucture
             var charlotteMembershipCreated = new MembershipCreatedEvent(Guid.NewGuid(), charlotte.Id);
             var mia = new CustomerRegisteredEvent(Guid.NewGuid(), "milee", "Mia", "Lee", "mialee@sampleemail.com");
             var miaMembershipCreated = new MembershipCreatedEvent(Guid.NewGuid(), mia.Id);
+            var miaMembershipPoint1 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 10, MembershipPointsType.Movie);
+            var miaMembershipPoint2 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 40, MembershipPointsType.Movie);
+            var miaMembershipPoint3 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 20, MembershipPointsType.Music);
+            var miaUpgradeMembership = new MembershipLevelUpgradeEvent(miaMembershipCreated.Id);
 
             var apocalypsoNameChanged = new CustomerNameChangedEvent(apocalypso.Id, "Apocal", "Lypso");
             var aphroditeNameChanged = new CustomerNameChangedEvent(aphrodite.Id, "Aphrod", "Ite");
@@ -79,7 +83,12 @@ namespace SolidSampleApplication.Infrastucture
                     SimpleApplicationEvent.New(charlotteMembershipCreated, 1, DateTime.Now.AddDays(-13), requestedBy),
                     SimpleApplicationEvent.New(olivia, 1, DateTime.Now.AddDays(-10), requestedBy),
                     SimpleApplicationEvent.New(oliviaMembershipCreated, 1, DateTime.Now.AddDays(-10), requestedBy),
-                    SimpleApplicationEvent.New(apocalypsoNameChanged3, 1, DateTime.Now.AddDays(-10), requestedBy)
+                    SimpleApplicationEvent.New(apocalypsoNameChanged3, 1, DateTime.Now.AddDays(-10), requestedBy),
+                    SimpleApplicationEvent.New(miaMembershipPoint1, 1, DateTime.Now.AddDays(-10), requestedBy),
+                    SimpleApplicationEvent.New(miaMembershipPoint2, 1, DateTime.Now.AddDays(-10), requestedBy),
+                    SimpleApplicationEvent.New(miaMembershipPoint3, 1, DateTime.Now.AddDays(-10), requestedBy),
+                    SimpleApplicationEvent.New(miaUpgradeMembership, 1, DateTime.Now.AddDays(-9), requestedBy),
+                    SimpleApplicationEvent.New(miaUpgradeMembership, 1, DateTime.Now.AddDays(-8), requestedBy)
               );
         }
     }

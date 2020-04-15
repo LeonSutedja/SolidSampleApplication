@@ -6,7 +6,9 @@ namespace SolidSampleApplication.Core
     public class AggregateMembership :
         IEntityEvent,
         IHasSimpleEvent<MembershipCreatedEvent>,
-        IHasSimpleEvent<MembershipPointsEarnedEvent>
+        IHasSimpleEvent<MembershipPointsEarnedEvent>,
+        IHasSimpleEvent<MembershipLevelUpgradeEvent>,
+        IHasSimpleEvent<MembershipLevelDowngradeEvent>
     {
         public Membership Membership { get; private set; }
         public List<MembershipPoint> Points { get; private set; }
@@ -31,6 +33,18 @@ namespace SolidSampleApplication.Core
             Membership = Membership.New(simpleEvent.Id, MembershipType.Level1, simpleEvent.CustomerId);
             Version = 1;
             TotalPoints = 0;
+        }
+
+        public void ApplyEvent(MembershipLevelUpgradeEvent simpleEvent)
+        {
+            Membership.UpgradeMembership();
+            Version++;
+        }
+
+        public void ApplyEvent(MembershipLevelDowngradeEvent simpleEvent)
+        {
+            Membership.DowngradeMembership();
+            Version++;
         }
     }
 }

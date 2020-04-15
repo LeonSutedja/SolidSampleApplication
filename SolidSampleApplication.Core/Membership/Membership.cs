@@ -19,5 +19,23 @@ namespace SolidSampleApplication.Core
             Type = type;
             CustomerId = customerId;
         }
+
+        public void UpgradeMembership()
+        {
+            Type = (Type == MembershipType.Level1)
+                ? MembershipType.Level2
+                : (Type == MembershipType.Level2)
+                    ? MembershipType.Level3
+                    : Type;
+        }
+
+        public void DowngradeMembership()
+        {
+            Type = (Type == MembershipType.Level3)
+                ? MembershipType.Level2
+                : (Type == MembershipType.Level2)
+                    ? MembershipType.Level1
+                    : Type;
+        }
     }
 }
