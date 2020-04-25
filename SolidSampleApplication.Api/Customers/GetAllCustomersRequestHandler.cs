@@ -1,6 +1,7 @@
 ﻿using MediatR;
-using SolidSampleApplication.Infrastructure.Repository;
+using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Infrastructure.Shared;
+using SolidSampleApplication.ReadModelStore;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,14 +13,14 @@ namespace SolidSampleApplication.Api.Customers
 
     public class GetAllCustomersRequestHandler : IRequestHandler<GetAllCustomersRequest, DefaultResponse>
     {
-        private readonly ICustomerRepository _repository;
+        private readonly ReadModelDbContext _readModelDbContext;
 
-        public GetAllCustomersRequestHandler(ICustomerRepository repository)
+        public GetAllCustomersRequestHandler(ReadModelDbContext readModelDbContext)
         {
-            _repository = repository;
+            _readModelDbContext = readModelDbContext;
         }
 
         public async Task<DefaultResponse> Handle(GetAllCustomersRequest request, CancellationToken cancellationToken)
-            => DefaultResponse.Success(await _repository.GetCustomers());
+            => DefaultResponse.Success(await _readModelDbContext.Customers.ToListAsync());
     }
 }

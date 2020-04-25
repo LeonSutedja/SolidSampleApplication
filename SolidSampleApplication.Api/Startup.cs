@@ -15,6 +15,7 @@ using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastucture;
+using SolidSampleApplication.ReadModelStore;
 using System.Linq;
 using System.Reflection;
 
@@ -76,7 +77,7 @@ namespace SolidSampleApplication.Api
 
             var readonlyDbContextConnection = new SqliteConnection("Data Source=:memory:");
             readonlyDbContextConnection.Open();
-            services.AddDbContext<ReadOnlyDbContext>(
+            services.AddDbContext<ReadModelDbContext>(
                 options => options.UseSqlite(readonlyDbContextConnection));
         }
 
@@ -110,21 +111,21 @@ namespace SolidSampleApplication.Api
                 eventStoreDbContext.Database.EnsureCreated();
 
                 // readonly initialization hack for sample purpose
-                var readOnlyDbContext = serviceScope.ServiceProvider.GetService<ReadOnlyDbContext>();
-                readOnlyDbContext.Database.EnsureCreated();
+                var readModelDbContext = serviceScope.ServiceProvider.GetService<ReadModelDbContext>();
+                readModelDbContext.Database.EnsureCreated();
 
                 var customerFactory = new GenericEntityFactory<Customer>(eventStoreDbContext);
-                var customers = customerFactory.GetAllEntities().Result;
-                readOnlyDbContext.Customers.AddRange(customers);
+                var customerEntities = customerFactory.GetAllEntities().Result;
+                var customerReadModels = customerEntities.Select(c => CustomerReadModel.FromAggregate(c));
+                readModelDbContext.Customers.AddRange(customerReadModels);
 
                 // As aggregate membership is a readmodel, we initialize it like this.
                 var aggregateMembershipFactory = new GenericEntityFactory<AggregateMembership>(eventStoreDbContext);
-                var aggregateMemberships = aggregateMembershipFactory.GetAllEntities().Result;
-                var memberships = aggregateMemberships.Select(a => a.Membership);
-                var points = aggregateMemberships.SelectMany(a => a.Points);
-                readOnlyDbContext.Memberships.AddRange(memberships);
-                readOnlyDbContext.MembershipPoints.AddRange(points);
-                readOnlyDbContext.SaveChanges();
+                var aggregateMembershipEntities = aggregateMembershipFactory.GetAllEntities().Result;
+                var aggregateMembershipReadModels = aggregateMembershipEntities.Select(am => AggregateMembershipReadModel.FromAggregate(am));
+                readModelDbContext.Memberships.AddRange(aggregateMembershipReadModels);
+
+                readModelDbContext.SaveChanges();
             }
         }
     }

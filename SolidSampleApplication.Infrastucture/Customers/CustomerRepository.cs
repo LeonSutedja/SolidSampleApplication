@@ -11,17 +11,16 @@ namespace SolidSampleApplication.Infrastructure.Repository
     public class CustomerRepository : ICustomerRepository
     {
         private readonly SimpleEventStoreDbContext _context;
-        private readonly ReadOnlyDbContext _readOnlyContext;
 
-        public CustomerRepository(SimpleEventStoreDbContext context, ReadOnlyDbContext readOnlyContext)
+        public CustomerRepository(SimpleEventStoreDbContext context)
         {
             _context = context;
-            _readOnlyContext = readOnlyContext;
         }
 
         public async Task<IEnumerable<Customer>> GetCustomers()
         {
-            var allCustomers = await _readOnlyContext.Customers.AsNoTracking().ToListAsync();
+            var genericFactory = new GenericEntityFactory<Customer>(_context);
+            var allCustomers = await genericFactory.GetAllEntities();
             return allCustomers;
         }
 

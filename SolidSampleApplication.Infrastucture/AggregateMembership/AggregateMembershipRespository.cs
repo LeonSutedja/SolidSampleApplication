@@ -28,6 +28,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
         {
             var genericFactory = new GenericEntityFactory<AggregateMembership>(_context);
             var entities = await genericFactory.GetAllEntities();
+            //var allEntties = _readOnlyDbContext.
             return entities;
         }
 
