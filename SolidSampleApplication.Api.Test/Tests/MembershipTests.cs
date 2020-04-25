@@ -33,7 +33,7 @@ namespace SolidSampleApplication.Api.Test
         {
             dynamic jsonDynamicList = JValue.Parse(jsonList);
             var count = 0;
-            foreach (var jsonItem in jsonDynamicList)
+            foreach(var jsonItem in jsonDynamicList)
             {
                 action(jsonItem, count);
                 count++;
@@ -53,7 +53,7 @@ namespace SolidSampleApplication.Api.Test
 
             ActionJsonStringList(content, (aggregateMembership, index) =>
             {
-                _output.WriteLine($"{index} - {aggregateMembership.membership.id}, {aggregateMembership.membership.customerId}: {aggregateMembership.membership.points}");
+                _output.WriteLine($"{index} - {aggregateMembership.id}, {aggregateMembership.customerId}: {aggregateMembership.points}");
                 count = index;
             });
 
@@ -67,7 +67,7 @@ namespace SolidSampleApplication.Api.Test
                 .ToList()
                 .Select(m => m.Membership.Id);
 
-            foreach (var id in idLists)
+            foreach(var id in idLists)
             {
                 _output.WriteLine($"Getting id: {id}");
                 var responseWithId = await _client.GetAsync($"/Membership/{id}");

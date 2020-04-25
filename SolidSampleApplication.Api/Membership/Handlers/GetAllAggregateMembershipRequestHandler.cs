@@ -1,6 +1,7 @@
 ﻿using MediatR;
-using SolidSampleApplication.Infrastructure.Repository;
+using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Infrastructure.Shared;
+using SolidSampleApplication.ReadModelStore;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,16 +13,16 @@ namespace SolidSampleApplication.Api.Membership
 
     public class GetAllAggregateMembershipRequestHandler : IRequestHandler<GetAllAggregateMembershipRequest, DefaultResponse>
     {
-        private readonly IAggregateMembershipRepository _repository;
+        private readonly ReadModelDbContext _readModelDbContext;
 
-        public GetAllAggregateMembershipRequestHandler(IAggregateMembershipRepository repository)
+        public GetAllAggregateMembershipRequestHandler(ReadModelDbContext readModelDbContext)
         {
-            _repository = repository;
+            _readModelDbContext = readModelDbContext;
         }
 
         public async Task<DefaultResponse> Handle(GetAllAggregateMembershipRequest request, CancellationToken cancellationToken)
         {
-            return DefaultResponse.Success(await _repository.GetAggregateMemberships());
+            return DefaultResponse.Success(await _readModelDbContext.Memberships.Include(m => m.Points).ToListAsync());
         }
     }
 }

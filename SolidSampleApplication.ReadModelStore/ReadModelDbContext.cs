@@ -15,14 +15,5 @@ namespace SolidSampleApplication.ReadModelStore
         public ReadModelDbContext(DbContextOptions<ReadModelDbContext> options)
             : base(options)
         { }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            SeedMembership(modelBuilder);
-        }
-
-        private void SeedMembership(ModelBuilder modelBuilder)
-        {
-        }
     }
 }
