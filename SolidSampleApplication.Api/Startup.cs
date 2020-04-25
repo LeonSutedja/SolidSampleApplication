@@ -30,6 +30,20 @@ namespace SolidSampleApplication.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // this allow call from other domain for CORS
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.WithOrigins(
+                        "http://localhost",
+                        "http://localhost:4200")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+                });
+            });
+
             var mainAssembly = typeof(Startup).GetTypeInfo().Assembly;
             services.AddControllers();
             services.AddMediatR(mainAssembly);
@@ -62,7 +76,7 @@ namespace SolidSampleApplication.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if(env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -70,6 +84,8 @@ namespace SolidSampleApplication.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthorization();
 
@@ -81,7 +97,7 @@ namespace SolidSampleApplication.Api
             // NOTE: this must go at the end of Configure
             // ensure db is created
             var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
-            using (var serviceScope = serviceScopeFactory.CreateScope())
+            using(var serviceScope = serviceScopeFactory.CreateScope())
             {
                 var dbContext = serviceScope.ServiceProvider.GetService<SimpleEventStoreDbContext>();
                 dbContext.Database.EnsureCreated();
