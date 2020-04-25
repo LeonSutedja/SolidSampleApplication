@@ -16,11 +16,6 @@ namespace SolidSampleApplication.Api.Membership
             _mediator = mediator;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
         [HttpGet]
         public async Task<ActionResult> GetMemberships()
         {
