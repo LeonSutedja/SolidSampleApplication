@@ -11,9 +11,11 @@ using SolidSampleApplication.Api.Customers;
 using SolidSampleApplication.Api.Healthcheck;
 using SolidSampleApplication.Api.Membership;
 using SolidSampleApplication.Api.Shared;
+using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastucture;
+using System.Linq;
 using System.Reflection;
 
 namespace SolidSampleApplication.Api
@@ -71,6 +73,11 @@ namespace SolidSampleApplication.Api
             inMemorySqlite.Open();
             services.AddDbContext<SimpleEventStoreDbContext>(
                 options => options.UseSqlite(inMemorySqlite));
+
+            var readonlyDbContextConnection = new SqliteConnection("Data Source=:memory:");
+            readonlyDbContextConnection.Open();
+            services.AddDbContext<ReadOnlyDbContext>(
+                options => options.UseSqlite(readonlyDbContextConnection));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -99,8 +106,25 @@ namespace SolidSampleApplication.Api
             var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
             using(var serviceScope = serviceScopeFactory.CreateScope())
             {
-                var dbContext = serviceScope.ServiceProvider.GetService<SimpleEventStoreDbContext>();
-                dbContext.Database.EnsureCreated();
+                var eventStoreDbContext = serviceScope.ServiceProvider.GetService<SimpleEventStoreDbContext>();
+                eventStoreDbContext.Database.EnsureCreated();
+
+                // readonly initialization hack for sample purpose
+                var readOnlyDbContext = serviceScope.ServiceProvider.GetService<ReadOnlyDbContext>();
+                readOnlyDbContext.Database.EnsureCreated();
+
+                var customerFactory = new GenericEntityFactory<Customer>(eventStoreDbContext);
+                var customers = customerFactory.GetAllEntities().Result;
+                readOnlyDbContext.Customers.AddRange(customers);
+
+                // As aggregate membership is a readmodel, we initialize it like this.
+                var aggregateMembershipFactory = new GenericEntityFactory<AggregateMembership>(eventStoreDbContext);
+                var aggregateMemberships = aggregateMembershipFactory.GetAllEntities().Result;
+                var memberships = aggregateMemberships.Select(a => a.Membership);
+                var points = aggregateMemberships.SelectMany(a => a.Points);
+                readOnlyDbContext.Memberships.AddRange(memberships);
+                readOnlyDbContext.MembershipPoints.AddRange(points);
+                readOnlyDbContext.SaveChanges();
             }
         }
     }

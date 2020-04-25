@@ -21,13 +21,13 @@ namespace SolidSampleApplication.Core
 
         public double Amount { get; private set; }
 
-        public MembershipPointsType Type { get; private set; }
+        public MembershipPointsType PointsType { get; private set; }
 
-        public MembershipPointsEarnedEvent(Guid id, double amount, MembershipPointsType type)
+        public MembershipPointsEarnedEvent(Guid id, double amount, MembershipPointsType pointsType)
         {
             Id = id;
             Amount = amount;
-            Type = type;
+            PointsType = pointsType;
         }
     }
 

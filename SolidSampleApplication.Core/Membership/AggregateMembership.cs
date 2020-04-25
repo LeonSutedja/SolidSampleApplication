@@ -12,7 +12,7 @@ namespace SolidSampleApplication.Core
     {
         public Membership Membership { get; private set; }
         public List<MembershipPoint> Points { get; private set; }
-        public double TotalPoints { get; private set; }
+        public double TotalPoints => Points.Sum(p => p.Amount);
         public int Version { get; private set; }
 
         public AggregateMembership()
@@ -20,11 +20,16 @@ namespace SolidSampleApplication.Core
             Points = new List<MembershipPoint>();
         }
 
+        public AggregateMembership(Membership membership, List<MembershipPoint> points)
+        {
+            Membership = membership;
+            Points = points;
+        }
+
         public void ApplyEvent(MembershipPointsEarnedEvent simpleEvent)
         {
-            var point = MembershipPoint.New(simpleEvent.Id, simpleEvent.Amount, simpleEvent.Type);
+            var point = MembershipPoint.New(simpleEvent.Id, simpleEvent.Amount, simpleEvent.PointsType);
             Points.Add(point);
-            TotalPoints = Points.Sum(p => p.Amount);
             Version++;
         }
 
@@ -32,7 +37,6 @@ namespace SolidSampleApplication.Core
         {
             Membership = Membership.New(simpleEvent.Id, MembershipType.Level1, simpleEvent.CustomerId);
             Version = 1;
-            TotalPoints = 0;
         }
 
         public void ApplyEvent(MembershipLevelUpgradeEvent simpleEvent)

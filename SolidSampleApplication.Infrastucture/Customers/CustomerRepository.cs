@@ -1,4 +1,5 @@
-﻿using SolidSampleApplication.Core;
+﻿using Microsoft.EntityFrameworkCore;
+using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastucture;
 using System;
 using System.Collections.Generic;
@@ -10,16 +11,17 @@ namespace SolidSampleApplication.Infrastructure.Repository
     public class CustomerRepository : ICustomerRepository
     {
         private readonly SimpleEventStoreDbContext _context;
+        private readonly ReadOnlyDbContext _readOnlyContext;
 
-        public CustomerRepository(SimpleEventStoreDbContext context)
+        public CustomerRepository(SimpleEventStoreDbContext context, ReadOnlyDbContext readOnlyContext)
         {
             _context = context;
+            _readOnlyContext = readOnlyContext;
         }
 
         public async Task<IEnumerable<Customer>> GetCustomers()
         {
-            var genericFactory = new GenericEntityFactory<Customer>(_context);
-            var allCustomers = await genericFactory.GetAllEntities();
+            var allCustomers = await _readOnlyContext.Customers.AsNoTracking().ToListAsync();
             return allCustomers;
         }
 
