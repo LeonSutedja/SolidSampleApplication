@@ -1,8 +1,12 @@
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Shouldly;
 using SolidSampleApplication.Api.Customers;
 using SolidSampleApplication.Core;
+using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.Repository;
+using SolidSampleApplication.Infrastucture;
+using SolidSampleApplication.ReadModelStore;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -34,7 +38,7 @@ namespace SolidSampleApplication.Api.Test
         {
             dynamic jsonDynamicList = JValue.Parse(jsonList);
             var count = 0;
-            foreach (var jsonItem in jsonDynamicList)
+            foreach(var jsonItem in jsonDynamicList)
             {
                 action(jsonItem, count);
                 count++;
@@ -91,6 +95,7 @@ namespace SolidSampleApplication.Api.Test
         [Fact]
         public async Task RegisterCustomer_ShouldReturn_Ok()
         {
+            // arrange
             var request = new RegisterCustomerRequest()
             {
                 Username = "test",
@@ -99,7 +104,10 @@ namespace SolidSampleApplication.Api.Test
                 Email = "email@email.com.au"
             };
 
+            // act
             var response = await _client.PostRequestAsStringContent("/customers", request);
+
+            // assert
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
@@ -110,6 +118,48 @@ namespace SolidSampleApplication.Api.Test
             jsonObject.ShouldContainKeyAndValue("username", request.Username);
             jsonObject.ShouldContainKeyAndValue("firstName", request.FirstName);
             jsonObject.ShouldContainKeyAndValue("lastName", request.LastName);
+        }
+
+        [Fact]
+        public async Task RegisterCustomer_ShouldCreateMembership_Ok()
+        {
+            // arrange
+            var request = new RegisterCustomerRequest()
+            {
+                Username = "test",
+                FirstName = "NewFirstname",
+                LastName = "NewLastname",
+                Email = "email@email.com.au"
+            };
+
+            // act
+            var response = await _client.PostRequestAsStringContent("/customers", request);
+
+            // assert
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            content.ShouldNotBeEmpty();
+            _output.WriteLine(content);
+
+            var jsonObject = JObject.Parse(content);
+            var customerIdAsString = jsonObject["id"].ToString();
+            Guid customerIdGuid;
+            Guid.TryParse(customerIdAsString, out customerIdGuid);
+
+            var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+            var membership = readModelContext.Memberships.FirstOrDefault(m => m.CustomerId == customerIdGuid);
+            membership.ShouldNotBeNull();
+            membership.TotalPoints.ShouldBe(0);
+            membership.Version.ShouldBe(1);
+            var membershipId = membership.Id;
+
+            var eventStoreDbContext = (SimpleEventStoreDbContext)_fixture.Services.GetService(typeof(SimpleEventStoreDbContext));
+            var entityType = typeof(MembershipCreatedEvent).AssemblyQualifiedName;
+            var membershipCreatedEvent = eventStoreDbContext
+                .ApplicationEvents
+                .FirstOrDefault(e => e.EntityId == membership.Id.ToString() && e.EntityType == entityType);
+            membershipCreatedEvent.ShouldNotBeNull();
         }
 
         [Theory]

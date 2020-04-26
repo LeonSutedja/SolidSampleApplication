@@ -18,9 +18,7 @@ namespace SolidSampleApplication.Infrastructure.Repository
         public async Task<AggregateMembership> EarnPoints(Guid id, MembershipPointsType type, double points)
         {
             var membershipPointEvent = new MembershipPointsEarnedEvent(id, points, type);
-            var simpleEvent = SimpleApplicationEvent.New(membershipPointEvent, 1, DateTime.Now, "Sample");
-            _context.Add(simpleEvent);
-            await _context.SaveChangesAsync();
+            await _context.SaveEventAsync(membershipPointEvent, 1, DateTime.Now, "Sample");
             return await GetMembershipDetail(id);
         }
 

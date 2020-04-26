@@ -1,6 +1,8 @@
-﻿namespace SolidSampleApplication.Core
+﻿using MediatR;
+
+namespace SolidSampleApplication.Core
 {
-    public interface ISimpleEvent
+    public interface ISimpleEvent : INotification
     {
     }
 

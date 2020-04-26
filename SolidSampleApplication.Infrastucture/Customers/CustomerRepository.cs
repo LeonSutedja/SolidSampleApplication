@@ -31,25 +31,10 @@ namespace SolidSampleApplication.Infrastructure.Repository
             return customer;
         }
 
-        public async Task<Customer> RegisterCustomer(string username, string firstname, string lastname, string email)
-        {
-            var customerRegisteredEvent = new CustomerRegisteredEvent(Guid.NewGuid(), username, firstname, lastname, email);
-            var simpleEvent = SimpleApplicationEvent.New(customerRegisteredEvent, 1, DateTime.Now, "Sample");
-            var membershipEvent = new MembershipCreatedEvent(Guid.NewGuid(), customerRegisteredEvent.Id);
-            var simpleMembershipEvent = SimpleApplicationEvent.New(membershipEvent, 1, DateTime.Now, "Sample");
-            await _context.ApplicationEvents.AddRangeAsync(new[] { simpleEvent, simpleMembershipEvent });
-            await _context.SaveChangesAsync();
-            var customer = new Customer();
-            customer.ApplyEvent(customerRegisteredEvent);
-            return customer;
-        }
-
         public async Task<Customer> ChangeCustomerName(Guid customerId, string firstname, string lastname)
         {
             var updatedEvent = new CustomerNameChangedEvent(customerId, firstname, lastname);
-            var simpleEvent = SimpleApplicationEvent.New(updatedEvent, 1, DateTime.Now, "Sample");
-            await _context.ApplicationEvents.AddAsync(simpleEvent);
-            await _context.SaveChangesAsync();
+            await _context.SaveEventAsync(updatedEvent, 1, DateTime.Now, "Sample");
             return await GetCustomer(customerId);
         }
     }

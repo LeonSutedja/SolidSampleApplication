@@ -22,7 +22,8 @@ namespace SolidSampleApplication.Api.Membership
             }
             set
             {
-                if (_id != null) throw new Exception("Value has already been set");
+                if(_id != null)
+                    throw new Exception("Value has already been set");
                 _id = value;
             }
         }
@@ -37,7 +38,8 @@ namespace SolidSampleApplication.Api.Membership
             }
             set
             {
-                if (_points != null) throw new Exception("Value has already been set");
+                if(_points != null)
+                    throw new Exception("Value has already been set");
                 _points = value;
             }
         }
@@ -52,7 +54,8 @@ namespace SolidSampleApplication.Api.Membership
             }
             set
             {
-                if (_type != null) throw new Exception("Value has already been set");
+                if(_type != null)
+                    throw new Exception("Value has already been set");
                 _type = value;
             }
         }

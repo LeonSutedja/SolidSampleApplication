@@ -1,7 +1,12 @@
 ﻿using FluentValidation;
 using MediatR;
+using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastructure.Shared;
+using SolidSampleApplication.Infrastucture;
+using SolidSampleApplication.ReadModelStore;
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,17 +44,74 @@ namespace SolidSampleApplication.Api.Customers
 
     public class RegisterCustomerRequestHandler : IRequestHandler<RegisterCustomerRequest, DefaultResponse>
     {
-        private readonly ICustomerRepository _repository;
+        private readonly ReadModelDbContext _context;
+        private readonly IMediator _mediator;
 
-        public RegisterCustomerRequestHandler(ICustomerRepository repository)
+        public RegisterCustomerRequestHandler(ReadModelDbContext context, IMediator mediator)
         {
-            _repository = repository;
+            _context = context;
+            _mediator = mediator;
         }
 
         public async Task<DefaultResponse> Handle(RegisterCustomerRequest request, CancellationToken cancellationToken)
         {
-            var customer = await _repository.RegisterCustomer(request.Username, request.FirstName, request.LastName, request.Email);
+            // pretend to run some sort of validation here.
+
+            // success
+            var customerRegisteredEvent = new CustomerRegisteredEvent(Guid.NewGuid(), request.Username, request.FirstName, request.LastName, request.Email);
+            var membershipEvent = new MembershipCreatedEvent(Guid.NewGuid(), customerRegisteredEvent.Id);
+
+            await _mediator.Publish(customerRegisteredEvent);
+            await _mediator.Publish(membershipEvent);
+
+            var customer = _context.Customers.FirstOrDefault(c => c.Username == request.Username);
             return DefaultResponse.Success(customer);
+        }
+    }
+
+    public class PersistCustomerRegisteredEventHandler : INotificationHandler<CustomerRegisteredEvent>
+    {
+        private readonly SimpleEventStoreDbContext _context;
+        private readonly ReadModelDbContext _readModelDbContext;
+
+        public PersistCustomerRegisteredEventHandler(SimpleEventStoreDbContext context, ReadModelDbContext readModelDbContext)
+        {
+            _context = context;
+            _readModelDbContext = readModelDbContext;
+        }
+
+        public async Task Handle(CustomerRegisteredEvent notification, CancellationToken cancellationToken)
+        {
+            await _context.SaveEventAsync(notification, 1, DateTime.Now, "Sample");
+
+            var customer = new Customer();
+            customer.ApplyEvent(notification);
+            var customerReadModel = CustomerReadModel.FromAggregate(customer);
+            await _readModelDbContext.Customers.AddAsync(customerReadModel);
+            await _readModelDbContext.SaveChangesAsync();
+        }
+    }
+
+    public class PersistMembershipCreatedEventHandler : INotificationHandler<MembershipCreatedEvent>
+    {
+        private readonly SimpleEventStoreDbContext _eventStoreDbContext;
+        private readonly ReadModelDbContext _readModelDbContext;
+
+        public PersistMembershipCreatedEventHandler(SimpleEventStoreDbContext eventStoreDbContext, ReadModelDbContext readModelDbContext)
+        {
+            _eventStoreDbContext = eventStoreDbContext;
+            _readModelDbContext = readModelDbContext;
+        }
+
+        public async Task Handle(MembershipCreatedEvent notification, CancellationToken cancellationToken)
+        {
+            await _eventStoreDbContext.SaveEventAsync(notification, 1, DateTime.Now, "Sample");
+
+            var aggregate = new AggregateMembership();
+            aggregate.ApplyEvent(notification);
+            var aggregateMembershipReadModel = AggregateMembershipReadModel.FromAggregate(aggregate);
+            await _readModelDbContext.Memberships.AddAsync(aggregateMembershipReadModel);
+            await _readModelDbContext.SaveChangesAsync();
         }
     }
 }
