@@ -12,7 +12,7 @@ using SolidSampleApplication.Api.Healthcheck;
 using SolidSampleApplication.Api.Membership;
 using SolidSampleApplication.Api.PipelineBehavior;
 using SolidSampleApplication.Core;
-using SolidSampleApplication.Core.Services;
+using SolidSampleApplication.Core.Services.CustomerServices;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.ReadModelStore;
 using System.Linq;

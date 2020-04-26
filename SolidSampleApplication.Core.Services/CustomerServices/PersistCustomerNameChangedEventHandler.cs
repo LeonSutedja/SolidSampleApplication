@@ -6,7 +6,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SolidSampleApplication.Core.Services
+namespace SolidSampleApplication.Core.Services.CustomerServices
 {
     public class PersistCustomerNameChangedEventHandler : INotificationHandler<CustomerNameChangedEvent>
     {
