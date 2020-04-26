@@ -19,7 +19,7 @@ namespace SolidSampleApplication.Api
                 Log.Information("Starting up");
                 CreateHostBuilder(args).Build().Run();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Log.Fatal(ex, "Application start-up failed");
             }

@@ -23,12 +23,12 @@ namespace SolidSampleApplication.Api.Healthcheck
         public ActionResult GetHealthcheck(string system, bool detail)
         {
             // if detail is check
-            if (detail)
+            if(detail)
             {
-                if (!string.IsNullOrEmpty(system))
+                if(!string.IsNullOrEmpty(system))
                 {
                     var systemToCheck = _healthCheckList.FirstOrDefault(s => s.Name.Equals(system, StringComparison.InvariantCultureIgnoreCase));
-                    if (systemToCheck == null)
+                    if(systemToCheck == null)
                         return BadRequest();
                     var result = systemToCheck.PerformCheck();
                     return new OkObjectResult(result);
@@ -40,13 +40,13 @@ namespace SolidSampleApplication.Api.Healthcheck
             }
 
             // if not detail, but system specific only
-            if (!string.IsNullOrEmpty(system))
+            if(!string.IsNullOrEmpty(system))
             {
                 var systemToCheck = _healthCheckList.FirstOrDefault(s => s.Name.Equals(system, StringComparison.InvariantCultureIgnoreCase));
-                if (systemToCheck == null)
+                if(systemToCheck == null)
                     return BadRequest();
                 var result = systemToCheck.PerformCheck();
-                if (result.IsOk)
+                if(result.IsOk)
                     return Ok("OK");
                 return Ok(result.Message);
             }

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace SolidSampleApplication.Infrastructure
 {
@@ -14,7 +13,8 @@ namespace SolidSampleApplication.Infrastructure
 
         public static string TryGetId<T>(this T item, string defaultReturn)
         {
-            if (item == null) return defaultReturn;
+            if(item == null)
+                return defaultReturn;
             try
             {
                 return ((dynamic)item).Id.ToString();

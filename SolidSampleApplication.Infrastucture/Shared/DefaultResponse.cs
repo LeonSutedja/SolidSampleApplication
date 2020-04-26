@@ -9,7 +9,7 @@ namespace SolidSampleApplication.Infrastructure.Shared
 
         public static DefaultResponse Failed(object requestObject, Exception e = null)
         {
-            if (e != null)
+            if(e != null)
                 return new DefaultResponse(new BadRequestObjectResult(requestObject), 1, e.Message, false);
 
             return new DefaultResponse(new BadRequestObjectResult(requestObject), 1, string.Empty, false);

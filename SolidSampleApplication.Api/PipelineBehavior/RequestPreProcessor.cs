@@ -1,10 +1,4 @@
-﻿using MediatR.Pipeline;
-using Microsoft.Extensions.Logging;
-using SolidSampleApplication.Infrastructure;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace SolidSampleApplication.Api.PipelineBehavior
+﻿namespace SolidSampleApplication.Api.PipelineBehavior
 {
     /// <summary>
     /// This is a placeholder only

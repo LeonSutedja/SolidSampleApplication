@@ -31,7 +31,7 @@ namespace SolidSampleApplication.Api.Test
         {
             dynamic jsonDynamicList = JValue.Parse(jsonList);
             var count = 0;
-            foreach (var jsonItem in jsonDynamicList)
+            foreach(var jsonItem in jsonDynamicList)
             {
                 action(jsonItem, count);
                 count++;

@@ -17,7 +17,7 @@ namespace SolidSampleApplication.Infrastructure
                     !x.IsInterface &&
                     x.GetInterfaces()
                         .Any(i => i == typeof(T))).ToList();
-            foreach (var t in allTypes)
+            foreach(var t in allTypes)
                 services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(T), t));
         }
 
@@ -27,7 +27,7 @@ namespace SolidSampleApplication.Infrastructure
                 !x.IsAbstract &&
                 !x.IsInterface &&
                 x.GetInterfaces().Any(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(T)))).ToList();
-            foreach (var t in allTypes)
+            foreach(var t in allTypes)
             {
                 var interfaceType = t.GetInterfaces().First(i => i.GetGenericTypeDefinition() == typeof(T));
                 services.TryAddEnumerable(ServiceDescriptor.Singleton(interfaceType, t));
@@ -44,12 +44,12 @@ namespace SolidSampleApplication.Infrastructure
                         !x.IsInterface &&
                         x.GetInterfaces().Any(i => i.Name.EndsWith(endsWith))))
                 .ToList();
-            foreach (var t in allTypes)
+            foreach(var t in allTypes)
             {
                 var interfaceType = t.GetInterfaces().First(i => i.Name.EndsWith(endsWith));
-                if (serviceLifeTime == ServiceLifetime.Scoped)
+                if(serviceLifeTime == ServiceLifetime.Scoped)
                     services.TryAddEnumerable(ServiceDescriptor.Scoped(interfaceType, t));
-                if (serviceLifeTime == ServiceLifetime.Transient)
+                if(serviceLifeTime == ServiceLifetime.Transient)
                     services.TryAddEnumerable(ServiceDescriptor.Transient(interfaceType, t));
                 else
                     services.TryAddEnumerable(ServiceDescriptor.Singleton(interfaceType, t));
