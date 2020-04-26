@@ -1,6 +1,8 @@
-﻿using MediatR;
-using SolidSampleApplication.Infrastructure.Repository;
+﻿using FluentValidation;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Infrastructure.Shared;
+using SolidSampleApplication.ReadModelStore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +22,8 @@ namespace SolidSampleApplication.Api.Membership
             }
             set
             {
-                if (_id != null) throw new Exception($"Value has already been set {_id.ToString()}");
+                if(_id != null)
+                    throw new Exception($"Value has already been set {_id.ToString()}");
                 _id = value;
             }
         }
@@ -31,18 +34,27 @@ namespace SolidSampleApplication.Api.Membership
         }
     }
 
+    public class GetAggregateMembershipRequestValidator : AbstractValidator<GetAggregateMembershipRequest>
+    {
+        public GetAggregateMembershipRequestValidator()
+        {
+            RuleFor(x => x.Id).NotNull();
+        }
+    }
+
     public class GetAggregateMembershipRequestHandler : IRequestHandler<GetAggregateMembershipRequest, DefaultResponse>
     {
-        private readonly IAggregateMembershipRepository _repository;
+        private readonly ReadModelDbContext _readModelDbContext;
 
-        public GetAggregateMembershipRequestHandler(IAggregateMembershipRepository repository)
+        public GetAggregateMembershipRequestHandler(ReadModelDbContext readModelDbContext)
         {
-            _repository = repository;
+            _readModelDbContext = readModelDbContext;
         }
 
         public async Task<DefaultResponse> Handle(GetAggregateMembershipRequest request, CancellationToken cancellationToken)
         {
-            return DefaultResponse.Success(await _repository.GetMembershipDetail(request.Id.Value));
+            var membership = await _readModelDbContext.Memberships.FirstOrDefaultAsync(m => m.Id == request.Id.Value);
+            return DefaultResponse.Success(membership);
         }
     }
 }

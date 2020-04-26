@@ -13,7 +13,6 @@ using SolidSampleApplication.Api.Membership;
 using SolidSampleApplication.Api.Shared;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
-using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastucture;
 using SolidSampleApplication.ReadModelStore;
 using System.Linq;

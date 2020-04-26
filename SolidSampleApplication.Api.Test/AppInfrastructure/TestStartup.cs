@@ -1,5 +1,4 @@
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,7 +13,6 @@ using SolidSampleApplication.Api.Membership;
 using SolidSampleApplication.Api.Shared;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
-using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastucture;
 using SolidSampleApplication.ReadModelStore;
 using System.Linq;

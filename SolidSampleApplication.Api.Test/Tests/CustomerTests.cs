@@ -3,8 +3,6 @@ using Newtonsoft.Json.Linq;
 using Shouldly;
 using SolidSampleApplication.Api.Customers;
 using SolidSampleApplication.Core;
-using SolidSampleApplication.Infrastructure;
-using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastucture;
 using SolidSampleApplication.ReadModelStore;
 using System;
@@ -21,12 +19,10 @@ namespace SolidSampleApplication.Api.Test
         private readonly DefaultWebHostTestFixture _fixture;
         private readonly HttpClient _client;
         private readonly ITestOutputHelper _output;
-        private readonly ICustomerRepository _customerRepository;
 
         public CustomerTests(DefaultWebHostTestFixture fixture, ITestOutputHelper output)
         {
             fixture.Output = output;
-            _customerRepository = (ICustomerRepository)fixture.Services.GetService(typeof(ICustomerRepository));
             _client = fixture.CreateClient();
             _fixture = fixture;
             _output = output;
@@ -68,8 +64,8 @@ namespace SolidSampleApplication.Api.Test
         [Fact]
         public async Task ChangeCustomerName_ShouldReturn_Ok()
         {
-            var allCustomers = (await _customerRepository.GetCustomers()).ToList();
-            var customer = allCustomers.FirstOrDefault();
+            var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+            var customer = await readModelContext.Customers.FirstOrDefaultAsync();
 
             var request = new ChangeNameCustomerRequest()
             {

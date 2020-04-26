@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
 using SolidSampleApplication.Core;
-using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastructure.Shared;
 using SolidSampleApplication.Infrastucture;
 using SolidSampleApplication.ReadModelStore;
@@ -56,6 +55,7 @@ namespace SolidSampleApplication.Api.Customers
         public async Task<DefaultResponse> Handle(RegisterCustomerRequest request, CancellationToken cancellationToken)
         {
             // pretend to run some sort of validation here.
+            // username must be unique.
 
             // success
             var customerRegisteredEvent = new CustomerRegisteredEvent(Guid.NewGuid(), request.Username, request.FirstName, request.LastName, request.Email);

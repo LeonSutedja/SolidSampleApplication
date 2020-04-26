@@ -1,7 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Shouldly;
 using SolidSampleApplication.Api.Membership;
-using SolidSampleApplication.Infrastructure.Repository;
+using SolidSampleApplication.ReadModelStore;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -16,12 +17,10 @@ namespace SolidSampleApplication.Api.Test
         private readonly DefaultWebHostTestFixture _fixture;
         private readonly HttpClient _client;
         private readonly ITestOutputHelper _output;
-        private readonly IAggregateMembershipRepository _membershipRepository;
 
         public MembershipTests(DefaultWebHostTestFixture fixture, ITestOutputHelper output)
         {
             fixture.Output = output;
-            _membershipRepository = (IAggregateMembershipRepository)fixture.Services.GetService(typeof(IAggregateMembershipRepository));
             _client = fixture.CreateClient();
             _fixture = fixture;
             _output = output;
@@ -63,9 +62,8 @@ namespace SolidSampleApplication.Api.Test
         [Fact]
         public async Task GetMembershipWithId_ShouldReturn_Ok()
         {
-            var idLists = (await _membershipRepository.GetAggregateMemberships())
-                .ToList()
-                .Select(m => m.Id);
+            var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+            var idLists = await readModelContext.Memberships.Select(m => m.Id).ToListAsync();
 
             foreach(var id in idLists)
             {
@@ -80,7 +78,9 @@ namespace SolidSampleApplication.Api.Test
         [Fact]
         public async Task EarnPoints_ShouldReturn_Ok()
         {
-            var member = (await _membershipRepository.GetAggregateMemberships()).ToList().FirstOrDefault();
+            var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+
+            var member = await readModelContext.Memberships.FirstOrDefaultAsync();
             var currentPoint = member.TotalPoints;
             var currentVersion = member.Version;
             var pointsToAdd = 50;
