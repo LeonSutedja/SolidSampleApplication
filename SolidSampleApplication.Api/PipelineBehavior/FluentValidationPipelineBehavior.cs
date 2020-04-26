@@ -4,7 +4,7 @@ using SolidSampleApplication.Infrastructure.Shared;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SolidSampleApplication.Api.Shared
+namespace SolidSampleApplication.Api.PipelineBehavior
 {
     public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TResponse : DefaultResponse
@@ -24,10 +24,10 @@ namespace SolidSampleApplication.Api.Shared
 
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            if (_fluentValidator != null)
+            if(_fluentValidator != null)
             {
                 var validationResult = _fluentValidator.Validate(request);
-                if (!validationResult.IsValid)
+                if(!validationResult.IsValid)
                     return (DefaultResponse.Failed(validationResult)) as TResponse;
             }
 

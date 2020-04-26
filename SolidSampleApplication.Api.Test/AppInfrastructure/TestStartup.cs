@@ -10,7 +10,7 @@ using Microsoft.Extensions.Hosting;
 using SolidSampleApplication.Api.Customers;
 using SolidSampleApplication.Api.Healthcheck;
 using SolidSampleApplication.Api.Membership;
-using SolidSampleApplication.Api.Shared;
+using SolidSampleApplication.Api.PipelineBehavior;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastucture;
@@ -53,6 +53,7 @@ namespace SolidSampleApplication.Api
             services.AddTransient<IValidator<RegisterCustomerRequest>, RegisterCustomerRequestValidator>();
             services.AddTransient<IValidator<EarnPointsAggregateMembershipRequest>, EarnPointsAggregateMembershipRequestValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
 
             // we are using sql lite in-memory database for this sample application purpose
             // for in-memory relational database, we use sqllite in-memory as opposed to the ef core in-memory provider.

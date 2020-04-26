@@ -10,7 +10,7 @@ using Microsoft.Extensions.Hosting;
 using SolidSampleApplication.Api.Customers;
 using SolidSampleApplication.Api.Healthcheck;
 using SolidSampleApplication.Api.Membership;
-using SolidSampleApplication.Api.Shared;
+using SolidSampleApplication.Api.PipelineBehavior;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastucture;
@@ -61,6 +61,7 @@ namespace SolidSampleApplication.Api
             services.AddTransient<IValidator<RegisterCustomerRequest>, RegisterCustomerRequestValidator>();
             services.AddTransient<IValidator<EarnPointsAggregateMembershipRequest>, EarnPointsAggregateMembershipRequestValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
 
             // As sqllite db context is scoped, repository must become scoped as well
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");

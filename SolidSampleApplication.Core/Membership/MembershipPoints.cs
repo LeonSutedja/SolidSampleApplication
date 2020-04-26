@@ -10,9 +10,9 @@ namespace SolidSampleApplication.Core
             return newPoint;
         }
 
-        public double Amount { get; set; }
-        public MembershipPointsType Type { get; set; }
-        public DateTime EarnedAt { get; set; }
+        public double Amount { get; private set; }
+        public MembershipPointsType Type { get; private set; }
+        public DateTime EarnedAt { get; private set; }
 
         protected MembershipPoint(double amount, MembershipPointsType type, DateTime earnedAt)
         {
