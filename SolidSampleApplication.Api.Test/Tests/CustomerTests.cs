@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
+using Pressius;
 using Shouldly;
 using SolidSampleApplication.Api.Customers;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastucture;
 using SolidSampleApplication.ReadModelStore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -61,8 +63,25 @@ namespace SolidSampleApplication.Api.Test
             count.ShouldBeGreaterThan(0);
         }
 
-        [Fact]
-        public async Task ChangeCustomerName_ShouldReturn_Ok()
+        public static IEnumerable<object[]> ValidNames()
+        {
+            var permutor = new Permutor();
+            var pressiusInputs = permutor
+                .AddParameterDefinition("FirstName", new List<object> { "batman", "four", "1234567890", "~`@#$%^&*()_+{}:><?,./;[]=-'" }, true)
+                .AddParameterDefinition("LastName", new List<object> { "batman", "four", "1234567890", "~`@#$%^&*()_+{}:><?,./;[]=-'" }, true)
+                .GeneratePermutation<ChangeNameCustomerCommand>();
+            foreach(var input in pressiusInputs)
+            {
+                yield return new object[]
+                {
+                    input.FirstName, input.LastName
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidNames))]
+        public async Task ChangeCustomerName_ShouldReturn_Ok(string firstName, string lastName)
         {
             var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
             var customer = await readModelContext.Customers.FirstOrDefaultAsync();
@@ -70,8 +89,8 @@ namespace SolidSampleApplication.Api.Test
             var request = new ChangeNameCustomerCommand()
             {
                 CustomerId = customer.Id,
-                FirstName = "NewFirstname",
-                LastName = "NewLastname"
+                FirstName = firstName,
+                LastName = lastName
             };
 
             var response = await _client.PutRequestAsStringContent("/customers", request);
@@ -86,6 +105,45 @@ namespace SolidSampleApplication.Api.Test
             jsonObject.ShouldContainKeyAndValue("username", customer.Username);
             jsonObject.ShouldContainKeyAndValue("firstName", request.FirstName);
             jsonObject.ShouldContainKeyAndValue("lastName", request.LastName);
+        }
+
+        public static IEnumerable<object[]> InvalidNames()
+        {
+            var permutor = new Permutor();
+            var pressiusInputs = permutor
+                .AddParameterDefinition("FirstName", new List<object> { null, "a", "ab", "abc", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" }, true)
+                .AddParameterDefinition("LastName", new List<object> { null, "a", "ab", "abc", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" }, true)
+                .GeneratePermutation<ChangeNameCustomerCommand>();
+            foreach(var input in pressiusInputs)
+            {
+                yield return new object[]
+                {
+                    input.FirstName, input.LastName
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(InvalidNames))]
+        public async Task ChangeCustomerName_WithInvalidCommand_ShouldReturn_BadRequest(string firstName, string lastName)
+        {
+            var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+            var customer = await readModelContext.Customers.FirstOrDefaultAsync();
+
+            var request = new ChangeNameCustomerCommand()
+            {
+                CustomerId = customer.Id,
+                FirstName = firstName,
+                LastName = lastName
+            };
+
+            var response = await _client.PutRequestAsStringContent("/customers", request);
+            response.IsSuccessStatusCode.ShouldBeFalse();
+            response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+
+            var content = await response.Content.ReadAsStringAsync();
+            content.ShouldNotBeEmpty();
+            _output.WriteLine(content);
         }
 
         [Fact]
@@ -158,13 +216,26 @@ namespace SolidSampleApplication.Api.Test
             membershipCreatedEvent.ShouldNotBeNull();
         }
 
+        public static IEnumerable<object[]> InvalidRegisterCustomerCommand()
+        {
+            var permutor = new Permutor();
+            var pressiusInputs = permutor
+                .AddParameterDefinition("Username", new List<object> { null, "a", "ab", "abc", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" }, true)
+                .AddParameterDefinition("FirstName", new List<object> { null, "a", "ab", "abc", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" }, true)
+                .AddParameterDefinition("LastName", new List<object> { null, "a", "ab", "abc", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" }, true)
+                .AddParameterDefinition("Email", new List<object> { null, "a", "ab", "abc" }, true)
+                .GeneratePermutation<RegisterCustomerCommand>();
+            foreach(var input in pressiusInputs)
+            {
+                yield return new object[]
+                {
+                    input.Username, input.FirstName, input.LastName, input.Email
+                };
+            }
+        }
+
         [Theory]
-        [InlineData("", "firstname", "lastname", "email@email.com.au")]
-        [InlineData("a", "firstname", "lastname", "email@email.com.au")]
-        [InlineData("12", "firstname", "lastname", "email@email.com.au")]
-        [InlineData("username1", "", "lastname", "email@email.com.au")]
-        [InlineData("username1", "firstname", "", "email@email.com.au")]
-        [InlineData("username1", "firstname", "lastname", "")]
+        [MemberData(nameof(InvalidRegisterCustomerCommand))]
         public async Task RegisterCustomer_WithInvalidRequests_Should_ReturnBadRequest(
             string username,
             string firstname,
@@ -180,6 +251,8 @@ namespace SolidSampleApplication.Api.Test
             };
 
             var response = await _client.PostRequestAsStringContent("/customers", request);
+
+            // assert
             response.IsSuccessStatusCode.ShouldBeFalse();
             response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
 

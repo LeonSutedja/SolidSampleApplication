@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
@@ -16,6 +17,23 @@ namespace SolidSampleApplication.Api.Customers
         public Guid CustomerId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+    }
+
+    public class ChangeNameCustomerCommandValidator : AbstractValidator<ChangeNameCustomerCommand>
+    {
+        public ChangeNameCustomerCommandValidator()
+        {
+            RuleFor(x => x.CustomerId)
+                .NotNull();
+            RuleFor(x => x.FirstName)
+                .NotNull()
+                .MinimumLength(3)
+                .MaximumLength(50);
+            RuleFor(x => x.LastName)
+                .NotNull()
+                .MinimumLength(3)
+                .MaximumLength(50);
+        }
     }
 
     public class ChangeNameCustomerCommandHandler : IRequestHandler<ChangeNameCustomerCommand, DefaultResponse>

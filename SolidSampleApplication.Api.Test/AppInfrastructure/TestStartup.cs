@@ -52,6 +52,7 @@ namespace SolidSampleApplication.Api
 
             services.AddTransient<IValidator<RegisterCustomerCommand>, RegisterCustomerCommandValidator>();
             services.AddTransient<IValidator<EarnPointsAggregateMembershipCommand>, EarnPointsAggregateMembershipCommandValidator>();
+            services.AddTransient<IValidator<ChangeNameCustomerCommand>, ChangeNameCustomerCommandValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
 
