@@ -56,6 +56,9 @@ namespace SolidSampleApplication.Api.Customers
         {
             // pretend to run some sort of validation here.
             // username must be unique.
+            var isUsernameExists = _context.Customers.Any(c => c.Username == request.Username);
+            if(isUsernameExists)
+                return DefaultResponse.Failed(request, "Username exists");
 
             // success
             var customerRegisteredEvent = new CustomerRegisteredEvent(Guid.NewGuid(), request.Username, request.FirstName, request.LastName, request.Email);

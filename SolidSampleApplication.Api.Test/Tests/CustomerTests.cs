@@ -175,6 +175,32 @@ namespace SolidSampleApplication.Api.Test
         }
 
         [Fact]
+        public async Task RegisterCustomer_WithExistingUsername_ShouldReturn_BadRequest()
+        {
+            // arrange
+            var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+            var customer = await readModelContext.Customers.FirstOrDefaultAsync();
+            var request = new RegisterCustomerCommand()
+            {
+                Username = customer.Username,
+                FirstName = "NewFirstname",
+                LastName = "NewLastname",
+                Email = "email@email.com.au"
+            };
+
+            // act
+            var response = await _client.PostRequestAsStringContent("/customers", request);
+
+            // assert
+            response.IsSuccessStatusCode.ShouldBeFalse();
+            response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
+
+            var content = await response.Content.ReadAsStringAsync();
+            content.ShouldNotBeEmpty();
+            _output.WriteLine(content);
+        }
+
+        [Fact]
         public async Task RegisterCustomer_ShouldCreateMembership_Ok()
         {
             // arrange

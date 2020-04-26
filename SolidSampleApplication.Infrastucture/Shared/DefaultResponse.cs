@@ -15,6 +15,11 @@ namespace SolidSampleApplication.Infrastructure.Shared
             return new DefaultResponse(new BadRequestObjectResult(requestObject), 1, string.Empty, false);
         }
 
+        public static DefaultResponse Failed(object requestObject, string message)
+        {
+            return new DefaultResponse(new BadRequestObjectResult(requestObject), 1, message, false);
+        }
+
         public ActionResult ActionResult { get; private set; }
         public int ErrorId { get; private set; }
         public string ErrorDescription { get; private set; }
