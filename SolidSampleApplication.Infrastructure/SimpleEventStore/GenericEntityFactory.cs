@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
-using SolidSampleApplication.Infrastucture;
+using SolidSampleApplication.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;

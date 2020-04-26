@@ -4,7 +4,7 @@ using Pressius;
 using Shouldly;
 using SolidSampleApplication.Api.Customers;
 using SolidSampleApplication.Core;
-using SolidSampleApplication.Infrastucture;
+using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.ReadModelStore;
 using System;
 using System.Collections.Generic;

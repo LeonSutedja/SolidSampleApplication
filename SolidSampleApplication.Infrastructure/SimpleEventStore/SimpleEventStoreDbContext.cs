@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SolidSampleApplication.Infrastucture.SampleData;
+using SolidSampleApplication.Infrastructure.SampleData;
 using System;
 using System.Threading.Tasks;
 
-namespace SolidSampleApplication.Infrastucture
+namespace SolidSampleApplication.Infrastructure
 {
     public class SimpleEventStoreDbContext : DbContext
     {

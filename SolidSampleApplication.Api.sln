@@ -6,17 +6,23 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolidSampleApplication.Api", "SolidSampleApplication.Api\SolidSampleApplication.Api.csproj", "{9CA7856F-E499-4A05-AE71-95C385CB16B0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7825D146-5FF3-48F3-9519-D439C085E73D} = {7825D146-5FF3-48F3-9519-D439C085E73D}
+		{72FF4CF1-5E22-453D-80D6-CBBAD174DA7B} = {72FF4CF1-5E22-453D-80D6-CBBAD174DA7B}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolidSampleApplication.Api.Test", "SolidSampleApplication.Api.Test\SolidSampleApplication.Api.Test.csproj", "{D14680B2-CA35-4DC6-A8F9-1E9FE2B7A055}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolidSampleApplication.Infrastucture", "SolidSampleApplication.Infrastucture\SolidSampleApplication.Infrastucture.csproj", "{200EFFC1-4B1F-49F2-9D0E-6B244B22AB95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolidSampleApplication.Infrastructure", "SolidSampleApplication.Infrastructure\SolidSampleApplication.Infrastructure.csproj", "{200EFFC1-4B1F-49F2-9D0E-6B244B22AB95}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolidSampleApplication.Core", "SolidSampleApplication.Core\SolidSampleApplication.Core.csproj", "{8DDF3277-C7AB-4550-98A2-56689546D0C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidSampleApplication.ReadModelStore", "SolidSampleApplication.ReadModelStore\SolidSampleApplication.ReadModelStore.csproj", "{7825D146-5FF3-48F3-9519-D439C085E73D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolidSampleApplication.ReadModelStore", "SolidSampleApplication.ReadModelStore\SolidSampleApplication.ReadModelStore.csproj", "{7825D146-5FF3-48F3-9519-D439C085E73D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8DDF3277-C7AB-4550-98A2-56689546D0C4} = {8DDF3277-C7AB-4550-98A2-56689546D0C4}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolidSampleApplication.Core.Services", "SolidSampleApplication.Core.Services\SolidSampleApplication.Core.Services.csproj", "{72FF4CF1-5E22-453D-80D6-CBBAD174DA7B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{200EFFC1-4B1F-49F2-9D0E-6B244B22AB95} = {200EFFC1-4B1F-49F2-9D0E-6B244B22AB95}
 	EndProjectSection
 EndProject
 Global
@@ -45,6 +51,10 @@ Global
 		{7825D146-5FF3-48F3-9519-D439C085E73D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7825D146-5FF3-48F3-9519-D439C085E73D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7825D146-5FF3-48F3-9519-D439C085E73D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72FF4CF1-5E22-453D-80D6-CBBAD174DA7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72FF4CF1-5E22-453D-80D6-CBBAD174DA7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72FF4CF1-5E22-453D-80D6-CBBAD174DA7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72FF4CF1-5E22-453D-80D6-CBBAD174DA7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

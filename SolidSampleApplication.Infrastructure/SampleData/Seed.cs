@@ -2,7 +2,7 @@
 using SolidSampleApplication.Core;
 using System;
 
-namespace SolidSampleApplication.Infrastucture.SampleData
+namespace SolidSampleApplication.Infrastructure.SampleData
 {
     public static class Seed
     {

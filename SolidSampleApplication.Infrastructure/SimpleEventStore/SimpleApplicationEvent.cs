@@ -1,7 +1,7 @@
 ﻿using SolidSampleApplication.Infrastructure;
 using System;
 
-namespace SolidSampleApplication.Infrastucture
+namespace SolidSampleApplication.Infrastructure
 {
     public class SimpleApplicationEvent
     {

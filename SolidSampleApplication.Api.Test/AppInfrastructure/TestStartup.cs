@@ -12,10 +12,12 @@ using SolidSampleApplication.Api.Healthcheck;
 using SolidSampleApplication.Api.Membership;
 using SolidSampleApplication.Api.PipelineBehavior;
 using SolidSampleApplication.Core;
+using SolidSampleApplication.Core.Services;
 using SolidSampleApplication.Infrastructure;
-using SolidSampleApplication.Infrastucture;
+
 using SolidSampleApplication.ReadModelStore;
 using System.Linq;
+using System.Reflection;
 
 namespace SolidSampleApplication.Api
 {
@@ -42,6 +44,7 @@ namespace SolidSampleApplication.Api
             // controller from another assemblies.
             services.AddControllers().AddApplicationPart(mainAssembly);
             services.AddMediatR(mainAssembly);
+            services.AddMediatR(typeof(PersistCustomerNameChangedEventHandler).GetTypeInfo().Assembly);
             services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
 
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");

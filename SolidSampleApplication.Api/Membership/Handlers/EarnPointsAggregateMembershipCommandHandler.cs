@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.Shared;
-using SolidSampleApplication.Infrastucture;
+
+using SolidSampleApplication.Infrastructure;
+
 using SolidSampleApplication.ReadModelStore;
 using System;
 using System.Threading;
