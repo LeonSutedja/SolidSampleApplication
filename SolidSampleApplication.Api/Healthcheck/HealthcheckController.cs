@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Healthcheck
 {
@@ -10,17 +11,15 @@ namespace SolidSampleApplication.Api.Healthcheck
     [Route("healthcheck")]
     public class HealthcheckController : Controller
     {
-        private readonly IMediator _mediator;
         private readonly IEnumerable<IHealthcheckSystem> _healthCheckList;
 
-        public HealthcheckController(IMediator mediator, IEnumerable<IHealthcheckSystem> healthCheckList)
+        public HealthcheckController(IEnumerable<IHealthcheckSystem> healthCheckList)
         {
-            _mediator = mediator;
-            this._healthCheckList = healthCheckList;
+            _healthCheckList = healthCheckList;
         }
 
         [HttpGet]
-        public ActionResult GetHealthcheck(string system, bool detail)
+        public async Task<ActionResult> GetHealthcheck(string system, bool detail)
         {
             // if detail is check
             if(detail)
@@ -34,7 +33,8 @@ namespace SolidSampleApplication.Api.Healthcheck
                     return new OkObjectResult(result);
                 }
 
-                var results = _healthCheckList.Select(sl => sl.PerformCheck());
+                var checkTasks = _healthCheckList.Select(sl => sl.PerformCheck());
+                var results = await Task.WhenAll(checkTasks);
                 var hcResponse = new HealthcheckResponse(results);
                 return new OkObjectResult(hcResponse);
             }
@@ -45,14 +45,15 @@ namespace SolidSampleApplication.Api.Healthcheck
                 var systemToCheck = _healthCheckList.FirstOrDefault(s => s.Name.Equals(system, StringComparison.InvariantCultureIgnoreCase));
                 if(systemToCheck == null)
                     return BadRequest();
-                var result = systemToCheck.PerformCheck();
+                var result = await systemToCheck.PerformCheck();
                 if(result.IsOk)
                     return Ok("OK");
                 return Ok(result.Message);
             }
 
             // not detail, not system specific
-            var allResults = _healthCheckList.Select(hc => hc.PerformCheck());
+            var allTasks = _healthCheckList.Select(hc => hc.PerformCheck());
+            var allResults = await Task.WhenAll(allTasks);
             return (allResults.Any(r => !r.IsOk))
                 ? Ok("ERROR")
                 : Ok("OK");
