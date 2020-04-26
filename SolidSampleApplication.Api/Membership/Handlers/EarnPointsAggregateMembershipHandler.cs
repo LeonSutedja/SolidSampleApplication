@@ -3,6 +3,8 @@ using MediatR;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure.Repository;
 using SolidSampleApplication.Infrastructure.Shared;
+using SolidSampleApplication.Infrastucture;
+using SolidSampleApplication.ReadModelStore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -86,16 +88,37 @@ namespace SolidSampleApplication.Api.Membership
     public class EarnPointsAggregateMembershipHandler : IRequestHandler<EarnPointsAggregateMembershipRequest, DefaultResponse>
     {
         private readonly IAggregateMembershipRepository _repository;
+        private readonly IMediator _mediator;
 
-        public EarnPointsAggregateMembershipHandler(IAggregateMembershipRepository repository)
+        public EarnPointsAggregateMembershipHandler(IAggregateMembershipRepository repository, IMediator mediator)
         {
             _repository = repository;
+            this._mediator = mediator;
         }
 
         public async Task<DefaultResponse> Handle(EarnPointsAggregateMembershipRequest request, CancellationToken cancellationToken)
         {
+            //var membershipPointEvent = new MembershipPointsEarnedEvent(request.Id.Value, request.Points.Value, request.Type.Value);
+            //await _mediator.Publish(membershipPointEvent);
             var aggregateMembership = await _repository.EarnPoints(request.Id.Value, request.Type.Value, request.Points.Value);
             return DefaultResponse.Success(aggregateMembership);
+        }
+    }
+
+    public class PersistMembershipPointsEarnedEventHandler : INotificationHandler<MembershipPointsEarnedEvent>
+    {
+        private readonly ReadModelDbContext _readModelDbContext;
+        private readonly SimpleEventStoreDbContext _simpleEventStoreDbContext;
+
+        public PersistMembershipPointsEarnedEventHandler(ReadModelDbContext readModelDbContext, SimpleEventStoreDbContext simpleEventStoreDbContext)
+        {
+            _readModelDbContext = readModelDbContext;
+            _simpleEventStoreDbContext = simpleEventStoreDbContext;
+        }
+
+        public async Task Handle(MembershipPointsEarnedEvent notification, CancellationToken cancellationToken)
+        {
+            await _simpleEventStoreDbContext.SaveEventAsync(notification, 1, DateTime.Now, "Sample");
         }
     }
 }

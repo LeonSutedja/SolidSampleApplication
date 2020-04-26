@@ -7,30 +7,28 @@ namespace SolidSampleApplication.Core
     // value object
     public class MembershipPointReadModel
     {
-        public Guid Id { get; private set; }
-        public Guid MembershipId { get; private set; }
         public double Amount { get; private set; }
         public MembershipPointsType Type { get; private set; }
+        public DateTime EarnedAt { get; private set; }
 
         protected MembershipPointReadModel()
         {
         }
 
-        public MembershipPointReadModel(Guid id, Guid membershipId, double amount, MembershipPointsType type)
+        public MembershipPointReadModel(double amount, MembershipPointsType type, DateTime earnedAt)
         {
-            Id = id;
-            MembershipId = membershipId;
             Amount = amount;
             Type = type;
+            EarnedAt = earnedAt;
         }
     }
 
-    public class AggregateMembershipReadModel
+    public class MembershipReadModel
     {
-        public static AggregateMembershipReadModel FromAggregate(AggregateMembership aggregateMembership)
+        public static MembershipReadModel FromAggregate(AggregateMembership aggregateMembership)
         {
-            var points = aggregateMembership.Points.Select(p => new MembershipPointReadModel(p.Id, p.MembershipId, p.Amount, p.Type));
-            return new AggregateMembershipReadModel(
+            var points = aggregateMembership.Points.Select(p => new MembershipPointReadModel(p.Amount, p.Type, p.EarnedAt));
+            return new MembershipReadModel(
                 aggregateMembership.Membership.Id,
                 aggregateMembership.Membership.Type,
                 aggregateMembership.Membership.CustomerId,
@@ -41,18 +39,20 @@ namespace SolidSampleApplication.Core
         // aggregate id
         public Guid Id { get; private set; }
 
+        private List<MembershipPointReadModel> _points = new List<MembershipPointReadModel>();
+        public List<MembershipPointReadModel> Points { get => _points; }
+
         public MembershipType Type { get; private set; }
         public Guid CustomerId { get; private set; }
-        public List<MembershipPointReadModel> Points { get; private set; }
         public double TotalPoints { get; private set; }
         public int Version { get; private set; }
 
-        protected AggregateMembershipReadModel()
+        protected MembershipReadModel()
         {
-            Points = new List<MembershipPointReadModel>();
+            _points = new List<MembershipPointReadModel>();
         }
 
-        public AggregateMembershipReadModel(
+        public MembershipReadModel(
             Guid id,
             MembershipType type,
             Guid customerId,
@@ -63,7 +63,7 @@ namespace SolidSampleApplication.Core
             Id = id;
             Type = type;
             CustomerId = customerId;
-            Points = points ?? throw new ArgumentNullException(nameof(points));
+            _points = points ?? throw new ArgumentNullException(nameof(points));
             Version = version;
             TotalPoints = totalPoints;
         }

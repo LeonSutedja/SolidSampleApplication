@@ -4,9 +4,9 @@ namespace SolidSampleApplication.Core
 {
     public class MembershipPoint
     {
-        public static MembershipPoint New(Guid membershipId, double amount, MembershipPointsType type)
+        public static MembershipPoint New(Guid membershipId, double amount, MembershipPointsType type, DateTime earnedAt)
         {
-            var newPoint = new MembershipPoint(Guid.NewGuid(), membershipId, amount, type);
+            var newPoint = new MembershipPoint(Guid.NewGuid(), membershipId, amount, type, earnedAt);
             return newPoint;
         }
 
@@ -14,13 +14,15 @@ namespace SolidSampleApplication.Core
         public Guid MembershipId { get; set; }
         public double Amount { get; set; }
         public MembershipPointsType Type { get; set; }
+        public DateTime EarnedAt { get; set; }
 
-        protected MembershipPoint(Guid id, Guid membershipId, double amount, MembershipPointsType type)
+        protected MembershipPoint(Guid id, Guid membershipId, double amount, MembershipPointsType type, DateTime earnedAt)
         {
             Id = id;
             MembershipId = membershipId;
             Amount = amount;
             Type = type;
+            EarnedAt = earnedAt;
         }
     }
 }

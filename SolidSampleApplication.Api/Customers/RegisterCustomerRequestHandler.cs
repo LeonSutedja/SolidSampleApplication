@@ -109,7 +109,7 @@ namespace SolidSampleApplication.Api.Customers
 
             var aggregate = new AggregateMembership();
             aggregate.ApplyEvent(notification);
-            var aggregateMembershipReadModel = AggregateMembershipReadModel.FromAggregate(aggregate);
+            var aggregateMembershipReadModel = MembershipReadModel.FromAggregate(aggregate);
             await _readModelDbContext.Memberships.AddAsync(aggregateMembershipReadModel);
             await _readModelDbContext.SaveChangesAsync();
         }

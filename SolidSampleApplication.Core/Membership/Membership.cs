@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SolidSampleApplication.Core
 {
@@ -12,6 +13,9 @@ namespace SolidSampleApplication.Core
         public Guid Id { get; private set; }
         public MembershipType Type { get; private set; }
         public Guid CustomerId { get; private set; }
+
+        // Value object
+        public List<MembershipPoint> Points { get; private set; }
 
         protected Membership(Guid id, MembershipType type, Guid customerId)
         {

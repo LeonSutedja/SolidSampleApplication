@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SolidSampleApplication.Core
@@ -28,7 +29,7 @@ namespace SolidSampleApplication.Core
 
         public void ApplyEvent(MembershipPointsEarnedEvent simpleEvent)
         {
-            var point = MembershipPoint.New(simpleEvent.Id, simpleEvent.Amount, simpleEvent.PointsType);
+            var point = MembershipPoint.New(simpleEvent.Id, simpleEvent.Amount, simpleEvent.PointsType, DateTime.Now);
             Points.Add(point);
             Version++;
         }

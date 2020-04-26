@@ -77,24 +77,6 @@ namespace SolidSampleApplication.Api.Test
             }
         }
 
-        //[Fact]
-        //public async Task CreateMembership_ShouldReturn_Ok()
-        //{
-        //    var request = new CreateMembershipRequest(Guid.NewGuid());
-        //    var response = await _client.PostRequestAsStringContent("/Membership", request);
-        //    response.EnsureSuccessStatusCode();
-        //    var content = await response.Content.ReadAsStringAsync();
-        //    _output.WriteLine(content);
-
-        //    var jsonObject = JObject.Parse(content);
-        //    // need to fix username
-        //    //jsonObject.ShouldContainKeyAndValue("username", "romulan");
-        //    jsonObject.ShouldContainKey("id");
-        //    jsonObject.ShouldContainKey("type");
-        //    var allMembers = _membershipRepository.GetMemberships();
-        //    allMembers.Select(m => m.CustomerId).ShouldContain(request.CustomerId.Value);
-        //}
-
         [Fact]
         public async Task EarnPoints_ShouldReturn_Ok()
         {

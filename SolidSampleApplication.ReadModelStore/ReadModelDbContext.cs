@@ -5,8 +5,7 @@ namespace SolidSampleApplication.ReadModelStore
 {
     public class ReadModelDbContext : DbContext
     {
-        public DbSet<AggregateMembershipReadModel> Memberships { get; set; }
-        public DbSet<MembershipPointReadModel> MembershipPoints { get; set; }
+        public DbSet<MembershipReadModel> Memberships { get; set; }
         public DbSet<CustomerReadModel> Customers { get; set; }
 
         public ReadModelDbContext()
@@ -15,5 +14,18 @@ namespace SolidSampleApplication.ReadModelStore
         public ReadModelDbContext(DbContextOptions<ReadModelDbContext> options)
             : base(options)
         { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder
+                .Entity<MembershipReadModel>()
+                .OwnsMany<MembershipPointReadModel>("Points", a =>
+            {
+                a.Property(ca => ca.Amount);
+                a.Property(ca => ca.Type);
+                a.Property(ca => ca.EarnedAt);
+                a.HasKey("Amount", "Type", "EarnedAt");
+            });
+        }
     }
 }
