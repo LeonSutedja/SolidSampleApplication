@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Membership
 {
-    public class GetAggregateMembershipRequest : IRequest<DefaultResponse>
+    public class GetAggregateMembershipQuery : IRequest<DefaultResponse>
     {
         // A way to make this value immutable, whilst at the same time able to be mapped from the controller
         private Guid? _id { get; set; }
@@ -28,30 +28,30 @@ namespace SolidSampleApplication.Api.Membership
             }
         }
 
-        public GetAggregateMembershipRequest(Guid id)
+        public GetAggregateMembershipQuery(Guid id)
         {
             Id = id;
         }
     }
 
-    public class GetAggregateMembershipRequestValidator : AbstractValidator<GetAggregateMembershipRequest>
+    public class GetAggregateMembershipQueryValidator : AbstractValidator<GetAggregateMembershipQuery>
     {
-        public GetAggregateMembershipRequestValidator()
+        public GetAggregateMembershipQueryValidator()
         {
             RuleFor(x => x.Id).NotNull();
         }
     }
 
-    public class GetAggregateMembershipRequestHandler : IRequestHandler<GetAggregateMembershipRequest, DefaultResponse>
+    public class GetAggregateMembershipQueryHandler : IRequestHandler<GetAggregateMembershipQuery, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
 
-        public GetAggregateMembershipRequestHandler(ReadModelDbContext readModelDbContext)
+        public GetAggregateMembershipQueryHandler(ReadModelDbContext readModelDbContext)
         {
             _readModelDbContext = readModelDbContext;
         }
 
-        public async Task<DefaultResponse> Handle(GetAggregateMembershipRequest request, CancellationToken cancellationToken)
+        public async Task<DefaultResponse> Handle(GetAggregateMembershipQuery request, CancellationToken cancellationToken)
         {
             var membership = await _readModelDbContext.Memberships.FirstOrDefaultAsync(m => m.Id == request.Id.Value);
             return DefaultResponse.Success(membership);

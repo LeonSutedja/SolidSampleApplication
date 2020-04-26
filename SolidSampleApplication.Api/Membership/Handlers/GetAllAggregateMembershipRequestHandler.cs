@@ -7,20 +7,20 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Membership
 {
-    public class GetAllAggregateMembershipRequest : IRequest<DefaultResponse>
+    public class GetAllAggregateMembershipQuery : IRequest<DefaultResponse>
     {
     }
 
-    public class GetAllAggregateMembershipRequestHandler : IRequestHandler<GetAllAggregateMembershipRequest, DefaultResponse>
+    public class GetAllAggregateMembershipQueryHandler : IRequestHandler<GetAllAggregateMembershipQuery, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
 
-        public GetAllAggregateMembershipRequestHandler(ReadModelDbContext readModelDbContext)
+        public GetAllAggregateMembershipQueryHandler(ReadModelDbContext readModelDbContext)
         {
             _readModelDbContext = readModelDbContext;
         }
 
-        public async Task<DefaultResponse> Handle(GetAllAggregateMembershipRequest request, CancellationToken cancellationToken)
+        public async Task<DefaultResponse> Handle(GetAllAggregateMembershipQuery request, CancellationToken cancellationToken)
         {
             return DefaultResponse.Success(await _readModelDbContext.Memberships.Include(m => m.Points).ToListAsync());
         }

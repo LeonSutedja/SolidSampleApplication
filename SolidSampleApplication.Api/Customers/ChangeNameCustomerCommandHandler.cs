@@ -11,25 +11,25 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Customers
 {
-    public class ChangeNameCustomerRequest : IRequest<DefaultResponse>
+    public class ChangeNameCustomerCommand : IRequest<DefaultResponse>
     {
         public Guid CustomerId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
     }
 
-    public class ChangeNameCustomerRequestHandler : IRequestHandler<ChangeNameCustomerRequest, DefaultResponse>
+    public class ChangeNameCustomerCommandHandler : IRequestHandler<ChangeNameCustomerCommand, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
         private readonly IMediator _mediator;
 
-        public ChangeNameCustomerRequestHandler(ReadModelDbContext readModelDbContext, IMediator mediator)
+        public ChangeNameCustomerCommandHandler(ReadModelDbContext readModelDbContext, IMediator mediator)
         {
             _readModelDbContext = readModelDbContext;
             _mediator = mediator;
         }
 
-        public async Task<DefaultResponse> Handle(ChangeNameCustomerRequest request, CancellationToken cancellationToken)
+        public async Task<DefaultResponse> Handle(ChangeNameCustomerCommand request, CancellationToken cancellationToken)
         {
             var @event = new CustomerNameChangedEvent(request.CustomerId, request.FirstName, request.LastName);
             await _mediator.Publish(@event);

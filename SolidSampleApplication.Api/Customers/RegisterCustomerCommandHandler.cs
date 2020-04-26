@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Customers
 {
-    public class RegisterCustomerRequest : IRequest<DefaultResponse>
+    public class RegisterCustomerCommand : IRequest<DefaultResponse>
     {
         public string Username { get; set; }
         public string FirstName { get; set; }
@@ -19,9 +19,9 @@ namespace SolidSampleApplication.Api.Customers
         public string Email { get; set; }
     }
 
-    public class RegisterCustomerRequestValidator : AbstractValidator<RegisterCustomerRequest>
+    public class RegisterCustomerCommandValidator : AbstractValidator<RegisterCustomerCommand>
     {
-        public RegisterCustomerRequestValidator()
+        public RegisterCustomerCommandValidator()
         {
             RuleFor(x => x.Username)
                 .NotNull()
@@ -41,18 +41,18 @@ namespace SolidSampleApplication.Api.Customers
         }
     }
 
-    public class RegisterCustomerRequestHandler : IRequestHandler<RegisterCustomerRequest, DefaultResponse>
+    public class RegisterCustomerCommandHandler : IRequestHandler<RegisterCustomerCommand, DefaultResponse>
     {
         private readonly ReadModelDbContext _context;
         private readonly IMediator _mediator;
 
-        public RegisterCustomerRequestHandler(ReadModelDbContext context, IMediator mediator)
+        public RegisterCustomerCommandHandler(ReadModelDbContext context, IMediator mediator)
         {
             _context = context;
             _mediator = mediator;
         }
 
-        public async Task<DefaultResponse> Handle(RegisterCustomerRequest request, CancellationToken cancellationToken)
+        public async Task<DefaultResponse> Handle(RegisterCustomerCommand request, CancellationToken cancellationToken)
         {
             // pretend to run some sort of validation here.
             // username must be unique.

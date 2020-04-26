@@ -50,8 +50,8 @@ namespace SolidSampleApplication.Api
             //services.AddMvc()
             //    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateMembershipRequestValidator>());
 
-            services.AddTransient<IValidator<RegisterCustomerRequest>, RegisterCustomerRequestValidator>();
-            services.AddTransient<IValidator<EarnPointsAggregateMembershipRequest>, EarnPointsAggregateMembershipRequestValidator>();
+            services.AddTransient<IValidator<RegisterCustomerCommand>, RegisterCustomerCommandValidator>();
+            services.AddTransient<IValidator<EarnPointsAggregateMembershipCommand>, EarnPointsAggregateMembershipCommandValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
 

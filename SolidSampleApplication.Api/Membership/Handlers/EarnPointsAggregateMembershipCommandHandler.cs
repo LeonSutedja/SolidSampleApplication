@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Membership
 {
-    public class EarnPointsAggregateMembershipRequest : IRequest<DefaultResponse>
+    public class EarnPointsAggregateMembershipCommand : IRequest<DefaultResponse>
     {
         // A way to make this value immutable, whilst at the same time able to be mapped from the controller
         private Guid? _id { get; set; }
@@ -64,11 +64,11 @@ namespace SolidSampleApplication.Api.Membership
         }
 
         // empty constructor require for api
-        protected EarnPointsAggregateMembershipRequest()
+        protected EarnPointsAggregateMembershipCommand()
         {
         }
 
-        public EarnPointsAggregateMembershipRequest(Guid id, MembershipPointsType type, double points)
+        public EarnPointsAggregateMembershipCommand(Guid id, MembershipPointsType type, double points)
         {
             Id = id;
             Type = type;
@@ -76,9 +76,9 @@ namespace SolidSampleApplication.Api.Membership
         }
     }
 
-    public class EarnPointsAggregateMembershipRequestValidator : AbstractValidator<EarnPointsAggregateMembershipRequest>
+    public class EarnPointsAggregateMembershipCommandValidator : AbstractValidator<EarnPointsAggregateMembershipCommand>
     {
-        public EarnPointsAggregateMembershipRequestValidator()
+        public EarnPointsAggregateMembershipCommandValidator()
         {
             RuleFor(x => x.Id).NotNull();
             RuleFor(x => x.Points).NotNull();
@@ -86,18 +86,18 @@ namespace SolidSampleApplication.Api.Membership
         }
     }
 
-    public class EarnPointsAggregateMembershipHandler : IRequestHandler<EarnPointsAggregateMembershipRequest, DefaultResponse>
+    public class EarnPointsAggregateMembershipCommandHandler : IRequestHandler<EarnPointsAggregateMembershipCommand, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
         private readonly IMediator _mediator;
 
-        public EarnPointsAggregateMembershipHandler(ReadModelDbContext readModelDbContext, IMediator mediator)
+        public EarnPointsAggregateMembershipCommandHandler(ReadModelDbContext readModelDbContext, IMediator mediator)
         {
             _readModelDbContext = readModelDbContext;
             _mediator = mediator;
         }
 
-        public async Task<DefaultResponse> Handle(EarnPointsAggregateMembershipRequest request, CancellationToken cancellationToken)
+        public async Task<DefaultResponse> Handle(EarnPointsAggregateMembershipCommand request, CancellationToken cancellationToken)
         {
             var membershipPointEvent = new MembershipPointsEarnedEvent(request.Id.Value, request.Points.Value, request.Type.Value);
             await _mediator.Publish(membershipPointEvent);

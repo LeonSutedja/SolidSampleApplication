@@ -58,8 +58,8 @@ namespace SolidSampleApplication.Api
             // fluent validation generic registration
             // we want to use mediatr pipeline to help with the fluent validation, rather than attaching it to the mvc.
             // This is because, we want the mediatr pipeline to be triggered first.
-            services.AddTransient<IValidator<RegisterCustomerRequest>, RegisterCustomerRequestValidator>();
-            services.AddTransient<IValidator<EarnPointsAggregateMembershipRequest>, EarnPointsAggregateMembershipRequestValidator>();
+            services.AddTransient<IValidator<RegisterCustomerCommand>, RegisterCustomerCommandValidator>();
+            services.AddTransient<IValidator<EarnPointsAggregateMembershipCommand>, EarnPointsAggregateMembershipCommandValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
 

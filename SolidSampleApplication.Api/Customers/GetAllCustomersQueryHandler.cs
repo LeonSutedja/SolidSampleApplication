@@ -7,20 +7,20 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Customers
 {
-    public class GetAllCustomersRequest : IRequest<DefaultResponse>
+    public class GetAllCustomersQuery : IRequest<DefaultResponse>
     {
     }
 
-    public class GetAllCustomersRequestHandler : IRequestHandler<GetAllCustomersRequest, DefaultResponse>
+    public class GetAllCustomersQueryHandler : IRequestHandler<GetAllCustomersQuery, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
 
-        public GetAllCustomersRequestHandler(ReadModelDbContext readModelDbContext)
+        public GetAllCustomersQueryHandler(ReadModelDbContext readModelDbContext)
         {
             _readModelDbContext = readModelDbContext;
         }
 
-        public async Task<DefaultResponse> Handle(GetAllCustomersRequest request, CancellationToken cancellationToken)
+        public async Task<DefaultResponse> Handle(GetAllCustomersQuery request, CancellationToken cancellationToken)
             => DefaultResponse.Success(await _readModelDbContext.Customers.ToListAsync());
     }
 }

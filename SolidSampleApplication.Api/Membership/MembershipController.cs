@@ -19,26 +19,26 @@ namespace SolidSampleApplication.Api.Membership
         [HttpGet]
         public async Task<ActionResult> GetMemberships()
         {
-            return (await _mediator.Send(new GetAllAggregateMembershipRequest())).ActionResult;
+            return (await _mediator.Send(new GetAllAggregateMembershipQuery())).ActionResult;
         }
 
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult> GetMember(Guid id)
         {
-            return (await _mediator.Send(new GetAggregateMembershipRequest(id))).ActionResult;
+            return (await _mediator.Send(new GetAggregateMembershipQuery(id))).ActionResult;
         }
 
         [HttpPut]
         [Route("points")]
-        public async Task<ActionResult> EarnPoints(EarnPointsAggregateMembershipRequest request)
+        public async Task<ActionResult> EarnPoints(EarnPointsAggregateMembershipCommand request)
         {
             return (await _mediator.Send(request)).ActionResult;
         }
 
         [HttpPut]
         [Route("upgrade")]
-        public async Task<ActionResult> Upgrade(EarnPointsAggregateMembershipRequest request)
+        public async Task<ActionResult> Upgrade(EarnPointsAggregateMembershipCommand request)
         {
             return (await _mediator.Send(request)).ActionResult;
         }

@@ -67,7 +67,7 @@ namespace SolidSampleApplication.Api.Test
             var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
             var customer = await readModelContext.Customers.FirstOrDefaultAsync();
 
-            var request = new ChangeNameCustomerRequest()
+            var request = new ChangeNameCustomerCommand()
             {
                 CustomerId = customer.Id,
                 FirstName = "NewFirstname",
@@ -92,7 +92,7 @@ namespace SolidSampleApplication.Api.Test
         public async Task RegisterCustomer_ShouldReturn_Ok()
         {
             // arrange
-            var request = new RegisterCustomerRequest()
+            var request = new RegisterCustomerCommand()
             {
                 Username = "test",
                 FirstName = "NewFirstname",
@@ -120,7 +120,7 @@ namespace SolidSampleApplication.Api.Test
         public async Task RegisterCustomer_ShouldCreateMembership_Ok()
         {
             // arrange
-            var request = new RegisterCustomerRequest()
+            var request = new RegisterCustomerCommand()
             {
                 Username = "test",
                 FirstName = "NewFirstname",
@@ -171,7 +171,7 @@ namespace SolidSampleApplication.Api.Test
             string lastname,
             string email)
         {
-            var request = new RegisterCustomerRequest()
+            var request = new RegisterCustomerCommand()
             {
                 Username = username,
                 FirstName = firstname,
