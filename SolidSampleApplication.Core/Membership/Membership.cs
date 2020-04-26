@@ -43,7 +43,7 @@ namespace SolidSampleApplication.Core
 
         public void ApplyEvent(MembershipPointsEarnedEvent simpleEvent)
         {
-            var point = MembershipPoint.New(simpleEvent.Amount, simpleEvent.PointsType, DateTime.Now);
+            var point = MembershipPoint.New(simpleEvent.Amount, simpleEvent.PointsType, simpleEvent.EarnedAt);
             Points.Add(point);
             Version++;
         }

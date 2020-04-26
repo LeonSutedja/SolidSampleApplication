@@ -23,11 +23,14 @@ namespace SolidSampleApplication.Core
 
         public MembershipPointsType PointsType { get; private set; }
 
-        public MembershipPointsEarnedEvent(Guid id, double amount, MembershipPointsType pointsType)
+        public DateTime EarnedAt { get; private set; }
+
+        public MembershipPointsEarnedEvent(Guid id, double amount, MembershipPointsType pointsType, DateTime earnedAt)
         {
             Id = id;
             Amount = amount;
             PointsType = pointsType;
+            EarnedAt = earnedAt;
         }
     }
 

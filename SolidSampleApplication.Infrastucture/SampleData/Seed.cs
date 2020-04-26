@@ -29,9 +29,9 @@ namespace SolidSampleApplication.Infrastucture.SampleData
             var charlotteMembershipCreated = new MembershipCreatedEvent(Guid.NewGuid(), charlotte.Id);
             var mia = new CustomerRegisteredEvent(Guid.NewGuid(), "milee", "Mia", "Lee", "mialee@sampleemail.com");
             var miaMembershipCreated = new MembershipCreatedEvent(Guid.NewGuid(), mia.Id);
-            var miaMembershipPoint1 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 10, MembershipPointsType.Movie);
-            var miaMembershipPoint2 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 40, MembershipPointsType.Movie);
-            var miaMembershipPoint3 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 20, MembershipPointsType.Music);
+            var miaMembershipPoint1 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 10, MembershipPointsType.Movie, DateTime.Now.AddDays(-10));
+            var miaMembershipPoint2 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 40, MembershipPointsType.Movie, DateTime.Now.AddDays(-9));
+            var miaMembershipPoint3 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 20, MembershipPointsType.Music, DateTime.Now.AddDays(-5));
             var miaUpgradeMembership = new MembershipLevelUpgradeEvent(miaMembershipCreated.Id);
 
             var apocalypsoNameChanged = new CustomerNameChangedEvent(apocalypso.Id, "Apocal", "Lypso");

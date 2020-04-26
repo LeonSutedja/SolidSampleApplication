@@ -206,7 +206,7 @@ namespace SolidSampleApplication.Api.Test
             // arrange
             var request = new RegisterCustomerCommand()
             {
-                Username = "test",
+                Username = "UniqueUsername",
                 FirstName = "NewFirstname",
                 LastName = "NewLastname",
                 Email = "email@email.com.au"
@@ -217,7 +217,6 @@ namespace SolidSampleApplication.Api.Test
 
             // assert
             response.EnsureSuccessStatusCode();
-
             var content = await response.Content.ReadAsStringAsync();
             content.ShouldNotBeEmpty();
             _output.WriteLine(content);
