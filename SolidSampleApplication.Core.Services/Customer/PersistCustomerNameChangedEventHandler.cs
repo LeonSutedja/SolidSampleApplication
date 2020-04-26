@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Infrastructure;
-using SolidSampleApplication.ReadModelStore;
+using SolidSampleApplication.Infrastructure.ReadModelStore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

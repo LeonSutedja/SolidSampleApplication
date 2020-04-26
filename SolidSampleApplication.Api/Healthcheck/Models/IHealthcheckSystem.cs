@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using SolidSampleApplication.Infrastructure;
-using SolidSampleApplication.ReadModelStore;
+using SolidSampleApplication.Infrastructure.ReadModelStore;
 using System;
 using System.Threading.Tasks;
 

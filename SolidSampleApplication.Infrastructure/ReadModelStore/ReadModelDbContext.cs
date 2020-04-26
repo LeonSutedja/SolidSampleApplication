@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
 
-namespace SolidSampleApplication.ReadModelStore
+namespace SolidSampleApplication.Infrastructure.ReadModelStore
 {
     public class ReadModelDbContext : DbContext
     {

@@ -17,7 +17,7 @@ using SolidSampleApplication.Infrastructure;
 
 using SolidSampleApplication.Infrastructure;
 
-using SolidSampleApplication.ReadModelStore;
+using SolidSampleApplication.Infrastructure.ReadModelStore;
 using System.Linq;
 using System.Reflection;
 
