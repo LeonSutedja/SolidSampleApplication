@@ -25,13 +25,13 @@ namespace SolidSampleApplication.Core
 
     public class MembershipReadModel
     {
-        public static MembershipReadModel FromAggregate(AggregateMembership aggregateMembership)
+        public static MembershipReadModel FromAggregate(Membership aggregateMembership)
         {
             var points = aggregateMembership.Points.Select(p => new MembershipPointReadModel(p.Amount, p.Type, p.EarnedAt));
             return new MembershipReadModel(
-                aggregateMembership.Membership.Id,
-                aggregateMembership.Membership.Type,
-                aggregateMembership.Membership.CustomerId,
+                aggregateMembership.Id,
+                aggregateMembership.Type,
+                aggregateMembership.CustomerId,
                 points.ToList(),
                 points.Sum(p => p.Amount), aggregateMembership.Version);
         }

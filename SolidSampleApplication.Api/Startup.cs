@@ -120,7 +120,7 @@ namespace SolidSampleApplication.Api
                 readModelDbContext.Customers.AddRange(customerReadModels);
 
                 // As aggregate membership is a readmodel, we initialize it like this.
-                var aggregateMembershipFactory = new GenericEntityFactory<AggregateMembership>(eventStoreDbContext);
+                var aggregateMembershipFactory = new GenericEntityFactory<Core.Membership>(eventStoreDbContext);
                 var aggregateMembershipEntities = aggregateMembershipFactory.GetAllEntities().Result;
                 var aggregateMembershipReadModels = aggregateMembershipEntities.Select(am => MembershipReadModel.FromAggregate(am));
                 readModelDbContext.Memberships.AddRange(aggregateMembershipReadModels);

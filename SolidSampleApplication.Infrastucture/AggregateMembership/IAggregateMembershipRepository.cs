@@ -7,10 +7,10 @@ namespace SolidSampleApplication.Infrastructure.Repository
 {
     public interface IAggregateMembershipRepository
     {
-        Task<IEnumerable<AggregateMembership>> GetAggregateMemberships();
+        Task<IEnumerable<Membership>> GetAggregateMemberships();
 
-        Task<AggregateMembership> GetMembershipDetail(Guid membershipId);
+        Task<Membership> GetMembershipDetail(Guid membershipId);
 
-        Task<AggregateMembership> EarnPoints(Guid id, MembershipPointsType type, double points);
+        Task<Membership> EarnPoints(Guid id, MembershipPointsType type, double points);
     }
 }

@@ -1,27 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SolidSampleApplication.Core
 {
-    public class Membership
+    public class Membership :
+        IEntityEvent,
+        IHasSimpleEvent<MembershipCreatedEvent>,
+        IHasSimpleEvent<MembershipPointsEarnedEvent>,
+        IHasSimpleEvent<MembershipLevelUpgradeEvent>,
+        IHasSimpleEvent<MembershipLevelDowngradeEvent>
     {
-        public static Membership New(Guid id, MembershipType type, Guid customerId)
-        {
-            return new Membership(id, type, customerId);
-        }
-
         public Guid Id { get; private set; }
         public MembershipType Type { get; private set; }
         public Guid CustomerId { get; private set; }
 
-        // Value object
+        //public Membership Membership { get; private set; }
         public List<MembershipPoint> Points { get; private set; }
 
-        protected Membership(Guid id, MembershipType type, Guid customerId)
+        public double TotalPoints => Points.Sum(p => p.Amount);
+        public int Version { get; private set; }
+
+        public Membership()
         {
-            Id = id;
-            Type = type;
-            CustomerId = customerId;
+            Points = new List<MembershipPoint>();
         }
 
         public void UpgradeMembership()
@@ -40,6 +42,33 @@ namespace SolidSampleApplication.Core
                 : (Type == MembershipType.Level2)
                     ? MembershipType.Level1
                     : Type;
+        }
+
+        public void ApplyEvent(MembershipPointsEarnedEvent simpleEvent)
+        {
+            var point = MembershipPoint.New(simpleEvent.Amount, simpleEvent.PointsType, DateTime.Now);
+            Points.Add(point);
+            Version++;
+        }
+
+        public void ApplyEvent(MembershipCreatedEvent simpleEvent)
+        {
+            Id = simpleEvent.Id;
+            Type = MembershipType.Level1;
+            CustomerId = simpleEvent.CustomerId;
+            Version = 1;
+        }
+
+        public void ApplyEvent(MembershipLevelUpgradeEvent simpleEvent)
+        {
+            UpgradeMembership();
+            Version++;
+        }
+
+        public void ApplyEvent(MembershipLevelDowngradeEvent simpleEvent)
+        {
+            DowngradeMembership();
+            Version++;
         }
     }
 }

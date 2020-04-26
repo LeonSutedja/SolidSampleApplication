@@ -107,7 +107,7 @@ namespace SolidSampleApplication.Api.Customers
         {
             await _eventStoreDbContext.SaveEventAsync(notification, 1, DateTime.Now, "Sample");
 
-            var aggregate = new AggregateMembership();
+            var aggregate = new SolidSampleApplication.Core.Membership();
             aggregate.ApplyEvent(notification);
             var aggregateMembershipReadModel = MembershipReadModel.FromAggregate(aggregate);
             await _readModelDbContext.Memberships.AddAsync(aggregateMembershipReadModel);

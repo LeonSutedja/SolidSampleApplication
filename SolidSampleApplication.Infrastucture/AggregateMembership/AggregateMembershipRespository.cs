@@ -15,24 +15,24 @@ namespace SolidSampleApplication.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<AggregateMembership> EarnPoints(Guid id, MembershipPointsType type, double points)
+        public async Task<Membership> EarnPoints(Guid id, MembershipPointsType type, double points)
         {
             var membershipPointEvent = new MembershipPointsEarnedEvent(id, points, type);
             await _context.SaveEventAsync(membershipPointEvent, 1, DateTime.Now, "Sample");
             return await GetMembershipDetail(id);
         }
 
-        public async Task<IEnumerable<AggregateMembership>> GetAggregateMemberships()
+        public async Task<IEnumerable<Membership>> GetAggregateMemberships()
         {
-            var genericFactory = new GenericEntityFactory<AggregateMembership>(_context);
+            var genericFactory = new GenericEntityFactory<Membership>(_context);
             var entities = await genericFactory.GetAllEntities();
             //var allEntties = _readOnlyDbContext.
             return entities;
         }
 
-        public async Task<AggregateMembership> GetMembershipDetail(Guid membershipId)
+        public async Task<Membership> GetMembershipDetail(Guid membershipId)
         {
-            var genericFactory = new GenericEntityFactory<AggregateMembership>(_context);
+            var genericFactory = new GenericEntityFactory<Membership>(_context);
             var entity = await genericFactory.GetEntity(membershipId.ToString());
             return entity;
         }
