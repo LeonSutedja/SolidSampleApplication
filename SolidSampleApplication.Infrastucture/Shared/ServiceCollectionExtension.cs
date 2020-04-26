@@ -8,7 +8,7 @@ namespace SolidSampleApplication.Infrastructure
 {
     public static class ServiceCollectionExtension
     {
-        public static void AddEnumerableInterfacesAsSingleton<T>(this IServiceCollection services, Assembly assembly)
+        public static void AddEnumerableInterfaces<T>(this IServiceCollection services, Assembly assembly, ServiceLifetime serviceLifeTime = ServiceLifetime.Scoped)
         {
             var allTypes = assembly
                 .GetTypes()
@@ -18,7 +18,14 @@ namespace SolidSampleApplication.Infrastructure
                     x.GetInterfaces()
                         .Any(i => i == typeof(T))).ToList();
             foreach(var t in allTypes)
-                services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(T), t));
+            {
+                if(serviceLifeTime == ServiceLifetime.Scoped)
+                    services.TryAddEnumerable(ServiceDescriptor.Scoped(typeof(T), t));
+                if(serviceLifeTime == ServiceLifetime.Transient)
+                    services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(T), t));
+                else
+                    services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(T), t));
+            }
         }
 
         public static void AddEnumerableGenericInterfacesAsSingleton<T>(this IServiceCollection services, Assembly assembly)

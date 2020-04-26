@@ -42,7 +42,7 @@ namespace SolidSampleApplication.Api
             // controller from another assemblies.
             services.AddControllers().AddApplicationPart(mainAssembly);
             services.AddMediatR(mainAssembly);
-            services.AddEnumerableInterfacesAsSingleton<IHealthcheckSystem>(mainAssembly);
+            services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
 
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");
 

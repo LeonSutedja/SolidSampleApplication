@@ -46,11 +46,13 @@ namespace SolidSampleApplication.Api
                 });
             });
 
+            services.AddOpenApiDocument();
+
             var mainAssembly = typeof(Startup).GetTypeInfo().Assembly;
             services.AddControllers();
             services.AddMediatR(mainAssembly);
 
-            services.AddEnumerableInterfacesAsSingleton<IHealthcheckSystem>(mainAssembly);
+            services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
 
             // This is the default way of registering all fluent validation abstract validator
             //services.AddMvc()
@@ -60,6 +62,7 @@ namespace SolidSampleApplication.Api
             // This is because, we want the mediatr pipeline to be triggered first.
             services.AddTransient<IValidator<RegisterCustomerCommand>, RegisterCustomerCommandValidator>();
             services.AddTransient<IValidator<EarnPointsAggregateMembershipCommand>, EarnPointsAggregateMembershipCommandValidator>();
+            services.AddTransient<IValidator<ChangeNameCustomerCommand>, ChangeNameCustomerCommandValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
 
@@ -101,6 +104,10 @@ namespace SolidSampleApplication.Api
             {
                 endpoints.MapControllers();
             });
+
+            // Add OpenAPI/Swagger middlewares
+            app.UseOpenApi(); // Serves the registered OpenAPI/Swagger documents by default on `/swagger/{documentName}/swagger.json`
+            app.UseSwaggerUi3(); // Serves the Swagger UI 3 web ui to view the OpenAPI/Swagger documents by default on `/swagger`
 
             // NOTE: this must go at the end of Configure
             // ensure db is created
