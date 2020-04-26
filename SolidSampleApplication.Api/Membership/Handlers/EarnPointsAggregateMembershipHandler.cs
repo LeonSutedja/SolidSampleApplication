@@ -1,7 +1,8 @@
 ﻿using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
-using SolidSampleApplication.Infrastructure.Repository;
+using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.Shared;
 using SolidSampleApplication.Infrastucture;
 using SolidSampleApplication.ReadModelStore;
@@ -87,21 +88,22 @@ namespace SolidSampleApplication.Api.Membership
 
     public class EarnPointsAggregateMembershipHandler : IRequestHandler<EarnPointsAggregateMembershipRequest, DefaultResponse>
     {
-        private readonly IAggregateMembershipRepository _repository;
+        private readonly ReadModelDbContext _readModelDbContext;
         private readonly IMediator _mediator;
 
-        public EarnPointsAggregateMembershipHandler(IAggregateMembershipRepository repository, IMediator mediator)
+        public EarnPointsAggregateMembershipHandler(ReadModelDbContext readModelDbContext, IMediator mediator)
         {
-            _repository = repository;
-            this._mediator = mediator;
+            _readModelDbContext = readModelDbContext;
+            _mediator = mediator;
         }
 
         public async Task<DefaultResponse> Handle(EarnPointsAggregateMembershipRequest request, CancellationToken cancellationToken)
         {
-            //var membershipPointEvent = new MembershipPointsEarnedEvent(request.Id.Value, request.Points.Value, request.Type.Value);
-            //await _mediator.Publish(membershipPointEvent);
-            var aggregateMembership = await _repository.EarnPoints(request.Id.Value, request.Type.Value, request.Points.Value);
-            return DefaultResponse.Success(aggregateMembership);
+            var membershipPointEvent = new MembershipPointsEarnedEvent(request.Id.Value, request.Points.Value, request.Type.Value);
+            await _mediator.Publish(membershipPointEvent);
+
+            var membership = await _readModelDbContext.Memberships.FirstOrDefaultAsync(m => m.Id == request.Id.Value);
+            return DefaultResponse.Success(membership);
         }
     }
 
@@ -119,6 +121,14 @@ namespace SolidSampleApplication.Api.Membership
         public async Task Handle(MembershipPointsEarnedEvent notification, CancellationToken cancellationToken)
         {
             await _simpleEventStoreDbContext.SaveEventAsync(notification, 1, DateTime.Now, "Sample");
+
+            var eventStoreFactory = new GenericEntityFactory<Core.Membership>(_simpleEventStoreDbContext);
+            var membershipCoreModel = await eventStoreFactory.GetEntityAsync(notification.Id.ToString());
+            var updatedReadModel = MembershipReadModel.FromAggregate(membershipCoreModel);
+
+            // this way, we don't need to 'get data and update'.
+            _readModelDbContext.Memberships.Attach(updatedReadModel).State = EntityState.Modified;
+            await _readModelDbContext.SaveChangesAsync();
         }
     }
 }

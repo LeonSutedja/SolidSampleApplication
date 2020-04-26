@@ -14,10 +14,7 @@ namespace SolidSampleApplication.Core
         public Guid Id { get; private set; }
         public MembershipType Type { get; private set; }
         public Guid CustomerId { get; private set; }
-
-        //public Membership Membership { get; private set; }
         public List<MembershipPoint> Points { get; private set; }
-
         public double TotalPoints => Points.Sum(p => p.Amount);
         public int Version { get; private set; }
 

@@ -17,7 +17,7 @@ namespace SolidSampleApplication.Infrastructure
             _context = context;
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllEntities(int max = 200)
+        public async Task<IEnumerable<TEntity>> GetAllEntitiesAsync(int max = 200)
         {
             var interfaces = typeof(TEntity).GetInterfaces();
             var implementedHasSimpleEventTypes = interfaces
@@ -41,7 +41,7 @@ namespace SolidSampleApplication.Infrastructure
             var allEvents = (await _getApplicationEvents(distinctEntityIds, assemblyQualifiedNameTypes)).GroupBy(allEvents => allEvents.EntityId);
 
             var entityList = new List<TEntity>();
-            foreach (var entityEvents in allEvents)
+            foreach(var entityEvents in allEvents)
             {
                 // Currently, we try to avoid using reflection (Activator.CreateInstance) to create entity.
                 // This is because of the performance impact from reflection.
@@ -53,7 +53,7 @@ namespace SolidSampleApplication.Infrastructure
             return entityList;
         }
 
-        public async Task<TEntity> GetEntity(string entityId)
+        public async Task<TEntity> GetEntityAsync(string entityId)
         {
             var interfaces = typeof(TEntity).GetInterfaces();
             var implementedHasSimpleEventTypes = interfaces

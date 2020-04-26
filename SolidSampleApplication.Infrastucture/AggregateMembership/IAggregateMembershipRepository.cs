@@ -10,7 +10,5 @@ namespace SolidSampleApplication.Infrastructure.Repository
         Task<IEnumerable<Membership>> GetAggregateMemberships();
 
         Task<Membership> GetMembershipDetail(Guid membershipId);
-
-        Task<Membership> EarnPoints(Guid id, MembershipPointsType type, double points);
     }
 }
