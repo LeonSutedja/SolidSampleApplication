@@ -8,8 +8,8 @@ namespace SolidSampleApplication.Core
         IEntityEvent,
         IHasSimpleEvent<MembershipCreatedEvent>,
         IHasSimpleEvent<MembershipPointsEarnedEvent>,
-        IHasSimpleEvent<MembershipLevelUpgradeEvent>,
-        IHasSimpleEvent<MembershipLevelDowngradeEvent>
+        IHasSimpleEvent<MembershipLevelUpgradedEvent>,
+        IHasSimpleEvent<MembershipLevelDowngradedEvent>
     {
         public Guid Id { get; private set; }
         public MembershipType Type { get; private set; }
@@ -56,13 +56,13 @@ namespace SolidSampleApplication.Core
             Version = 1;
         }
 
-        public void ApplyEvent(MembershipLevelUpgradeEvent simpleEvent)
+        public void ApplyEvent(MembershipLevelUpgradedEvent simpleEvent)
         {
             UpgradeMembership();
             Version++;
         }
 
-        public void ApplyEvent(MembershipLevelDowngradeEvent simpleEvent)
+        public void ApplyEvent(MembershipLevelDowngradedEvent simpleEvent)
         {
             DowngradeMembership();
             Version++;

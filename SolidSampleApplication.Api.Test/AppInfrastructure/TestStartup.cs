@@ -104,7 +104,12 @@ namespace SolidSampleApplication.Api
 
                 var customerFactory = new GenericEntityFactory<Customer>(eventStoreDbContext);
                 var customerEntities = customerFactory.GetAllEntitiesAsync().Result;
-                var customerReadModels = customerEntities.Select(c => CustomerReadModel.FromAggregate(c));
+                var customerReadModels = customerEntities.Select(c =>
+                {
+                    var readModel = new CustomerReadModel();
+                    readModel.FromAggregate(c);
+                    return readModel;
+                });
                 readModelDbContext.Customers.AddRange(customerReadModels);
 
                 // As aggregate membership is a readmodel, we initialize it like this.

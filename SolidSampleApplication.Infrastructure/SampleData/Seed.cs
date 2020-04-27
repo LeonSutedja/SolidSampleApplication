@@ -32,7 +32,7 @@ namespace SolidSampleApplication.Infrastructure.SampleData
             var miaMembershipPoint1 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 10, MembershipPointsType.Movie, DateTime.Now.AddDays(-10));
             var miaMembershipPoint2 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 40, MembershipPointsType.Movie, DateTime.Now.AddDays(-9));
             var miaMembershipPoint3 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 20, MembershipPointsType.Music, DateTime.Now.AddDays(-5));
-            var miaUpgradeMembership = new MembershipLevelUpgradeEvent(miaMembershipCreated.Id);
+            var miaUpgradeMembership = new MembershipLevelUpgradedEvent(miaMembershipCreated.Id, DateTime.Now.AddDays(-5));
 
             var apocalypsoNameChanged = new CustomerNameChangedEvent(apocalypso.Id, "Apocal", "Lypso");
             var aphroditeNameChanged = new CustomerNameChangedEvent(aphrodite.Id, "Aphrod", "Ite");

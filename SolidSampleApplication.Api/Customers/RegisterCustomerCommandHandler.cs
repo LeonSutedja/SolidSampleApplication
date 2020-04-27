@@ -89,8 +89,12 @@ namespace SolidSampleApplication.Api.Customers
 
             var customer = new Customer();
             customer.ApplyEvent(notification);
-            var customerReadModel = CustomerReadModel.FromAggregate(customer);
-            await _readModelDbContext.Customers.AddAsync(customerReadModel);
+
+            var readModel = new CustomerReadModel();
+            readModel.FromAggregate(customer);
+
+            //var customerReadModel = CustomerReadModel.FromAggregate(customer);
+            await _readModelDbContext.AddAsync(readModel);
             await _readModelDbContext.SaveChangesAsync();
         }
     }

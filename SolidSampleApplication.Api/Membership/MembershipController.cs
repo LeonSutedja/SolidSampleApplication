@@ -38,7 +38,7 @@ namespace SolidSampleApplication.Api.Membership
 
         [HttpPut]
         [Route("upgrade")]
-        public async Task<ActionResult> Upgrade(EarnPointsAggregateMembershipCommand request)
+        public async Task<ActionResult> Upgrade(UpgradeMembershipCommand request)
         {
             return (await _mediator.Send(request)).ActionResult;
         }

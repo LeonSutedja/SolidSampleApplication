@@ -2,11 +2,8 @@
 
 namespace SolidSampleApplication.Core
 {
-    public class CustomerReadModel
+    public class CustomerReadModel : IReadModel<Customer>
     {
-        public static CustomerReadModel FromAggregate(Customer customer)
-            => new CustomerReadModel(customer.Id, customer.Username, customer.FirstName, customer.LastName, customer.Email, customer.Version);
-
         public Guid Id { get; private set; }
         public string Username { get; private set; }
         public string FirstName { get; private set; }
@@ -26,6 +23,16 @@ namespace SolidSampleApplication.Core
             LastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
             Email = email ?? throw new ArgumentNullException(nameof(email));
             Version = version;
+        }
+
+        public void FromAggregate(Customer aggregate)
+        {
+            Id = aggregate.Id;
+            Username = aggregate.Username;
+            FirstName = aggregate.FirstName;
+            LastName = aggregate.LastName;
+            Email = aggregate.Email;
+            Version = aggregate.Version;
         }
     }
 }
