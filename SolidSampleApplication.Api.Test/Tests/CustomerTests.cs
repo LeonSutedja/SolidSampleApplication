@@ -172,6 +172,11 @@ namespace SolidSampleApplication.Api.Test
             jsonObject.ShouldContainKeyAndValue("username", request.Username);
             jsonObject.ShouldContainKeyAndValue("firstName", request.FirstName);
             jsonObject.ShouldContainKeyAndValue("lastName", request.LastName);
+            jsonObject.ShouldContainKey("id");
+            var id = jsonObject.GetValue("id");
+            var eventStoreDbContext = (SimpleEventStoreDbContext)_fixture.Services.GetService(typeof(SimpleEventStoreDbContext));
+            var events = await eventStoreDbContext.FindEventsAsync<CustomerRegisteredEvent>(id.ToString());
+            events.ShouldNotBeEmpty();
         }
 
         [Fact]
@@ -234,11 +239,8 @@ namespace SolidSampleApplication.Api.Test
             var membershipId = membership.Id;
 
             var eventStoreDbContext = (SimpleEventStoreDbContext)_fixture.Services.GetService(typeof(SimpleEventStoreDbContext));
-            var entityType = typeof(MembershipCreatedEvent).AssemblyQualifiedName;
-            var membershipCreatedEvent = eventStoreDbContext
-                .ApplicationEvents
-                .FirstOrDefault(e => e.EntityId == membership.Id.ToString() && e.EntityType == entityType);
-            membershipCreatedEvent.ShouldNotBeNull();
+            var events = await eventStoreDbContext.FindEventsAsync<MembershipCreatedEvent>(membership.Id.ToString());
+            events.ShouldNotBeEmpty();
         }
 
         public static IEnumerable<object[]> InvalidRegisterCustomerCommand()

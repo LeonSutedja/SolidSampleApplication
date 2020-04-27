@@ -1,9 +1,13 @@
+using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Shouldly;
 using SolidSampleApplication.Api.Membership;
+using SolidSampleApplication.Core;
+using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.ReadModelStore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -91,9 +95,41 @@ namespace SolidSampleApplication.Api.Test
             _output.WriteLine(content);
 
             var jsonObject = JObject.Parse(content);
-            // need to fix username
             jsonObject.ShouldContainKeyAndValue("totalPoints", pointsToAdd + (int)currentPoint);
-            jsonObject.ShouldContainKeyAndValue("version", currentVersion + 1);
+            jsonObject.ShouldContainKey("version");
+            var newVersion = (int)jsonObject.GetValue("version");
+            newVersion.ShouldBeGreaterThan(currentVersion);
+        }
+
+        [Fact]
+        public async Task MembershipUpgrade_ShouldReturn_Ok()
+        {
+            // arrange
+            var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+
+            var member = await readModelContext.Memberships.FirstOrDefaultAsync();
+            var currentVersion = member.Version;
+            var currentLevel = (int)member.Type;
+
+            var request = new UpgradeMembershipCommand(member.Id);
+            // act
+            var response = await _client.PutRequestAsStringContent("/Membership/upgrade", request);
+
+            // assert
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            _output.WriteLine(content);
+
+            var jsonObject = JObject.Parse(content);
+            jsonObject.ShouldContainKeyAndValue("type", currentLevel + 1);
+            jsonObject.ShouldContainKey("version");
+            var newVersion = (int)jsonObject.GetValue("version");
+            newVersion.ShouldBeGreaterThan(currentVersion);
+
+            var eventStoreDbContext = (SimpleEventStoreDbContext)_fixture.Services.GetService(typeof(SimpleEventStoreDbContext));
+            var @events = await eventStoreDbContext.FindEventsAsync<MembershipLevelUpgradedEvent>(member.Id.ToString());
+            @events.ShouldNotBeEmpty();
+            @events.Count().ShouldBeGreaterThan(0);
         }
     }
 }
