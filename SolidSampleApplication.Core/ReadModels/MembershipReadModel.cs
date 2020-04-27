@@ -23,19 +23,8 @@ namespace SolidSampleApplication.Core
         }
     }
 
-    public class MembershipReadModel
+    public class MembershipReadModel : IReadModel<Membership>
     {
-        public static MembershipReadModel FromAggregate(Membership aggregateMembership)
-        {
-            var points = aggregateMembership.Points.Select(p => new MembershipPointReadModel(p.Amount, p.Type, p.EarnedAt));
-            return new MembershipReadModel(
-                aggregateMembership.Id,
-                aggregateMembership.Type,
-                aggregateMembership.CustomerId,
-                points.ToList(),
-                points.Sum(p => p.Amount), aggregateMembership.Version);
-        }
-
         // aggregate id
         public Guid Id { get; private set; }
 
@@ -47,7 +36,7 @@ namespace SolidSampleApplication.Core
         public double TotalPoints { get; private set; }
         public int Version { get; private set; }
 
-        protected MembershipReadModel()
+        public MembershipReadModel()
         {
             _points = new List<MembershipPointReadModel>();
         }
@@ -66,6 +55,17 @@ namespace SolidSampleApplication.Core
             _points = points ?? throw new ArgumentNullException(nameof(points));
             Version = version;
             TotalPoints = totalPoints;
+        }
+
+        public void FromAggregate(Membership membership)
+        {
+            var points = membership.Points.Select(p => new MembershipPointReadModel(p.Amount, p.Type, p.EarnedAt));
+            Id = membership.Id;
+            Type = membership.Type;
+            CustomerId = membership.CustomerId;
+            _points = points.ToList();
+            TotalPoints = points.Sum(p => p.Amount);
+            Version = membership.Version;
         }
     }
 }

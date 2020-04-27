@@ -2,7 +2,6 @@
 using MediatR;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure.Shared;
-using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.ReadModelStore;
 using System;
 using System.Linq;
@@ -69,56 +68,6 @@ namespace SolidSampleApplication.Api.Customers
 
             var customer = _context.Customers.FirstOrDefault(c => c.Username == request.Username);
             return DefaultResponse.Success(customer);
-        }
-    }
-
-    public class PersistCustomerRegisteredEventHandler : INotificationHandler<CustomerRegisteredEvent>
-    {
-        private readonly SimpleEventStoreDbContext _context;
-        private readonly ReadModelDbContext _readModelDbContext;
-
-        public PersistCustomerRegisteredEventHandler(SimpleEventStoreDbContext context, ReadModelDbContext readModelDbContext)
-        {
-            _context = context;
-            _readModelDbContext = readModelDbContext;
-        }
-
-        public async Task Handle(CustomerRegisteredEvent notification, CancellationToken cancellationToken)
-        {
-            await _context.SaveEventAsync(notification, 1, DateTime.Now, "Sample");
-
-            var customer = new Customer();
-            customer.ApplyEvent(notification);
-
-            var readModel = new CustomerReadModel();
-            readModel.FromAggregate(customer);
-
-            //var customerReadModel = CustomerReadModel.FromAggregate(customer);
-            await _readModelDbContext.AddAsync(readModel);
-            await _readModelDbContext.SaveChangesAsync();
-        }
-    }
-
-    public class PersistMembershipCreatedEventHandler : INotificationHandler<MembershipCreatedEvent>
-    {
-        private readonly SimpleEventStoreDbContext _eventStoreDbContext;
-        private readonly ReadModelDbContext _readModelDbContext;
-
-        public PersistMembershipCreatedEventHandler(SimpleEventStoreDbContext eventStoreDbContext, ReadModelDbContext readModelDbContext)
-        {
-            _eventStoreDbContext = eventStoreDbContext;
-            _readModelDbContext = readModelDbContext;
-        }
-
-        public async Task Handle(MembershipCreatedEvent notification, CancellationToken cancellationToken)
-        {
-            await _eventStoreDbContext.SaveEventAsync(notification, 1, DateTime.Now, "Sample");
-
-            var aggregate = new SolidSampleApplication.Core.Membership();
-            aggregate.ApplyEvent(notification);
-            var aggregateMembershipReadModel = MembershipReadModel.FromAggregate(aggregate);
-            await _readModelDbContext.Memberships.AddAsync(aggregateMembershipReadModel);
-            await _readModelDbContext.SaveChangesAsync();
         }
     }
 }

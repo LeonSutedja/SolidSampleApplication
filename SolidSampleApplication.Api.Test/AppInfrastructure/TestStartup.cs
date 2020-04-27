@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -41,20 +42,18 @@ namespace SolidSampleApplication.Api
 
             // the way to add and register
             // controller from another assemblies.
-            services.AddControllers().AddApplicationPart(mainAssembly);
+            services.AddControllers()
+                .AddApplicationPart(mainAssembly)
+                // This is the default way of registering all fluent validation abstract validator
+                // fluent validation generic registration
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(mainAssembly));
+
             services.AddMediatR(mainAssembly);
             services.AddMediatR(typeof(PersistCustomerNameChangedEventHandler).GetTypeInfo().Assembly);
             services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
 
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");
 
-            // fluent validation generic registration
-            //services.AddMvc()
-            //    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateMembershipRequestValidator>());
-
-            services.AddTransient<IValidator<RegisterCustomerCommand>, RegisterCustomerCommandValidator>();
-            services.AddTransient<IValidator<EarnPointsAggregateMembershipCommand>, EarnPointsAggregateMembershipCommandValidator>();
-            services.AddTransient<IValidator<ChangeNameCustomerCommand>, ChangeNameCustomerCommandValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
 
@@ -115,7 +114,12 @@ namespace SolidSampleApplication.Api
                 // As aggregate membership is a readmodel, we initialize it like this.
                 var aggregateMembershipFactory = new GenericEntityFactory<Core.Membership>(eventStoreDbContext);
                 var aggregateMembershipEntities = aggregateMembershipFactory.GetAllEntitiesAsync().Result;
-                var aggregateMembershipReadModels = aggregateMembershipEntities.Select(am => MembershipReadModel.FromAggregate(am));
+                var aggregateMembershipReadModels = aggregateMembershipEntities.Select(am =>
+                {
+                    var model = new MembershipReadModel();
+                    model.FromAggregate(am);
+                    return model;
+                });
                 readModelDbContext.Memberships.AddRange(aggregateMembershipReadModels);
 
                 readModelDbContext.SaveChanges();

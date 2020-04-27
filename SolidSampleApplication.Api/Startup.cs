@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -49,21 +50,19 @@ namespace SolidSampleApplication.Api
             services.AddOpenApiDocument();
 
             var mainAssembly = typeof(Startup).GetTypeInfo().Assembly;
-            services.AddControllers();
+
+            // This is the default way of registering all fluent validation abstract validator
+            // fluent validation generic registration
+            services.AddControllers()
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(mainAssembly));
+
             services.AddMediatR(mainAssembly);
             services.AddMediatR(typeof(PersistCustomerNameChangedEventHandler).GetTypeInfo().Assembly);
 
             services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
 
-            // This is the default way of registering all fluent validation abstract validator
-            //services.AddMvc()
-            //    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateMembershipRequestValidator>());
-            // fluent validation generic registration
             // we want to use mediatr pipeline to help with the fluent validation, rather than attaching it to the mvc.
             // This is because, we want the mediatr pipeline to be triggered first.
-            services.AddTransient<IValidator<RegisterCustomerCommand>, RegisterCustomerCommandValidator>();
-            services.AddTransient<IValidator<EarnPointsAggregateMembershipCommand>, EarnPointsAggregateMembershipCommandValidator>();
-            services.AddTransient<IValidator<ChangeNameCustomerCommand>, ChangeNameCustomerCommandValidator>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
 
@@ -135,7 +134,12 @@ namespace SolidSampleApplication.Api
                 // As aggregate membership is a readmodel, we initialize it like this.
                 var aggregateMembershipFactory = new GenericEntityFactory<Core.Membership>(eventStoreDbContext);
                 var aggregateMembershipEntities = aggregateMembershipFactory.GetAllEntitiesAsync().Result;
-                var aggregateMembershipReadModels = aggregateMembershipEntities.Select(am => MembershipReadModel.FromAggregate(am));
+                var aggregateMembershipReadModels = aggregateMembershipEntities.Select(am =>
+                {
+                    var model = new MembershipReadModel();
+                    model.FromAggregate(am);
+                    return model;
+                });
                 readModelDbContext.Memberships.AddRange(aggregateMembershipReadModels);
 
                 readModelDbContext.SaveChanges();
