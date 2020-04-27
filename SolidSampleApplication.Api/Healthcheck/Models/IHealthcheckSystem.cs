@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.ReadModelStore;
-using System;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Healthcheck

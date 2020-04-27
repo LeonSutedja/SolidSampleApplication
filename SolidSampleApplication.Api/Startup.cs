@@ -65,6 +65,7 @@ namespace SolidSampleApplication.Api
             // This is because, we want the mediatr pipeline to be triggered first.
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggerPipelineBehavior<,>));
 
             // As sqllite db context is scoped, repository must become scoped as well
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");

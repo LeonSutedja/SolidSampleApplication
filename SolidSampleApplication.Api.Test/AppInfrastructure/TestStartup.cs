@@ -56,6 +56,7 @@ namespace SolidSampleApplication.Api
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggerPipelineBehavior<,>));
 
             // we are using sql lite in-memory database for this sample application purpose
             // for in-memory relational database, we use sqllite in-memory as opposed to the ef core in-memory provider.
