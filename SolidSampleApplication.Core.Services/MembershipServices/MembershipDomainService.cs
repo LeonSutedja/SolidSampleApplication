@@ -23,6 +23,8 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
             var membership = await _readModelDbContext.Memberships
                 .Include(m => m.Points)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
+            // this is require, as otherwise, the place where it save to the read mokdel will throw some exceptions
             _readModelDbContext.Entry(membership).State = EntityState.Detached;
             var currentPoints = membership.TotalPoints;
             var currentPointsPer100 = (int)(currentPoints / 100);

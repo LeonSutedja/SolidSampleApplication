@@ -45,6 +45,12 @@ namespace SolidSampleApplication.Core
         {
             var point = MembershipPoint.New(simpleEvent.Amount, simpleEvent.PointsType, simpleEvent.EarnedAt);
             Points.Add(point);
+            // domain rule. if the new points are in between 200 - 300, and it is a membership type level 1, we upgrade the membership.
+            // if the points above 300 then it would be membership type level 3
+            if(TotalPoints > 200 && TotalPoints < 300 && Type == MembershipType.Level1)
+                Type = MembershipType.Level2;
+            if(TotalPoints > 300)
+                Type = MembershipType.Level3;
             Version++;
         }
 

@@ -287,14 +287,5 @@ namespace SolidSampleApplication.Api.Test
             content.ShouldNotBeEmpty();
             _output.WriteLine(content);
         }
-
-        [Fact]
-        public void Test()
-        {
-            var a = new Customer();
-            var interfaces = a.GetType().GetInterfaces();
-            var hasEventInterfaces = interfaces.Where(i => i.Name.Contains("IHasSimpleEvent")).ToList();
-            var implementedEvent = hasEventInterfaces.Select(i => i.GenericTypeArguments.First()).ToList();
-        }
     }
 }
