@@ -27,10 +27,7 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
 
             // success
             var customerRegisteredEvent = new CustomerRegisteredEvent(Guid.NewGuid(), username, firstname, lastname, email);
-            var membershipEvent = new MembershipCreatedEvent(Guid.NewGuid(), customerRegisteredEvent.Id);
-
             await _mediator.Publish(customerRegisteredEvent);
-            await _mediator.Publish(membershipEvent);
 
             return true;
         }
