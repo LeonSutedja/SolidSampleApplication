@@ -6,5 +6,7 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
     public interface IMembershipDomainService
     {
         Task PointsEarned(Guid id, double points, MembershipPointsType type);
+
+        Task UpgradeMembership(Guid id);
     }
 }

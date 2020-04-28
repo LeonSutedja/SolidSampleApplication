@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
+using SolidSampleApplication.Core.Services.MembershipServices;
 using SolidSampleApplication.Infrastructure.ReadModelStore;
 using SolidSampleApplication.Infrastructure.Shared;
 using System;
@@ -51,18 +52,17 @@ namespace SolidSampleApplication.Api.Membership
     public class UpgradeMembershipCommandHandler : IRequestHandler<UpgradeMembershipCommand, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
-        private readonly IMediator _mediator;
+        private readonly IMembershipDomainService _service;
 
-        public UpgradeMembershipCommandHandler(ReadModelDbContext readModelDbContext, IMediator mediator)
+        public UpgradeMembershipCommandHandler(ReadModelDbContext readModelDbContext, IMembershipDomainService service)
         {
             _readModelDbContext = readModelDbContext;
-            _mediator = mediator;
+            _service = service;
         }
 
         public async Task<DefaultResponse> Handle(UpgradeMembershipCommand request, CancellationToken cancellationToken)
         {
-            var @event = new MembershipLevelUpgradedEvent(request.Id.Value, DateTime.Now);
-            await _mediator.Publish(@event);
+            await _service.UpgradeMembership(request.Id.Value);
 
             var membership = await _readModelDbContext.Memberships.FirstOrDefaultAsync(m => m.Id == request.Id.Value);
             return DefaultResponse.Success(membership);

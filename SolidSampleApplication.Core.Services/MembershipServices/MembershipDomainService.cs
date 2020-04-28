@@ -43,5 +43,11 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
             var membershipPointEvent = new MembershipPointsEarnedEvent(id, points, type, DateTime.Now);
             await _mediator.Publish(membershipPointEvent);
         }
+
+        public async Task UpgradeMembership(Guid id)
+        {
+            var @event = new MembershipLevelUpgradedEvent(id, DateTime.Now);
+            await _mediator.Publish(@event);
+        }
     }
 }
