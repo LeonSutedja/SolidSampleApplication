@@ -11,8 +11,4 @@
   <ItemGroup>
     <ProjectReference Include="..\SolidSampleApplication.Infrastructure\SolidSampleApplication.Infrastructure.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="MembershipServices\Models\" />
-  </ItemGroup>
 </Project>
