@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
+using SolidSampleApplication.Core.Services.MembershipServices;
 using SolidSampleApplication.Infrastructure.ReadModelStore;
 using SolidSampleApplication.Infrastructure.Shared;
 using System;
@@ -87,18 +88,17 @@ namespace SolidSampleApplication.Api.Membership
     public class EarnPointsAggregateMembershipCommandHandler : IRequestHandler<EarnPointsAggregateMembershipCommand, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
-        private readonly IMediator _mediator;
+        private readonly IMembershipDomainService _service;
 
-        public EarnPointsAggregateMembershipCommandHandler(ReadModelDbContext readModelDbContext, IMediator mediator)
+        public EarnPointsAggregateMembershipCommandHandler(ReadModelDbContext readModelDbContext, IMembershipDomainService service)
         {
             _readModelDbContext = readModelDbContext;
-            _mediator = mediator;
+            _service = service;
         }
 
         public async Task<DefaultResponse> Handle(EarnPointsAggregateMembershipCommand request, CancellationToken cancellationToken)
         {
-            var membershipPointEvent = new MembershipPointsEarnedEvent(request.Id.Value, request.Points.Value, request.Type.Value, DateTime.Now);
-            await _mediator.Publish(membershipPointEvent);
+            await _service.PointsEarned(request.Id.Value, request.Points.Value, request.Type.Value);
 
             var membership = await _readModelDbContext.Memberships.FirstOrDefaultAsync(m => m.Id == request.Id.Value);
             return DefaultResponse.Success(membership);

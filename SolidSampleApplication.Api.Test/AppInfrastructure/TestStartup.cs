@@ -53,6 +53,7 @@ namespace SolidSampleApplication.Api
             services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
 
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");
+            services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Service");
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));

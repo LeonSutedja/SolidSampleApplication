@@ -1,33 +1,33 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core.Rewards;
-using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.ReadModelStore;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Core.Services.MembershipServices
 {
-    public class PersistMembershipPointsEarnedEventHandler
-        : AbstractUpdatePersistEventHandler<Membership, MembershipReadModel, MembershipPointsEarnedEvent>
+    public class MembershipDomainService : IMembershipDomainService
     {
         private readonly IMediator _mediator;
+        private readonly ReadModelDbContext _readModelDbContext;
 
-        public PersistMembershipPointsEarnedEventHandler(ReadModelDbContext readModelDbContext, SimpleEventStoreDbContext simpleEventStoreDbContext, IMediator mediator)
-            : base(readModelDbContext, simpleEventStoreDbContext)
+        public MembershipDomainService(IMediator mediator, ReadModelDbContext readModelDbContext)
         {
-            this._mediator = mediator;
+            _mediator = mediator;
+            _readModelDbContext = readModelDbContext;
         }
 
-        public override async Task Handle(MembershipPointsEarnedEvent notification, CancellationToken cancellationToken)
+        public async Task PointsEarned(Guid id, double points, MembershipPointsType type)
         {
-            var membership = await _readModelDbContext.Memberships.Include(m => m.Points).FirstOrDefaultAsync(m => m.Id == notification.Id);
+            var membership = await _readModelDbContext.Memberships
+                .Include(m => m.Points)
+                .FirstOrDefaultAsync(m => m.Id == id);
             _readModelDbContext.Entry(membership).State = EntityState.Detached;
             var currentPoints = membership.TotalPoints;
             var currentPointsPer100 = (int)(currentPoints / 100);
 
-            var newPoints = currentPoints + notification.Amount;
+            var newPoints = currentPoints + points;
             var newPointsPer100 = (int)(newPoints / 100);
             var rewardPointsEarned = newPointsPer100 - currentPointsPer100;
 
@@ -40,7 +40,8 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
                 await _mediator.Publish(@event);
             }
 
-            await base.Handle(notification, cancellationToken);
+            var membershipPointEvent = new MembershipPointsEarnedEvent(id, points, type, DateTime.Now);
+            await _mediator.Publish(membershipPointEvent);
         }
     }
 }

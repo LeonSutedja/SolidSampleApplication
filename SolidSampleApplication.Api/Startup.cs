@@ -69,6 +69,7 @@ namespace SolidSampleApplication.Api
 
             // As sqllite db context is scoped, repository must become scoped as well
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");
+            services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Service");
 
             // we are using sql lite in-memory database for this sample application purpose
             // for in-memory relational database, we use sqllite in-memory as opposed to the ef core in-memory provider.
