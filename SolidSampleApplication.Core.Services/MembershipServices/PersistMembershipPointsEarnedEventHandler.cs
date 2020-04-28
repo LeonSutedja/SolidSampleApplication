@@ -23,23 +23,24 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
         public override async Task Handle(MembershipPointsEarnedEvent notification, CancellationToken cancellationToken)
         {
             var membership = await _readModelDbContext.Memberships.Include(m => m.Points).FirstOrDefaultAsync(m => m.Id == notification.Id);
+            _readModelDbContext.Entry(membership).State = EntityState.Detached;
             var currentPoints = membership.TotalPoints;
             var currentPointsPer100 = (int)(currentPoints / 100);
-            _readModelDbContext.Entry(membership).State = EntityState.Detached;
-            await base.Handle(notification, cancellationToken);
-            var newMembership = await _readModelDbContext.Memberships.Include(m => m.Points).FirstOrDefaultAsync(m => m.Id == notification.Id);
-            var newPoints = newMembership.TotalPoints;
+
+            var newPoints = currentPoints + notification.Amount;
             var newPointsPer100 = (int)(newPoints / 100);
             var rewardPointsEarned = newPointsPer100 - currentPointsPer100;
 
-            if(rewardPointsEarned == 0)
-                return;
+            if(rewardPointsEarned > 0)
+            {
+                var rewardType = (rewardPointsEarned == 1)
+                   ? RewardType.GiftVoucher
+                   : RewardType.FreeMeal;
+                var @event = new RewardEarnedEvent(Guid.NewGuid(), membership.CustomerId, rewardType, DateTime.Now);
+                await _mediator.Publish(@event);
+            }
 
-            var rewardType = (rewardPointsEarned == 1)
-                ? RewardType.GiftVoucher
-                : RewardType.FreeMeal;
-            var @event = new RewardEarnedEvent(Guid.NewGuid(), membership.CustomerId, rewardType, DateTime.Now);
-            await _mediator.Publish(@event);
+            await base.Handle(notification, cancellationToken);
         }
     }
 }

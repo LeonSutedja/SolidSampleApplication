@@ -120,9 +120,13 @@ namespace SolidSampleApplication.Api.Test
             jsonObject.ShouldContainKey("totalPoints");
             jsonObject.ShouldContainKey("version");
 
-            var rewards = await readModelContext.Rewards.ToListAsync();
+            var rewards = await readModelContext.Rewards.Where(r => r.CustomerId == member.CustomerId).ToListAsync();
             _output.WriteLine($"Rewards count: {rewards.Count()}");
             rewards.Count().ShouldBe(2);
+            foreach(var r in rewards)
+            {
+                _output.WriteLine($"{r.CustomerId}: {r.RewardType} at {r.EarnedAt}");
+            }
         }
 
         [Fact]
