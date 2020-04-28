@@ -56,8 +56,9 @@ namespace SolidSampleApplication.Api
             services.AddControllers()
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(mainAssembly));
 
-            services.AddMediatR(mainAssembly);
-            services.AddMediatR(typeof(PersistCustomerNameChangedEventHandler).GetTypeInfo().Assembly);
+            var namespaceToCheck = "SolidSampleApplication";
+            var allAssemblies = mainAssembly.GetAllAssembliesInNamespace(namespaceToCheck);
+            services.AddMediatR(allAssemblies.ToArray());
 
             services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
 

@@ -34,11 +34,6 @@ namespace SolidSampleApplication.Api
         public void ConfigureServices(IServiceCollection services)
         {
             var mainAssembly = typeof(Startup).Assembly;
-            var namespaceToCheck = "SolidSampleApplication";
-            var allAssembliesName = mainAssembly
-                .GetReferencedAssemblies()
-                .Where(a => a.Name.ToLower().Contains(namespaceToCheck.ToLower()))
-                .ToList();
 
             // the way to add and register
             // controller from another assemblies.
@@ -48,8 +43,10 @@ namespace SolidSampleApplication.Api
                 // fluent validation generic registration
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(mainAssembly));
 
-            services.AddMediatR(mainAssembly);
-            services.AddMediatR(typeof(PersistCustomerNameChangedEventHandler).GetTypeInfo().Assembly);
+            var namespaceToCheck = "SolidSampleApplication";
+            var allAssemblies = mainAssembly.GetAllAssembliesInNamespace(namespaceToCheck);
+
+            services.AddMediatR(allAssemblies.ToArray());
             services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
 
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");
