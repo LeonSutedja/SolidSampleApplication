@@ -20,8 +20,8 @@ namespace SolidSampleApplication.Core.Services
         where TEntity : IEntityEvent, new()
         where TEntityReadModel : IReadModel<TEntity>, new()
     {
-        private readonly ReadModelDbContext _readModelDbContext;
-        private readonly SimpleEventStoreDbContext _simpleEventStoreDbContext;
+        protected readonly ReadModelDbContext _readModelDbContext;
+        protected readonly SimpleEventStoreDbContext _simpleEventStoreDbContext;
 
         public AbstractUpdatePersistEventHandler(ReadModelDbContext readModelDbContext, SimpleEventStoreDbContext simpleEventStoreDbContext)
         {
@@ -29,7 +29,7 @@ namespace SolidSampleApplication.Core.Services
             _simpleEventStoreDbContext = simpleEventStoreDbContext;
         }
 
-        public async Task Handle(TEvent notification, CancellationToken cancellationToken)
+        public virtual async Task Handle(TEvent notification, CancellationToken cancellationToken)
         {
             await _simpleEventStoreDbContext.SaveEventAsync(notification, 1, DateTime.Now, "Sample");
 
@@ -59,8 +59,8 @@ namespace SolidSampleApplication.Core.Services
         where TEntity : IEntityEvent, new()
         where TEntityReadModel : IReadModel<TEntity>, new()
     {
-        private readonly ReadModelDbContext _readModelDbContext;
-        private readonly SimpleEventStoreDbContext _simpleEventStoreDbContext;
+        protected readonly ReadModelDbContext _readModelDbContext;
+        protected readonly SimpleEventStoreDbContext _simpleEventStoreDbContext;
 
         public AbstractCreatePersistEventHandler(ReadModelDbContext readModelDbContext, SimpleEventStoreDbContext simpleEventStoreDbContext)
         {
@@ -68,7 +68,7 @@ namespace SolidSampleApplication.Core.Services
             _simpleEventStoreDbContext = simpleEventStoreDbContext;
         }
 
-        public async Task Handle(TEvent notification, CancellationToken cancellationToken)
+        public virtual async Task Handle(TEvent notification, CancellationToken cancellationToken)
         {
             await _simpleEventStoreDbContext.SaveEventAsync(notification, 1, DateTime.Now, "Sample");
 

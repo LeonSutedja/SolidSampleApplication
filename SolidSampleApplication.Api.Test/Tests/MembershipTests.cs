@@ -102,6 +102,30 @@ namespace SolidSampleApplication.Api.Test
         }
 
         [Fact]
+        public async Task EarnPointsMoreThan100_ShouldEarnRewards_Return_Ok()
+        {
+            var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+
+            var member = (await readModelContext.Memberships.ToListAsync())[1];
+            var pointsToAdd = 150;
+            var request1 = new EarnPointsAggregateMembershipCommand(member.Id, MembershipPointsType.Movie, pointsToAdd);
+            var request2 = new EarnPointsAggregateMembershipCommand(member.Id, MembershipPointsType.Music, pointsToAdd);
+            await _client.PutRequestAsStringContent("/Membership/points", request1);
+            var response2 = await _client.PutRequestAsStringContent("/Membership/points", request2);
+            response2.EnsureSuccessStatusCode();
+            var content = await response2.Content.ReadAsStringAsync();
+            _output.WriteLine(content);
+
+            var jsonObject = JObject.Parse(content);
+            jsonObject.ShouldContainKey("totalPoints");
+            jsonObject.ShouldContainKey("version");
+
+            var rewards = await readModelContext.Rewards.ToListAsync();
+            _output.WriteLine($"Rewards count: {rewards.Count()}");
+            rewards.Count().ShouldBe(2);
+        }
+
+        [Fact]
         public async Task MembershipUpgrade_ShouldReturn_Ok()
         {
             // arrange

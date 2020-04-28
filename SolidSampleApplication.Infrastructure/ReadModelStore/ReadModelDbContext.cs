@@ -7,6 +7,7 @@ namespace SolidSampleApplication.Infrastructure.ReadModelStore
     {
         public DbSet<MembershipReadModel> Memberships { get; set; }
         public DbSet<CustomerReadModel> Customers { get; set; }
+        public DbSet<RewardReadModel> Rewards { get; set; }
 
         public ReadModelDbContext()
         { }

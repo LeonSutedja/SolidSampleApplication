@@ -18,4 +18,8 @@
     <ProjectReference Include="..\SolidSampleApplication.Core.Services\SolidSampleApplication.Core.Services.csproj" />
     <ProjectReference Include="..\SolidSampleApplication.Infrastructure\SolidSampleApplication.Infrastructure.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Reward\" />
+  </ItemGroup>
 </Project>
