@@ -29,9 +29,7 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
                 return false;
 
             var customerRegisteredEvent = new CustomerRegisteredEvent(Guid.NewGuid(), username, firstname, lastname, email);
-
-            await EventStoreAndReadModelUpdator
-                .Create<Customer, CustomerReadModel, CustomerRegisteredEvent>(_readModelDbContext, _eventStoreDbContext, customerRegisteredEvent);
+            await _eventStoreDbContext.SaveEventAsync(customerRegisteredEvent, 1, DateTime.Now, "Sample");
 
             // success
             await _mediator.Publish(customerRegisteredEvent);
@@ -42,10 +40,7 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
         public async Task<bool> ChangeCustomerNameAsync(Guid customerId, string firstName, string lastName)
         {
             var @event = new CustomerNameChangedEvent(customerId, firstName, lastName);
-
-            await EventStoreAndReadModelUpdator
-                .Update<Customer, CustomerReadModel, CustomerNameChangedEvent>(_readModelDbContext, _eventStoreDbContext, @event);
-
+            await _eventStoreDbContext.SaveEventAsync(@event, 1, DateTime.Now, "Sample");
             await _mediator.Publish(@event);
 
             return true;
