@@ -1,5 +1,4 @@
-﻿using SolidSampleApplication.Infrastructure;
-using System;
+﻿using System;
 
 namespace SolidSampleApplication.Infrastructure
 {

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.ReadModelStore;
 using System;
 using System.Linq;
@@ -9,11 +10,13 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
     public class CustomerDomainService : ICustomerDomainService
     {
         private readonly ReadModelDbContext _readModelDbContext;
+        private readonly SimpleEventStoreDbContext _eventStoreDbContext;
         private readonly IMediator _mediator;
 
-        public CustomerDomainService(ReadModelDbContext readModelDbContext, IMediator mediator)
+        public CustomerDomainService(ReadModelDbContext readModelDbContext, SimpleEventStoreDbContext eventStoreDbContext, IMediator mediator)
         {
             _readModelDbContext = readModelDbContext;
+            _eventStoreDbContext = eventStoreDbContext;
             _mediator = mediator;
         }
 
@@ -25,8 +28,12 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
             if(isUsernameExists)
                 return false;
 
-            // success
             var customerRegisteredEvent = new CustomerRegisteredEvent(Guid.NewGuid(), username, firstname, lastname, email);
+
+            await EventStoreAndReadModelUpdator
+                .Create<Customer, CustomerReadModel, CustomerRegisteredEvent>(_readModelDbContext, _eventStoreDbContext, customerRegisteredEvent);
+
+            // success
             await _mediator.Publish(customerRegisteredEvent);
 
             return true;
