@@ -38,5 +38,17 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
 
             return true;
         }
+
+        public async Task<bool> ChangeCustomerNameAsync(Guid customerId, string firstName, string lastName)
+        {
+            var @event = new CustomerNameChangedEvent(customerId, firstName, lastName);
+
+            await EventStoreAndReadModelUpdator
+                .Update<Customer, CustomerReadModel, CustomerNameChangedEvent>(_readModelDbContext, _eventStoreDbContext, @event);
+
+            await _mediator.Publish(@event);
+
+            return true;
+        }
     }
 }

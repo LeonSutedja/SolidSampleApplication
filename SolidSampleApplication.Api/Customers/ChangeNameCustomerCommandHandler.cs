@@ -7,6 +7,7 @@ using SolidSampleApplication.Infrastructure.ReadModelStore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SolidSampleApplication.Core.Services.CustomerServices;
 
 namespace SolidSampleApplication.Api.Customers
 {
@@ -38,17 +39,18 @@ namespace SolidSampleApplication.Api.Customers
     {
         private readonly ReadModelDbContext _readModelDbContext;
         private readonly IMediator _mediator;
+        private readonly ICustomerDomainService _service;
 
-        public ChangeNameCustomerCommandHandler(ReadModelDbContext readModelDbContext, IMediator mediator)
+        public ChangeNameCustomerCommandHandler(ReadModelDbContext readModelDbContext, IMediator mediator, ICustomerDomainService service)
         {
             _readModelDbContext = readModelDbContext;
             _mediator = mediator;
+            _service = service;
         }
 
         public async Task<DefaultResponse> Handle(ChangeNameCustomerCommand request, CancellationToken cancellationToken)
         {
-            var @event = new CustomerNameChangedEvent(request.CustomerId, request.FirstName, request.LastName);
-            await _mediator.Publish(@event);
+            await _service.ChangeCustomerNameAsync(request.CustomerId, request.FirstName, request.LastName);
 
             var customer = await _readModelDbContext.Customers.FirstOrDefaultAsync(c => c.Id == request.CustomerId);
             return DefaultResponse.Success(customer);
