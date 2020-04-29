@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SolidSampleApplication.ApplicationReadModel\SolidSampleApplication.ApplicationReadModel.csproj" />
     <ProjectReference Include="..\SolidSampleApplication.Infrastructure\SolidSampleApplication.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

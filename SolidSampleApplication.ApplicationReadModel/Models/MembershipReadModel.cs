@@ -1,8 +1,9 @@
-﻿using System;
+﻿using SolidSampleApplication.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SolidSampleApplication.Core
+namespace SolidSampleApplication.ApplicationReadModel
 {
     // value object
     public class MembershipPointReadModel

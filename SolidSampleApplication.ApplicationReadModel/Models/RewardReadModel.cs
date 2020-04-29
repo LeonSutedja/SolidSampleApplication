@@ -1,7 +1,8 @@
-﻿using SolidSampleApplication.Core.Rewards;
+﻿using SolidSampleApplication.Core;
+using SolidSampleApplication.Core.Rewards;
 using System;
 
-namespace SolidSampleApplication.Core
+namespace SolidSampleApplication.ApplicationReadModel
 {
     public class RewardReadModel : IReadModel<Reward>
     {

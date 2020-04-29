@@ -1,6 +1,7 @@
-﻿using System;
+﻿using SolidSampleApplication.Core;
+using System;
 
-namespace SolidSampleApplication.Core
+namespace SolidSampleApplication.ApplicationReadModel
 {
     public class CustomerReadModel : IReadModel<Customer>
     {

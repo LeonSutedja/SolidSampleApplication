@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using SolidSampleApplication.Core;
+using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core.Services.MembershipServices;
-using SolidSampleApplication.Infrastructure.ReadModelStore;
 using SolidSampleApplication.Infrastructure.Shared;
 using System;
 using System.Threading;

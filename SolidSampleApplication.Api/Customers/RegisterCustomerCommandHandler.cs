@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
+using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core.Services.CustomerServices;
-using SolidSampleApplication.Infrastructure.ReadModelStore;
 using SolidSampleApplication.Infrastructure.Shared;
 using System.Linq;
 using System.Threading;

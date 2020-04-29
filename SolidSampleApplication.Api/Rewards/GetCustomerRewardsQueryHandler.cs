@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using SolidSampleApplication.Infrastructure.ReadModelStore;
+using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Infrastructure.Shared;
 using System;
 using System.Linq;

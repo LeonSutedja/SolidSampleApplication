@@ -1,4 +1,3 @@
-using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -8,16 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SolidSampleApplication.Api.Customers;
 using SolidSampleApplication.Api.Healthcheck;
-using SolidSampleApplication.Api.Membership;
 using SolidSampleApplication.Api.PipelineBehavior;
+using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core;
-using SolidSampleApplication.Core.Services.CustomerServices;
 using SolidSampleApplication.Infrastructure;
-using SolidSampleApplication.Infrastructure.ReadModelStore;
 using System.Linq;
-using System.Reflection;
 
 namespace SolidSampleApplication.Api
 {

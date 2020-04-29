@@ -1,13 +1,12 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using SolidSampleApplication.Core;
+using SolidSampleApplication.ApplicationReadModel;
+using SolidSampleApplication.Core.Services.CustomerServices;
 using SolidSampleApplication.Infrastructure.Shared;
-using SolidSampleApplication.Infrastructure.ReadModelStore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SolidSampleApplication.Core.Services.CustomerServices;
 
 namespace SolidSampleApplication.Api.Customers
 {
