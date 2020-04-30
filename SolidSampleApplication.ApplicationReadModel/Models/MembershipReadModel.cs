@@ -24,7 +24,8 @@ namespace SolidSampleApplication.ApplicationReadModel
         }
     }
 
-    public class MembershipReadModel : IReadModel<Membership>
+    public class MembershipReadModel :
+        IReadModel<Membership>
     {
         // aggregate id
         public Guid Id { get; private set; }

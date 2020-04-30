@@ -5,7 +5,7 @@ using System.Linq;
 namespace SolidSampleApplication.Core
 {
     public class Membership :
-        IEntityEvent,
+        DomainAggregate,
         IHasSimpleEvent<MembershipCreatedEvent>,
         IHasSimpleEvent<MembershipPointsEarnedEvent>,
         IHasSimpleEvent<MembershipLevelUpgradedEvent>,
@@ -16,11 +16,17 @@ namespace SolidSampleApplication.Core
         public Guid CustomerId { get; private set; }
         public List<MembershipPoint> Points { get; private set; }
         public double TotalPoints => Points.Sum(p => p.Amount);
-        public int Version { get; private set; }
 
         public Membership()
         {
             Points = new List<MembershipPoint>();
+        }
+
+        public Membership(Guid id, Guid customerId)
+        {
+            var @event = new MembershipCreatedEvent(id, customerId);
+            Append(@event);
+            ApplyEvent(@event);
         }
 
         public void UpgradeMembership()

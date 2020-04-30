@@ -28,20 +28,26 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
             if(isUsernameExists)
                 return false;
 
-            var customerRegisteredEvent = new CustomerRegisteredEvent(Guid.NewGuid(), username, firstname, lastname, email);
-            await _eventStoreDbContext.SaveEventAsync(customerRegisteredEvent, 1, DateTime.Now, "Sample");
-
-            // success
-            await _mediator.Publish(customerRegisteredEvent);
+            var customer = new Customer(Guid.NewGuid(), username, firstname, lastname, email);
+            foreach(var @event in customer.PendingEvents)
+            {
+                await _eventStoreDbContext.SaveEventAsync(@event, 1, DateTime.Now, "Sample");
+                await _mediator.Publish(@event);
+            }
 
             return true;
         }
 
         public async Task<bool> ChangeCustomerNameAsync(Guid customerId, string firstName, string lastName)
         {
-            var @event = new CustomerNameChangedEvent(customerId, firstName, lastName);
-            await _eventStoreDbContext.SaveEventAsync(@event, 1, DateTime.Now, "Sample");
-            await _mediator.Publish(@event);
+            var entityFactory = new GenericEntityFactory<Customer>(_eventStoreDbContext);
+            var customer = await entityFactory.GetEntityAsync(customerId.ToString());
+            customer.ChangeName(firstName, lastName);
+            foreach(var @event in customer.PendingEvents)
+            {
+                await _eventStoreDbContext.SaveEventAsync(@event, 1, DateTime.Now, "Sample");
+                await _mediator.Publish(@event);
+            }
 
             return true;
         }

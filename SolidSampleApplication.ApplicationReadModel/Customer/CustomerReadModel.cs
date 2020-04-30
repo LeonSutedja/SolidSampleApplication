@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.ApplicationReadModel
 {
-    public class CustomerReadModel : IReadModel<Customer>
+    public class CustomerReadModel :
+        IReadModel<Customer>,
+        IHasSimpleEvent<CustomerRegisteredEvent>,
+        IHasSimpleEvent<CustomerNameChangedEvent>
     {
         public Guid Id { get; private set; }
         public string Username { get; private set; }
@@ -30,13 +33,6 @@ namespace SolidSampleApplication.ApplicationReadModel
             Version = version;
         }
 
-        public void ChangeName(string firstname, string lastname)
-        {
-            FirstName = firstname;
-            LastName = lastname;
-            Version++;
-        }
-
         public void FromAggregate(Customer aggregate)
         {
             Id = aggregate.Id;
@@ -45,6 +41,25 @@ namespace SolidSampleApplication.ApplicationReadModel
             LastName = aggregate.LastName;
             Email = aggregate.Email;
             Version = aggregate.Version;
+        }
+
+        public void ApplyEvent(CustomerRegisteredEvent simpleEvent)
+        {
+            Id = simpleEvent.Id;
+            Username = simpleEvent.Username;
+            FirstName = simpleEvent.FirstName;
+            LastName = simpleEvent.LastName;
+            Email = simpleEvent.Email;
+            Version = 1;
+        }
+
+        public void ApplyEvent(CustomerNameChangedEvent simpleEvent)
+        {
+            if(simpleEvent.Id != Id)
+                throw new Exception("This is the wrong customer");
+            FirstName = simpleEvent.FirstName;
+            LastName = simpleEvent.LastName;
+            Version++;
         }
     }
 
@@ -59,8 +74,8 @@ namespace SolidSampleApplication.ApplicationReadModel
 
         public async Task Handle(CustomerRegisteredEvent notification, CancellationToken cancellationToken)
         {
-            var customer = new CustomerReadModel(notification.Id, notification.Username,
-                notification.FirstName, notification.LastName, notification.Email);
+            var customer = new CustomerReadModel();
+            customer.ApplyEvent(notification);
             _readModelDbContext.Add(customer);
             await _readModelDbContext.SaveChangesAsync();
         }
@@ -78,7 +93,7 @@ namespace SolidSampleApplication.ApplicationReadModel
         public async Task Handle(CustomerNameChangedEvent notification, CancellationToken cancellationToken)
         {
             var customer = await _readModelDbContext.Customers.FirstOrDefaultAsync(c => c.Id == notification.Id);
-            customer.ChangeName(notification.FirstName, notification.LastName);
+            customer.ApplyEvent(notification);
             _readModelDbContext.Update(customer);
             await _readModelDbContext.SaveChangesAsync();
         }
