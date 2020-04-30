@@ -63,11 +63,13 @@ namespace SolidSampleApplication.ApplicationReadModel
         }
     }
 
-    public class CustomerRegisteredEventHandler : INotificationHandler<CustomerRegisteredEvent>
+    public class CustomerEventHandlers :
+        INotificationHandler<CustomerRegisteredEvent>,
+        INotificationHandler<CustomerNameChangedEvent>
     {
         private readonly ReadModelDbContext _readModelDbContext;
 
-        public CustomerRegisteredEventHandler(ReadModelDbContext readModelDbContext)
+        public CustomerEventHandlers(ReadModelDbContext readModelDbContext)
         {
             _readModelDbContext = readModelDbContext;
         }
@@ -78,16 +80,6 @@ namespace SolidSampleApplication.ApplicationReadModel
             customer.ApplyEvent(notification);
             _readModelDbContext.Add(customer);
             await _readModelDbContext.SaveChangesAsync();
-        }
-    }
-
-    public class CustomerNameChangeEventHandler : INotificationHandler<CustomerNameChangedEvent>
-    {
-        private readonly ReadModelDbContext _readModelDbContext;
-
-        public CustomerNameChangeEventHandler(ReadModelDbContext readModelDbContext)
-        {
-            _readModelDbContext = readModelDbContext;
         }
 
         public async Task Handle(CustomerNameChangedEvent notification, CancellationToken cancellationToken)

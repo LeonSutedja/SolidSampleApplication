@@ -118,11 +118,6 @@ namespace SolidSampleApplication.ApplicationReadModel
     {
         private readonly ReadModelDbContext _readModelDbContext;
 
-        private async Task<MembershipReadModel> _getMembership(Guid membershipId)
-        {
-            return await _readModelDbContext.Memberships.FirstOrDefaultAsync(m => m.Id == membershipId);
-        }
-
         public MembershipEventHandlers(ReadModelDbContext readModelDbContext)
         {
             _readModelDbContext = readModelDbContext;
@@ -158,6 +153,11 @@ namespace SolidSampleApplication.ApplicationReadModel
             membership.ApplyEvent(notification);
             _readModelDbContext.Update(membership);
             await _readModelDbContext.SaveChangesAsync();
+        }
+
+        private async Task<MembershipReadModel> _getMembership(Guid membershipId)
+        {
+            return await _readModelDbContext.Memberships.FirstOrDefaultAsync(m => m.Id == membershipId);
         }
     }
 }

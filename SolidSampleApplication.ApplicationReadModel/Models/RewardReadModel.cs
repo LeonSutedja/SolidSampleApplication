@@ -1,10 +1,16 @@
-﻿using SolidSampleApplication.Core;
+﻿using MediatR;
+using SolidSampleApplication.Core;
 using SolidSampleApplication.Core.Rewards;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SolidSampleApplication.ApplicationReadModel
 {
-    public class RewardReadModel : IReadModel<Reward>
+    public class RewardReadModel :
+        IReadModel<Reward>,
+        IHasSimpleEvent<RewardEarnedEvent>
+
     {
         public Guid Id { get; private set; }
 
@@ -20,15 +26,6 @@ namespace SolidSampleApplication.ApplicationReadModel
         {
         }
 
-        public RewardReadModel(Guid id, Guid customerId, RewardType rewardType, DateTime earnedAt, int version)
-        {
-            Id = id;
-            CustomerId = customerId;
-            RewardType = rewardType;
-            EarnedAt = earnedAt;
-            Version = version;
-        }
-
         public void FromAggregate(Reward aggregate)
         {
             Id = aggregate.Id;
@@ -36,6 +33,34 @@ namespace SolidSampleApplication.ApplicationReadModel
             RewardType = aggregate.RewardType;
             EarnedAt = aggregate.EarnedAt;
             Version = aggregate.Version;
+        }
+
+        public void ApplyEvent(RewardEarnedEvent simpleEvent)
+        {
+            Id = simpleEvent.Id;
+            CustomerId = simpleEvent.CustomerId;
+            RewardType = simpleEvent.RewardType;
+            EarnedAt = simpleEvent.EarnedAt;
+            Version = 1;
+        }
+    }
+
+    public class RewardEventHandlers :
+       INotificationHandler<RewardEarnedEvent>
+    {
+        private readonly ReadModelDbContext _readModelDbContext;
+
+        public RewardEventHandlers(ReadModelDbContext readModelDbContext)
+        {
+            _readModelDbContext = readModelDbContext;
+        }
+
+        public async Task Handle(RewardEarnedEvent notification, CancellationToken cancellationToken)
+        {
+            var readModel = new RewardReadModel();
+            readModel.ApplyEvent(notification);
+            _readModelDbContext.Add(readModel);
+            await _readModelDbContext.SaveChangesAsync();
         }
     }
 }

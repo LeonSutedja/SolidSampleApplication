@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core.Rewards;
 using SolidSampleApplication.Infrastructure;
+using SolidSampleApplication.Infrastructure.EventBus;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,16 +14,16 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
     {
         private readonly ReadModelDbContext _readModelDbContext;
         private readonly SimpleEventStoreDbContext _simpleEventStoreDbContext;
-        private readonly IMediator _mediator;
+        private readonly IEventBusService _eventBusService;
 
         public RewardsEarnedFromMembershipPointsEarnedEventHandler(
             ReadModelDbContext readModelDbContext,
             SimpleEventStoreDbContext simpleEventStoreDbContext,
-            IMediator mediator)
+            IEventBusService eventBusService)
         {
             _readModelDbContext = readModelDbContext;
             _simpleEventStoreDbContext = simpleEventStoreDbContext;
-            _mediator = mediator;
+            _eventBusService = eventBusService;
         }
 
         public async Task Handle(MembershipPointsEarnedEvent notification, CancellationToken cancellationToken)
@@ -47,12 +48,9 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
                 var rewardType = (rewardPointsEarned == 1)
                    ? RewardType.GiftVoucher
                    : RewardType.FreeMeal;
-                var @event = new RewardEarnedEvent(Guid.NewGuid(), membership.CustomerId, rewardType, DateTime.Now);
-
-                await EventStoreAndReadModelUpdator.Create<Reward, RewardReadModel, RewardEarnedEvent>(
-                    _readModelDbContext, _simpleEventStoreDbContext, @event);
-
-                await _mediator.Publish(@event);
+                var entity = new Reward(membership.CustomerId, rewardType);
+                await _simpleEventStoreDbContext.SavePendingEventsAsync(entity.PendingEvents, 1, "Sample");
+                await _eventBusService.Send(entity.PendingEvents);
             }
         }
     }

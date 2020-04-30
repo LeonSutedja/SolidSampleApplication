@@ -9,21 +9,24 @@ namespace SolidSampleApplication.Core.Rewards
     }
 
     public class Reward :
-        IEntityEvent,
+        DomainAggregate,
         IHasSimpleEvent<RewardEarnedEvent>
     {
-        public Guid Id { get; private set; }
-
         public Guid CustomerId { get; private set; }
 
         public RewardType RewardType { get; private set; }
 
         public DateTime EarnedAt { get; private set; }
 
-        public int Version { get; private set; }
-
-        public Reward()
+        protected Reward()
         {
+        }
+
+        public Reward(Guid customerId, RewardType type)
+        {
+            var @event = new RewardEarnedEvent(Guid.NewGuid(), customerId, type, DateTime.Now);
+            ApplyEvent(@event);
+            Append(@event);
         }
 
         public void ApplyEvent(RewardEarnedEvent simpleEvent)
