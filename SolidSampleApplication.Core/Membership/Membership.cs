@@ -22,42 +22,58 @@ namespace SolidSampleApplication.Core
             Points = new List<MembershipPoint>();
         }
 
-        public Membership(Guid id, Guid customerId)
+        public Membership(Guid customerId)
         {
-            var @event = new MembershipCreatedEvent(id, customerId);
-            Append(@event);
+            var @event = new MembershipCreatedEvent(Guid.NewGuid(), customerId);
             ApplyEvent(@event);
+            Append(@event);
         }
 
         public void UpgradeMembership()
         {
-            Type = (Type == MembershipType.Level1)
-                ? MembershipType.Level2
-                : (Type == MembershipType.Level2)
-                    ? MembershipType.Level3
-                    : Type;
+            var @event = new MembershipLevelUpgradedEvent(Id, DateTime.Now);
+            ApplyEvent(@event);
+            Append(@event);
         }
 
         public void DowngradeMembership()
         {
-            Type = (Type == MembershipType.Level3)
-                ? MembershipType.Level2
-                : (Type == MembershipType.Level2)
-                    ? MembershipType.Level1
-                    : Type;
+            var @event = new MembershipLevelDowngradedEvent(Id, DateTime.Now);
+            ApplyEvent(@event);
+            Append(@event);
+        }
+
+        public void PointsEarned(double points, MembershipPointsType type)
+        {
+            var @event = new MembershipPointsEarnedEvent(Id, points, type, DateTime.Now);
+            ApplyEvent(@event);
+            Append(@event);
         }
 
         public void ApplyEvent(MembershipPointsEarnedEvent simpleEvent)
         {
             var point = MembershipPoint.New(simpleEvent.Amount, simpleEvent.PointsType, simpleEvent.EarnedAt);
             Points.Add(point);
+            Version++;
             // domain rule. if the new points are in between 200 - 300, and it is a membership type level 1, we upgrade the membership.
             // if the points above 300 then it would be membership type level 3
             if(TotalPoints > 200 && TotalPoints < 300 && Type == MembershipType.Level1)
-                Type = MembershipType.Level2;
+            {
+                UpgradeMembership();
+            }
             if(TotalPoints > 300)
-                Type = MembershipType.Level3;
-            Version++;
+            {
+                // convert membership type to lvl 3
+                if(Type == MembershipType.Level1)
+                {
+                    UpgradeMembership();
+                    UpgradeMembership();
+                }
+                else if(Type == MembershipType.Level2)
+                {
+                    UpgradeMembership();
+                }
+            }
         }
 
         public void ApplyEvent(MembershipCreatedEvent simpleEvent)
@@ -70,13 +86,21 @@ namespace SolidSampleApplication.Core
 
         public void ApplyEvent(MembershipLevelUpgradedEvent simpleEvent)
         {
-            UpgradeMembership();
+            Type = (Type == MembershipType.Level1)
+               ? MembershipType.Level2
+               : (Type == MembershipType.Level2)
+                   ? MembershipType.Level3
+                   : Type;
             Version++;
         }
 
         public void ApplyEvent(MembershipLevelDowngradedEvent simpleEvent)
         {
-            DowngradeMembership();
+            Type = (Type == MembershipType.Level3)
+               ? MembershipType.Level2
+               : (Type == MembershipType.Level2)
+                   ? MembershipType.Level1
+                   : Type;
             Version++;
         }
     }

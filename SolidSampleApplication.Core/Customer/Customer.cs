@@ -22,15 +22,15 @@ namespace SolidSampleApplication.Core
         public Customer(Guid id, string username, string firstName, string lastName, string email)
         {
             var @event = new CustomerRegisteredEvent(id, username, firstName, lastName, email);
-            Append(@event);
             ApplyEvent(@event);
+            Append(@event);
         }
 
         public void ChangeName(string firstname, string lastname)
         {
             var @event = new CustomerNameChangedEvent(Id, firstname, lastname);
-            Append(@event);
             ApplyEvent(@event);
+            Append(@event);
         }
 
         public void ApplyEvent(CustomerRegisteredEvent simpleEvent)
