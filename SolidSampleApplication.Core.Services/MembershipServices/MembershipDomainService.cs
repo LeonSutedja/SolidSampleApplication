@@ -1,5 +1,5 @@
-﻿using MediatR;
-using SolidSampleApplication.Infrastructure;
+﻿using SolidSampleApplication.Infrastructure;
+using SolidSampleApplication.Infrastructure.EventBus;
 using System;
 using System.Threading.Tasks;
 
@@ -7,12 +7,13 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
 {
     public class MembershipDomainService : IMembershipDomainService
     {
-        private readonly IMediator _mediator;
+        private readonly IEventBusService _eventBusService;
+
         private readonly SimpleEventStoreDbContext _simpleEventStoreDbContext;
 
-        public MembershipDomainService(IMediator mediator, SimpleEventStoreDbContext simpleEventStoreDbContext)
+        public MembershipDomainService(IEventBusService eventBusService, SimpleEventStoreDbContext simpleEventStoreDbContext)
         {
-            _mediator = mediator;
+            _eventBusService = eventBusService;
             _simpleEventStoreDbContext = simpleEventStoreDbContext;
         }
 
@@ -22,11 +23,7 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
             entity.PointsEarned(points, type);
 
             await _simpleEventStoreDbContext.SavePendingEventsAsync(entity.PendingEvents, 1, "Sample");
-
-            foreach(var @event in entity.PendingEvents)
-            {
-                await _mediator.Publish(@event);
-            }
+            await _eventBusService.Send(entity.PendingEvents);
         }
 
         public async Task UpgradeMembership(Guid id)
@@ -35,11 +32,7 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
             entity.UpgradeMembership();
 
             await _simpleEventStoreDbContext.SavePendingEventsAsync(entity.PendingEvents, 1, "Sample");
-
-            foreach(var @event in entity.PendingEvents)
-            {
-                await _mediator.Publish(@event);
-            }
+            await _eventBusService.Send(entity.PendingEvents);
         }
     }
 }
