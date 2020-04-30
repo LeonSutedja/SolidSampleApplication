@@ -9,6 +9,12 @@ namespace SolidSampleApplication.Infrastructure
 {
     public class GenericEntityFactory<TEntity> where TEntity : IEntityEvent, new()
     {
+        public static async Task<TEntity> GetEntityAsync(SimpleEventStoreDbContext context, string entityId)
+        {
+            var factory = new GenericEntityFactory<TEntity>(context);
+            return await factory.GetEntityAsync(entityId);
+        }
+
         private readonly SimpleEventStoreDbContext _context;
 
         public GenericEntityFactory(SimpleEventStoreDbContext context)

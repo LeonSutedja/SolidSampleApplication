@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure.SampleData;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,16 @@ namespace SolidSampleApplication.Infrastructure
         //{
         //    optionsBuilder.UseSqlite("DataSource=:memory:");
         //}
+
+        public async Task SavePendingEventsAsync(Queue<ISimpleEvent> pendingEvents, int entityTypeVersion, string requestedBy)
+        {
+            foreach(var @event in pendingEvents)
+            {
+                var simpleApplicationEvent = SimpleApplicationEvent.New(@event, entityTypeVersion, DateTime.Now, requestedBy);
+                await ApplicationEvents.AddAsync(simpleApplicationEvent);
+            }
+            await SaveChangesAsync();
+        }
 
         public async Task SaveEventAsync<T>(T @event, int entityTypeVersion, DateTime requestedTime, string requestedBy)
         {

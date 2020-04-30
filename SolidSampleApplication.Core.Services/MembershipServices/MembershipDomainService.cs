@@ -18,24 +18,26 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
 
         public async Task PointsEarned(Guid id, double points, MembershipPointsType type)
         {
-            var entityFactory = new GenericEntityFactory<Membership>(_simpleEventStoreDbContext);
-            var entity = await entityFactory.GetEntityAsync(id.ToString());
+            var entity = await GenericEntityFactory<Membership>.GetEntityAsync(_simpleEventStoreDbContext, id.ToString());
             entity.PointsEarned(points, type);
+
+            await _simpleEventStoreDbContext.SavePendingEventsAsync(entity.PendingEvents, 1, "Sample");
+
             foreach(var @event in entity.PendingEvents)
             {
-                await _simpleEventStoreDbContext.SaveEventAsync(@event, 1, DateTime.Now, "Sample");
                 await _mediator.Publish(@event);
             }
         }
 
         public async Task UpgradeMembership(Guid id)
         {
-            var entityFactory = new GenericEntityFactory<Membership>(_simpleEventStoreDbContext);
-            var entity = await entityFactory.GetEntityAsync(id.ToString());
+            var entity = await GenericEntityFactory<Membership>.GetEntityAsync(_simpleEventStoreDbContext, id.ToString());
             entity.UpgradeMembership();
+
+            await _simpleEventStoreDbContext.SavePendingEventsAsync(entity.PendingEvents, 1, "Sample");
+
             foreach(var @event in entity.PendingEvents)
             {
-                await _simpleEventStoreDbContext.SaveEventAsync(@event, 1, DateTime.Now, "Sample");
                 await _mediator.Publish(@event);
             }
         }
