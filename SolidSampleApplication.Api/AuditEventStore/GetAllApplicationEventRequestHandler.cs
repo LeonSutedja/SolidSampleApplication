@@ -1,17 +1,17 @@
-﻿using MediatR;
+﻿using SolidSampleApplication.Infrastructure;
+using SolidSampleApplication.Infrastructure.ApplicationBus;
 using SolidSampleApplication.Infrastructure.Shared;
-using SolidSampleApplication.Infrastructure;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Membership
 {
-    public class GetAllApplicationEventRequest : IRequest<DefaultResponse>
+    public class GetAllApplicationEventRequest : IQuery<DefaultResponse>
     {
     }
 
-    public class GetAllApplicationEventRequestHandler : IRequestHandler<GetAllApplicationEventRequest, DefaultResponse>
+    public class GetAllApplicationEventRequestHandler : IQueryHandler<GetAllApplicationEventRequest, DefaultResponse>
     {
         private readonly SimpleEventStoreDbContext _eventStoreDbContext;
 

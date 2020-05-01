@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Infrastructure.ApplicationBus;
 using SolidSampleApplication.Infrastructure.Shared;
@@ -12,7 +11,7 @@ namespace SolidSampleApplication.Api.Customers
     {
     }
 
-    public class GetAllCustomersQueryHandler : IRequestHandler<GetAllCustomersQuery, DefaultResponse>
+    public class GetAllCustomersQueryHandler : IQueryHandler<GetAllCustomersQuery, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
 

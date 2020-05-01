@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.Shared;

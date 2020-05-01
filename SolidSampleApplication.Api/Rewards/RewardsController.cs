@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SolidSampleApplication.Infrastructure.ApplicationBus;
 using System;
 using System.Threading.Tasks;

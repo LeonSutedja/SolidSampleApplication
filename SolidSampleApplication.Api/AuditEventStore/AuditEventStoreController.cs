@@ -1,5 +1,5 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using SolidSampleApplication.Infrastructure.ApplicationBus;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Membership
@@ -8,17 +8,17 @@ namespace SolidSampleApplication.Api.Membership
     [Route("[controller]")]
     public class AuditEventStoreController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IApplicationBusService _busService;
 
-        public AuditEventStoreController(IMediator mediator)
+        public AuditEventStoreController(IApplicationBusService busService)
         {
-            _mediator = mediator;
+            this._busService = busService;
         }
 
         [HttpGet]
         public async Task<ActionResult> GetApplicationEvents()
         {
-            return (await _mediator.Send(new GetAllApplicationEventRequest())).ActionResult;
+            return (await _busService.Send(new GetAllApplicationEventRequest())).ActionResult;
         }
     }
 }
