@@ -1,31 +1,28 @@
-﻿using MediatR;
-using SolidSampleApplication.ApplicationReadModel;
-using SolidSampleApplication.Infrastructure;
-using System;
+﻿using SolidSampleApplication.Infrastructure;
+using SolidSampleApplication.Infrastructure.EventBus;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Core.Services.MembershipServices
 {
-    public class CreateMembershipCustomerRegisteredEventHandler : INotificationHandler<CustomerRegisteredEvent>
+    public class CreateMembershipCustomerRegisteredEventHandler : IEventHandler<CustomerRegisteredEvent>
     {
         private readonly SimpleEventStoreDbContext _eventStoreDbContext;
-        private readonly IMediator _mediator;
+        private readonly IEventBusService _eventBusService;
 
-        public CreateMembershipCustomerRegisteredEventHandler(SimpleEventStoreDbContext eventStoreDbContext, IMediator mediator)
+        public CreateMembershipCustomerRegisteredEventHandler(
+            SimpleEventStoreDbContext eventStoreDbContext,
+            IEventBusService eventBusService)
         {
             _eventStoreDbContext = eventStoreDbContext;
-            _mediator = mediator;
+            _eventBusService = eventBusService;
         }
 
         public async Task Handle(CustomerRegisteredEvent notification, CancellationToken cancellationToken)
         {
             var membership = new Membership(notification.Id);
-            foreach(var @event in membership.PendingEvents)
-            {
-                await _eventStoreDbContext.SaveEventAsync(@event, 1, DateTime.Now, "Sample");
-                await _mediator.Publish(@event);
-            }
+            await _eventStoreDbContext.SavePendingEventsAsync(membership.PendingEvents, 1, "Sample");
+            await _eventBusService.Send(membership.PendingEvents);
         }
     }
 }

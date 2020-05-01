@@ -1,16 +1,14 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core.Rewards;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.EventBus;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Core.Services.CustomerServices
 {
-    public class RewardsEarnedFromMembershipPointsEarnedEventHandler : INotificationHandler<MembershipPointsEarnedEvent>
+    public class RewardsEarnedFromMembershipPointsEarnedEventHandler : IEventHandler<MembershipPointsEarnedEvent>
     {
         private readonly ReadModelDbContext _readModelDbContext;
         private readonly SimpleEventStoreDbContext _simpleEventStoreDbContext;
