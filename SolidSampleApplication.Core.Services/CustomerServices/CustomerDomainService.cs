@@ -33,7 +33,7 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
 
             var customer = new Customer(Guid.NewGuid(), username, firstname, lastname, email);
             await _eventStoreDbContext.SavePendingEventsAsync(customer.PendingEvents, 1, "Sample");
-            await _eventBusService.Send(customer.PendingEvents);
+            await _eventBusService.Publish(customer.PendingEvents);
             return true;
         }
 
@@ -42,7 +42,7 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
             var customer = await GenericEntityFactory<Customer>.GetEntityAsync(_eventStoreDbContext, customerId.ToString());
             customer.ChangeName(firstName, lastName);
             await _eventStoreDbContext.SavePendingEventsAsync(customer.PendingEvents, 1, "Sample");
-            await _eventBusService.Send(customer.PendingEvents);
+            await _eventBusService.Publish(customer.PendingEvents);
             return true;
         }
     }

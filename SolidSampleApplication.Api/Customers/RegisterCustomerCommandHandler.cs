@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using MediatR;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core.Services.CustomerServices;
+using SolidSampleApplication.Infrastructure.CommandBus;
 using SolidSampleApplication.Infrastructure.Shared;
 using System.Linq;
 using System.Threading;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Customers
 {
-    public class RegisterCustomerCommand : IRequest<DefaultResponse>
+    public class RegisterCustomerCommand : ICommand<DefaultResponse>
     {
         public string Username { get; set; }
         public string FirstName { get; set; }
@@ -39,7 +39,7 @@ namespace SolidSampleApplication.Api.Customers
         }
     }
 
-    public class RegisterCustomerCommandHandler : IRequestHandler<RegisterCustomerCommand, DefaultResponse>
+    public class RegisterCustomerCommandHandler : ICommandHandler<RegisterCustomerCommand, DefaultResponse>
     {
         private readonly ReadModelDbContext _context;
         private readonly ICustomerDomainService _service;

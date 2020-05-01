@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Core.Services.CustomerServices
 {
-    public class RewardsEarnedFromMembershipPointsEarnedEventHandler : IEventHandler<MembershipPointsEarnedEvent>
+    public class RewardsEventHandlers : IEventHandler<MembershipPointsEarnedEvent>
     {
         private readonly ReadModelDbContext _readModelDbContext;
         private readonly SimpleEventStoreDbContext _simpleEventStoreDbContext;
         private readonly IEventBusService _eventBusService;
 
-        public RewardsEarnedFromMembershipPointsEarnedEventHandler(
+        public RewardsEventHandlers(
             ReadModelDbContext readModelDbContext,
             SimpleEventStoreDbContext simpleEventStoreDbContext,
             IEventBusService eventBusService)
@@ -48,7 +48,7 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
                    : RewardType.FreeMeal;
                 var entity = new Reward(membership.CustomerId, rewardType);
                 await _simpleEventStoreDbContext.SavePendingEventsAsync(entity.PendingEvents, 1, "Sample");
-                await _eventBusService.Send(entity.PendingEvents);
+                await _eventBusService.Publish(entity.PendingEvents);
             }
         }
     }

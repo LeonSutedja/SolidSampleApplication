@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Core.Services.MembershipServices;
+using SolidSampleApplication.Infrastructure.CommandBus;
 using SolidSampleApplication.Infrastructure.Shared;
 using System;
 using System.Threading;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Membership
 {
-    public class EarnPointsAggregateMembershipCommand : IRequest<DefaultResponse>
+    public class EarnPointsAggregateMembershipCommand : ICommand<DefaultResponse>
     {
         // A way to make this value immutable, whilst at the same time able to be mapped from the controller
         private Guid? _id { get; set; }
@@ -85,7 +85,7 @@ namespace SolidSampleApplication.Api.Membership
         }
     }
 
-    public class EarnPointsAggregateMembershipCommandHandler : IRequestHandler<EarnPointsAggregateMembershipCommand, DefaultResponse>
+    public class EarnPointsAggregateMembershipCommandHandler : ICommandHandler<EarnPointsAggregateMembershipCommand, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
         private readonly IMembershipDomainService _service;

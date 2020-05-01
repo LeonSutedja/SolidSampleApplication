@@ -23,7 +23,7 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
             entity.PointsEarned(points, type);
 
             await _simpleEventStoreDbContext.SavePendingEventsAsync(entity.PendingEvents, 1, "Sample");
-            await _eventBusService.Send(entity.PendingEvents);
+            await _eventBusService.Publish(entity.PendingEvents);
         }
 
         public async Task UpgradeMembership(Guid id)
@@ -32,7 +32,7 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
             entity.UpgradeMembership();
 
             await _simpleEventStoreDbContext.SavePendingEventsAsync(entity.PendingEvents, 1, "Sample");
-            await _eventBusService.Send(entity.PendingEvents);
+            await _eventBusService.Publish(entity.PendingEvents);
         }
     }
 }

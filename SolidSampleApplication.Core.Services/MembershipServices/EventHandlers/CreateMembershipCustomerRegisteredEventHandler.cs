@@ -22,7 +22,7 @@ namespace SolidSampleApplication.Core.Services.MembershipServices
         {
             var membership = new Membership(notification.Id);
             await _eventStoreDbContext.SavePendingEventsAsync(membership.PendingEvents, 1, "Sample");
-            await _eventBusService.Send(membership.PendingEvents);
+            await _eventBusService.Publish(membership.PendingEvents);
         }
     }
 }

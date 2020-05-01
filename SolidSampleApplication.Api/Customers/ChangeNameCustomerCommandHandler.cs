@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core.Services.CustomerServices;
+using SolidSampleApplication.Infrastructure.CommandBus;
 using SolidSampleApplication.Infrastructure.Shared;
 using System;
 using System.Threading;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Customers
 {
-    public class ChangeNameCustomerCommand : IRequest<DefaultResponse>
+    public class ChangeNameCustomerCommand : ICommand<DefaultResponse>
     {
         public Guid CustomerId { get; set; }
         public string FirstName { get; set; }
@@ -34,16 +34,14 @@ namespace SolidSampleApplication.Api.Customers
         }
     }
 
-    public class ChangeNameCustomerCommandHandler : IRequestHandler<ChangeNameCustomerCommand, DefaultResponse>
+    public class ChangeNameCustomerCommandHandler : ICommandHandler<ChangeNameCustomerCommand, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
-        private readonly IMediator _mediator;
         private readonly ICustomerDomainService _service;
 
-        public ChangeNameCustomerCommandHandler(ReadModelDbContext readModelDbContext, IMediator mediator, ICustomerDomainService service)
+        public ChangeNameCustomerCommandHandler(ReadModelDbContext readModelDbContext, ICustomerDomainService service)
         {
             _readModelDbContext = readModelDbContext;
-            _mediator = mediator;
             _service = service;
         }
 
