@@ -1,4 +1,4 @@
-﻿namespace SolidSampleApplication.Core
+﻿namespace SolidSampleApplication.Infrastructure
 {
     public interface IReadModel<T>
     {

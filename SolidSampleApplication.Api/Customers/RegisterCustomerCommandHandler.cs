@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core.Services.CustomerServices;
-using SolidSampleApplication.Infrastructure.CommandBus;
+using SolidSampleApplication.Infrastructure.ApplicationBus;
 using SolidSampleApplication.Infrastructure.Shared;
 using System.Linq;
 using System.Threading;

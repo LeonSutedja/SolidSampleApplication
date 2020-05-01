@@ -1,5 +1,6 @@
 ﻿using SolidSampleApplication.Core;
 using SolidSampleApplication.Core.Rewards;
+using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.EventBus;
 using System;
 using System.Threading;

@@ -1,5 +1,5 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using SolidSampleApplication.Infrastructure.ApplicationBus;
 using System;
 using System.Threading.Tasks;
 
@@ -9,38 +9,38 @@ namespace SolidSampleApplication.Api.Membership
     [Route("[controller]")]
     public class MembershipController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IApplicationBusService _bus;
 
-        public MembershipController(IMediator mediator)
+        public MembershipController(IApplicationBusService bus)
         {
-            _mediator = mediator;
+            _bus = bus;
         }
 
         [HttpGet]
         public async Task<ActionResult> GetMemberships()
         {
-            return (await _mediator.Send(new GetAllAggregateMembershipQuery())).ActionResult;
+            return (await _bus.Send(new GetAllAggregateMembershipQuery())).ActionResult;
         }
 
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult> GetMember(Guid id)
         {
-            return (await _mediator.Send(new GetAggregateMembershipQuery(id))).ActionResult;
+            return (await _bus.Send(new GetAggregateMembershipQuery(id))).ActionResult;
         }
 
         [HttpPut]
         [Route("points")]
         public async Task<ActionResult> EarnPoints(EarnPointsAggregateMembershipCommand request)
         {
-            return (await _mediator.Send(request)).ActionResult;
+            return (await _bus.Send(request)).ActionResult;
         }
 
         [HttpPut]
         [Route("upgrade")]
         public async Task<ActionResult> Upgrade(UpgradeMembershipCommand request)
         {
-            return (await _mediator.Send(request)).ActionResult;
+            return (await _bus.Send(request)).ActionResult;
         }
     }
 }

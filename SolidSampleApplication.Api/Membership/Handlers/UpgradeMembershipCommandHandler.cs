@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core.Services.MembershipServices;
-using SolidSampleApplication.Infrastructure.CommandBus;
+using SolidSampleApplication.Infrastructure.ApplicationBus;
 using SolidSampleApplication.Infrastructure.Shared;
 using System;
 using System.Threading;

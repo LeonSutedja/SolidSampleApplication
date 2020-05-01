@@ -1,5 +1,5 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using SolidSampleApplication.Infrastructure.ApplicationBus;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Customers
@@ -8,29 +8,29 @@ namespace SolidSampleApplication.Api.Customers
     [Route("[controller]")]
     public class CustomersController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IApplicationBusService _bus;
 
-        public CustomersController(IMediator mediator)
+        public CustomersController(IApplicationBusService bus)
         {
-            _mediator = mediator;
+            _bus = bus;
         }
 
         [HttpGet]
         public async Task<ActionResult> GetCustomers()
         {
-            return (await _mediator.Send(new GetAllCustomersQuery())).ActionResult;
+            return (await _bus.Send(new GetAllCustomersQuery())).ActionResult;
         }
 
         [HttpPut]
         public async Task<ActionResult> ChangeName(ChangeNameCustomerCommand request)
         {
-            return (await _mediator.Send(request)).ActionResult;
+            return (await _bus.Send(request)).ActionResult;
         }
 
         [HttpPost]
         public async Task<ActionResult> RegisterCustomer(RegisterCustomerCommand request)
         {
-            return (await _mediator.Send(request)).ActionResult;
+            return (await _bus.Send(request)).ActionResult;
         }
     }
 }

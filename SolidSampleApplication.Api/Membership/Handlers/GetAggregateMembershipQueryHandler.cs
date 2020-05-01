@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.ApplicationReadModel;
+using SolidSampleApplication.Infrastructure.ApplicationBus;
 using SolidSampleApplication.Infrastructure.Shared;
 using System;
 using System.Threading;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Membership
 {
-    public class GetAggregateMembershipQuery : IRequest<DefaultResponse>
+    public class GetAggregateMembershipQuery : IQuery<DefaultResponse>
     {
         // A way to make this value immutable, whilst at the same time able to be mapped from the controller
         private Guid? _id { get; set; }
@@ -42,7 +42,7 @@ namespace SolidSampleApplication.Api.Membership
         }
     }
 
-    public class GetAggregateMembershipQueryHandler : IRequestHandler<GetAggregateMembershipQuery, DefaultResponse>
+    public class GetAggregateMembershipQueryHandler : IQueryHandler<GetAggregateMembershipQuery, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
 

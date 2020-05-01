@@ -1,13 +1,14 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.ApplicationReadModel;
+using SolidSampleApplication.Infrastructure.ApplicationBus;
 using SolidSampleApplication.Infrastructure.Shared;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Customers
 {
-    public class GetAllCustomersQuery : IRequest<DefaultResponse>
+    public class GetAllCustomersQuery : IQuery<DefaultResponse>
     {
     }
 

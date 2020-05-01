@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SolidSampleApplication.Infrastructure.ApplicationBus;
 using System;
 using System.Threading.Tasks;
 
@@ -9,18 +10,18 @@ namespace SolidSampleApplication.Api.Membership
     [Route("[controller]")]
     public class RewardsController : Controller
     {
-        private readonly IMediator _mediator;
+        private readonly IApplicationBusService _bus;
 
-        public RewardsController(IMediator mediator)
+        public RewardsController(IApplicationBusService bus)
         {
-            _mediator = mediator;
+            _bus = bus;
         }
 
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult> GetCustomerRewards(Guid id)
         {
-            return (await _mediator.Send(new GetCustomerRewardsQuery(id))).ActionResult;
+            return (await _bus.Send(new GetCustomerRewardsQuery(id))).ActionResult;
         }
     }
 }

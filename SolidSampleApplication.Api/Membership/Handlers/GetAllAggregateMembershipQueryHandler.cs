@@ -1,17 +1,17 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.ApplicationReadModel;
+using SolidSampleApplication.Infrastructure.ApplicationBus;
 using SolidSampleApplication.Infrastructure.Shared;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Membership
 {
-    public class GetAllAggregateMembershipQuery : IRequest<DefaultResponse>
+    public class GetAllAggregateMembershipQuery : IQuery<DefaultResponse>
     {
     }
 
-    public class GetAllAggregateMembershipQueryHandler : IRequestHandler<GetAllAggregateMembershipQuery, DefaultResponse>
+    public class GetAllAggregateMembershipQueryHandler : IQueryHandler<GetAllAggregateMembershipQuery, DefaultResponse>
     {
         private readonly ReadModelDbContext _readModelDbContext;
 

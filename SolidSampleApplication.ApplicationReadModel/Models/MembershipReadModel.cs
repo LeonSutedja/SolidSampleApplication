@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
+using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.EventBus;
 using System;
 using System.Collections.Generic;
