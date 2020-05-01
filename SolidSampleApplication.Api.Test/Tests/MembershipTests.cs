@@ -5,6 +5,7 @@ using SolidSampleApplication.Api.Membership;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
+using SolidSampleApplication.ReportingReadModel;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -81,8 +82,11 @@ namespace SolidSampleApplication.Api.Test
         public async Task EarnPoints_ShouldReturn_Ok()
         {
             var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+            var customerUsername = "chajohn2013";
 
-            var member = await readModelContext.Memberships.FirstOrDefaultAsync();
+            var customer = (await readModelContext.Customers.FirstOrDefaultAsync(c => c.Username == customerUsername));
+            var member = (await readModelContext.Memberships.FirstOrDefaultAsync(m => m.CustomerId == customer.Id));
+
             var currentPoint = member.TotalPoints;
             var currentVersion = member.Version;
             var pointsToAdd = 50;
@@ -103,8 +107,11 @@ namespace SolidSampleApplication.Api.Test
         public async Task EarnPointsMoreThan100_ShouldEarnRewards_Return_Ok()
         {
             var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+            var customerUsername = "milee";
 
-            var member = (await readModelContext.Memberships.ToListAsync())[1];
+            var customer = (await readModelContext.Customers.FirstOrDefaultAsync(c => c.Username == customerUsername));
+            var member = (await readModelContext.Memberships.FirstOrDefaultAsync(m => m.CustomerId == customer.Id));
+
             var pointsToAdd = 150;
             var request1 = new EarnPointsAggregateMembershipCommand(member.Id, MembershipPointsType.Movie, pointsToAdd);
             var request2 = new EarnPointsAggregateMembershipCommand(member.Id, MembershipPointsType.Music, pointsToAdd);
@@ -132,8 +139,11 @@ namespace SolidSampleApplication.Api.Test
         {
             // arrange
             var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+            var customerUsername = "beaver";
 
-            var member = await readModelContext.Memberships.FirstOrDefaultAsync();
+            var customer = (await readModelContext.Customers.FirstOrDefaultAsync(c => c.Username == customerUsername));
+            var member = (await readModelContext.Memberships.FirstOrDefaultAsync(m => m.CustomerId == customer.Id));
+
             var currentVersion = member.Version;
             var currentLevel = (int)member.Type;
 
@@ -156,6 +166,28 @@ namespace SolidSampleApplication.Api.Test
             var @events = await eventStoreDbContext.FindEventsAsync<MembershipLevelUpgradedEvent>(member.Id.ToString());
             @events.ShouldNotBeEmpty();
             @events.Count().ShouldBeGreaterThan(0);
+        }
+
+        [Fact]
+        public async Task EarnPoints_ShouldUpdateReporting_Return_Ok()
+        {
+            var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
+            var customerUsername = "olivia";
+
+            var customer = (await readModelContext.Customers.FirstOrDefaultAsync(c => c.Username == customerUsername));
+            var member = (await readModelContext.Memberships.FirstOrDefaultAsync(m => m.CustomerId == customer.Id));
+            var pointsToAdd = 150;
+            var req = new EarnPointsAggregateMembershipCommand(member.Id, MembershipPointsType.Movie, pointsToAdd);
+            await _client.PutRequestAsStringContent("/Membership/points", req);
+
+            var reportingContext = (ReportingReadModelDbContext)_fixture.Services.GetService(typeof(ReportingReadModelDbContext));
+            var memberReporting = await reportingContext.MembershipPointsReporting.FirstOrDefaultAsync(m => m.MembershipId == member.Id);
+            memberReporting.ShouldNotBeNull();
+            _output.WriteLine($"Member: {memberReporting.MembershipId} with {memberReporting.Username} has {memberReporting.TotalPoints} earned {memberReporting.PointsEarnedTime} times");
+
+            memberReporting.TotalPoints.ShouldBe(pointsToAdd);
+            memberReporting.PointsEarnedTime.ShouldBe(1);
+            memberReporting.Username.ShouldBe(customerUsername);
         }
     }
 }

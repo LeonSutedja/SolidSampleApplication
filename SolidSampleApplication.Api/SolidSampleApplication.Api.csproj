@@ -17,5 +17,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SolidSampleApplication.Core.Services\SolidSampleApplication.Core.Services.csproj" />
     <ProjectReference Include="..\SolidSampleApplication.Infrastructure\SolidSampleApplication.Infrastructure.csproj" />
+    <ProjectReference Include="..\SolidSampleApplication.ReportingReadModel\SolidSampleApplication.ReportingReadModel.csproj" />
   </ItemGroup>
 </Project>

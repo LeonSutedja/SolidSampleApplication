@@ -50,6 +50,14 @@ namespace SolidSampleApplication.Infrastructure
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<SimpleApplicationEvent>> FindEventsAsync<T>()
+        {
+            var entityType = typeof(T).AssemblyQualifiedName;
+            return await ApplicationEvents
+                .Where(e => e.EntityType == entityType)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<SimpleApplicationEvent>> FindEventsAsync(string entityId)
         {
             return await ApplicationEvents
