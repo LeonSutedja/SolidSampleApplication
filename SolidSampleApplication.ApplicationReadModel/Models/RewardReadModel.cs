@@ -1,6 +1,6 @@
-﻿using MediatR;
-using SolidSampleApplication.Core;
+﻿using SolidSampleApplication.Core;
 using SolidSampleApplication.Core.Rewards;
+using SolidSampleApplication.Infrastructure.EventBus;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,7 +46,7 @@ namespace SolidSampleApplication.ApplicationReadModel
     }
 
     public class RewardEventHandlers :
-       INotificationHandler<RewardEarnedEvent>
+       IEventHandler<RewardEarnedEvent>
     {
         private readonly ReadModelDbContext _readModelDbContext;
 

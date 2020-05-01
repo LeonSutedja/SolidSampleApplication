@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SolidSampleApplication.Core;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -32,5 +33,10 @@ namespace SolidSampleApplication.Infrastructure.EventBus
             foreach(var e in events)
                 await _mediator.Publish(e);
         }
+    }
+
+    public interface IEventHandler<T> : INotificationHandler<T>
+        where T : ISimpleEvent
+    {
     }
 }

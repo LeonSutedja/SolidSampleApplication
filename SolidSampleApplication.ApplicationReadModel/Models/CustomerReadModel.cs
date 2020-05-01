@@ -1,6 +1,6 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
+using SolidSampleApplication.Infrastructure.EventBus;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,8 +64,8 @@ namespace SolidSampleApplication.ApplicationReadModel
     }
 
     public class CustomerEventHandlers :
-        INotificationHandler<CustomerRegisteredEvent>,
-        INotificationHandler<CustomerNameChangedEvent>
+        IEventHandler<CustomerRegisteredEvent>,
+        IEventHandler<CustomerNameChangedEvent>
     {
         private readonly ReadModelDbContext _readModelDbContext;
 

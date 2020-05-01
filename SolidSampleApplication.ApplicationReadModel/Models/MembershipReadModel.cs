@@ -1,6 +1,6 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
+using SolidSampleApplication.Infrastructure.EventBus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -111,10 +111,10 @@ namespace SolidSampleApplication.ApplicationReadModel
     }
 
     public class MembershipEventHandlers :
-        INotificationHandler<MembershipCreatedEvent>,
-        INotificationHandler<MembershipPointsEarnedEvent>,
-        INotificationHandler<MembershipLevelUpgradedEvent>,
-        INotificationHandler<MembershipLevelDowngradedEvent>
+        IEventHandler<MembershipCreatedEvent>,
+        IEventHandler<MembershipPointsEarnedEvent>,
+        IEventHandler<MembershipLevelUpgradedEvent>,
+        IEventHandler<MembershipLevelDowngradedEvent>
     {
         private readonly ReadModelDbContext _readModelDbContext;
 

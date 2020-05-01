@@ -10,6 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SolidSampleApplication.Core\SolidSampleApplication.Core.csproj" />
+    <ProjectReference Include="..\SolidSampleApplication.Infrastructure\SolidSampleApplication.Infrastructure.csproj" />
   </ItemGroup>
-
 </Project>
