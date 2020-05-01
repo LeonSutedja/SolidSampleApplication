@@ -3,6 +3,8 @@
     public enum MembershipPointsType
     {
         Movie,
-        Music
+        Music,
+        Retail,
+        FastFood
     }
 }

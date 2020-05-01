@@ -18,7 +18,14 @@ namespace SolidSampleApplication.ReportingReadModel
         public string Username { get; private set; }
         public int PointsEarnedTime { get; private set; }
         public double TotalPoints { get; private set; }
-        public double Average => TotalPoints / PointsEarnedTime;
+
+        public double Average
+        {
+            get
+            {
+                return (PointsEarnedTime == 0) ? 0 : (TotalPoints / PointsEarnedTime);
+            }
+        }
 
         public void ApplyEvent(CustomerRegisteredEvent simpleEvent)
         {
