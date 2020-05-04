@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure.EventBus;
 using System;
@@ -45,6 +46,24 @@ namespace SolidSampleApplication.ReportingReadModel
         public void ApplyEvent(MembershipCreatedEvent simpleEvent)
         {
             MembershipId = simpleEvent.Id;
+        }
+    }
+
+    public class MembershipPointsConsumerHandlers : IConsumer<CustomerRegisteredEvent>
+    {
+        private readonly ReportingReadModelDbContext _context;
+
+        public MembershipPointsConsumerHandlers(ReportingReadModelDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task Consume(ConsumeContext<CustomerRegisteredEvent> context)
+        {
+            var entity = new MembershipPointsReportingReadModel();
+            entity.ApplyEvent(context.Message);
+            _context.Add(entity);
+            await _context.SaveChangesAsync();
         }
     }
 

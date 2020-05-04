@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
 using System;
+using System.Collections.Generic;
 
 namespace SolidSampleApplication.Infrastructure.SampleData
 {
     public static class Seed
     {
-        public static void SeedApplicationEvent(ModelBuilder modelBuilder)
+        public static List<SimpleApplicationEvent> EventDataSeed()
         {
             var requestedBy = "SeedData";
             var apocalypso = new CustomerRegisteredEvent(Guid.NewGuid(), "apocalypso", "Apo", "Calypso", "apocalyptic@sampleemail.com");
@@ -39,8 +40,9 @@ namespace SolidSampleApplication.Infrastructure.SampleData
             var apocalypsoNameChanged2 = new CustomerNameChangedEvent(apocalypso.Id, "Apo", "Calypso");
             var apocalypsoNameChanged3 = new CustomerNameChangedEvent(apocalypso.Id, "Apocalyptic", "Calypso");
 
-            modelBuilder.Entity<SimpleApplicationEvent>().HasData(
-                    SimpleApplicationEvent.New(apocalypso, 1, DateTime.Now.AddDays(-30), requestedBy),
+            var result = new List<SimpleApplicationEvent>()
+            {
+                 SimpleApplicationEvent.New(apocalypso, 1, DateTime.Now.AddDays(-30), requestedBy),
                     SimpleApplicationEvent.New(apoMembershipCreated, 1, DateTime.Now.AddDays(-30), requestedBy),
                     SimpleApplicationEvent.New(apollo, 1, DateTime.Now.AddDays(-29), requestedBy),
                     SimpleApplicationEvent.New(apolloMembershipCreated, 1, DateTime.Now.AddDays(-29), requestedBy),
@@ -69,7 +71,15 @@ namespace SolidSampleApplication.Infrastructure.SampleData
                     SimpleApplicationEvent.New(miaMembershipPoint3, 1, DateTime.Now.AddDays(-10), requestedBy),
                     SimpleApplicationEvent.New(miaUpgradeMembership, 1, DateTime.Now.AddDays(-9), requestedBy),
                     SimpleApplicationEvent.New(miaUpgradeMembership, 1, DateTime.Now.AddDays(-8), requestedBy)
-              );
+            };
+
+            return result;
+        }
+
+        public static void SeedApplicationEvent(ModelBuilder modelBuilder)
+        {
+            var events = EventDataSeed();
+            modelBuilder.Entity<SimpleApplicationEvent>().HasData(events);
         }
     }
 }

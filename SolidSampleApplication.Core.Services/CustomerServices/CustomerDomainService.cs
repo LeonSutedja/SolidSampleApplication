@@ -1,4 +1,5 @@
-﻿using SolidSampleApplication.ApplicationReadModel;
+﻿using MassTransit;
+using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.EventBus;
 using System;
@@ -12,15 +13,18 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
         private readonly ReadModelDbContext _readModelDbContext;
         private readonly SimpleEventStoreDbContext _eventStoreDbContext;
         private readonly IEventBusService _eventBusService;
+        private readonly IPublishEndpoint _publishEndpoint;
 
         public CustomerDomainService(
             ReadModelDbContext readModelDbContext,
             SimpleEventStoreDbContext eventStoreDbContext,
-            IEventBusService eventBusService)
+            IEventBusService eventBusService,
+            IPublishEndpoint publishEndpoint)
         {
             _readModelDbContext = readModelDbContext;
             _eventStoreDbContext = eventStoreDbContext;
             _eventBusService = eventBusService;
+            this._publishEndpoint = publishEndpoint;
         }
 
         public async Task<bool> RegisterCustomerAsync(string username, string firstname, string lastname, string email)
@@ -34,6 +38,10 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
             var customer = new Customer(Guid.NewGuid(), username, firstname, lastname, email);
             await _eventStoreDbContext.SavePendingEventsAsync(customer.PendingEvents, 1, "Sample");
             await _eventBusService.Publish(customer.PendingEvents);
+            foreach(var e in customer.PendingEvents)
+            {
+                await _publishEndpoint.Publish(e, e.GetType());
+            }
             return true;
         }
 

@@ -168,7 +168,7 @@ namespace SolidSampleApplication.Api.Test
             @events.Count().ShouldBeGreaterThan(0);
         }
 
-        [Fact]
+        [Fact(Skip = "reporting will be in a different process")]
         public async Task EarnPoints_ShouldUpdateReporting_Return_Ok()
         {
             var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));

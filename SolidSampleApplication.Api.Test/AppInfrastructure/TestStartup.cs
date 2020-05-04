@@ -68,10 +68,10 @@ namespace SolidSampleApplication.Api
             services.AddDbContext<ReadModelDbContext>(
                 options => options.UseSqlite(applicationReadModel));
 
-            var reportingConnection = new SqliteConnection("Data Source=:memory:");
-            reportingConnection.Open();
-            services.AddDbContext<ReportingReadModelDbContext>(
-                options => options.UseSqlite(reportingConnection));
+            //var reportingConnection = new SqliteConnection("Data Source=:memory:");
+            //reportingConnection.Open();
+            //services.AddDbContext<ReportingReadModelDbContext>(
+            //    options => options.UseSqlite(reportingConnection));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -128,38 +128,38 @@ namespace SolidSampleApplication.Api
 
                 // reporting initialization
 
-                // readonly initialization hack for sample purpose
-                var reportingDbContext = serviceScope.ServiceProvider.GetService<ReportingReadModelDbContext>();
-                reportingDbContext.Database.EnsureCreated();
+                //// readonly initialization hack for sample purpose
+                //var reportingDbContext = serviceScope.ServiceProvider.GetService<ReportingReadModelDbContext>();
+                //reportingDbContext.Database.EnsureCreated();
 
-                var reportingModelEventHandlers = new MembershipPointsReportingReadModelHandlers(reportingDbContext);
-                var customerregisteredEvents = eventStoreDbContext.FindEventsAsync<CustomerRegisteredEvent>().Result;
-                var membershipCreatedEvents = eventStoreDbContext.FindEventsAsync<MembershipCreatedEvent>().Result;
-                var membershipPointsEarnedEvents = eventStoreDbContext.FindEventsAsync<MembershipPointsEarnedEvent>().Result;
+                //var reportingModelEventHandlers = new MembershipPointsReportingReadModelHandlers(reportingDbContext);
+                //var customerregisteredEvents = eventStoreDbContext.FindEventsAsync<CustomerRegisteredEvent>().Result;
+                //var membershipCreatedEvents = eventStoreDbContext.FindEventsAsync<MembershipCreatedEvent>().Result;
+                //var membershipPointsEarnedEvents = eventStoreDbContext.FindEventsAsync<MembershipPointsEarnedEvent>().Result;
 
-                List<dynamic> dynamicCustomerRegistered = customerregisteredEvents
-                    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
-                    .ToList();
+                //List<dynamic> dynamicCustomerRegistered = customerregisteredEvents
+                //    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
+                //    .ToList();
 
-                List<dynamic> dynamicMembershipCreated = membershipCreatedEvents
-                    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
-                    .ToList();
+                //List<dynamic> dynamicMembershipCreated = membershipCreatedEvents
+                //    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
+                //    .ToList();
 
-                List<dynamic> dynamicMembershipPointsEarned = membershipPointsEarnedEvents
-                    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
-                    .ToList();
-                foreach(var @event in dynamicCustomerRegistered)
-                {
-                    reportingModelEventHandlers.Handle(@event);
-                }
-                foreach(var @event in dynamicMembershipCreated)
-                {
-                    reportingModelEventHandlers.Handle(@event);
-                }
-                foreach(var @event in dynamicMembershipPointsEarned)
-                {
-                    reportingModelEventHandlers.Handle(@event);
-                }
+                //List<dynamic> dynamicMembershipPointsEarned = membershipPointsEarnedEvents
+                //    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
+                //    .ToList();
+                //foreach(var @event in dynamicCustomerRegistered)
+                //{
+                //    reportingModelEventHandlers.Handle(@event);
+                //}
+                //foreach(var @event in dynamicMembershipCreated)
+                //{
+                //    reportingModelEventHandlers.Handle(@event);
+                //}
+                //foreach(var @event in dynamicMembershipPointsEarned)
+                //{
+                //    reportingModelEventHandlers.Handle(@event);
+                //}
             }
         }
     }
