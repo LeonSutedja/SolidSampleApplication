@@ -1,9 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using SolidSampleApplication.Core;
-using SolidSampleApplication.Infrastructure.EventBus;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.ReportingReadModel
@@ -49,7 +47,10 @@ namespace SolidSampleApplication.ReportingReadModel
         }
     }
 
-    public class MembershipPointsConsumerHandlers : IConsumer<CustomerRegisteredEvent>
+    public class MembershipPointsConsumerHandlers :
+        IConsumer<CustomerRegisteredEvent>,
+        IConsumer<MembershipCreatedEvent>,
+        IConsumer<MembershipPointsEarnedEvent>
     {
         private readonly ReportingReadModelDbContext _context;
 
@@ -65,40 +66,53 @@ namespace SolidSampleApplication.ReportingReadModel
             _context.Add(entity);
             await _context.SaveChangesAsync();
         }
-    }
 
-    public class MembershipPointsReportingReadModelHandlers :
-        IEventHandler<CustomerRegisteredEvent>,
-        IEventHandler<MembershipCreatedEvent>,
-        IEventHandler<MembershipPointsEarnedEvent>
-    {
-        private readonly ReportingReadModelDbContext _context;
-
-        public MembershipPointsReportingReadModelHandlers(ReportingReadModelDbContext context)
+        public async Task Consume(ConsumeContext<MembershipCreatedEvent> context)
         {
-            _context = context;
-        }
-
-        public async Task Handle(CustomerRegisteredEvent notification, CancellationToken cancellationToken = default)
-        {
-            var entity = new MembershipPointsReportingReadModel();
-            entity.ApplyEvent(notification);
-            _context.Add(entity);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task Handle(MembershipCreatedEvent notification, CancellationToken cancellationToken = default)
-        {
-            var entity = await _context.MembershipPointsReporting.FirstOrDefaultAsync(c => c.CustomerId == notification.CustomerId);
-            entity.ApplyEvent(notification);
+            var entity = await _context.MembershipPointsReporting.FirstOrDefaultAsync(c => c.CustomerId == context.Message.CustomerId);
+            entity.ApplyEvent(context.Message);
             _context.Update(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task Handle(MembershipPointsEarnedEvent notification, CancellationToken cancellationToken = default)
+        public async Task Consume(ConsumeContext<MembershipPointsEarnedEvent> context)
         {
-            var entity = await _context.MembershipPointsReporting.FirstOrDefaultAsync(c => c.MembershipId == notification.Id);
-            entity.ApplyEvent(notification);
+            var entity = await _context.MembershipPointsReporting.FirstOrDefaultAsync(c => c.MembershipId == context.Message.Id);
+            entity.ApplyEvent(context.Message);
+            _context.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public class MembershipHandlers
+    {
+        private readonly ReportingReadModelDbContext _context;
+
+        public MembershipHandlers(ReportingReadModelDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task Handle(CustomerRegisteredEvent simpleEvent)
+        {
+            var entity = new MembershipPointsReportingReadModel();
+            entity.ApplyEvent(simpleEvent);
+            _context.Add(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task Handle(MembershipCreatedEvent simpleEvent)
+        {
+            var entity = await _context.MembershipPointsReporting.FirstOrDefaultAsync(c => c.CustomerId == simpleEvent.CustomerId);
+            entity.ApplyEvent(simpleEvent);
+            _context.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task Handle(MembershipPointsEarnedEvent simpleEvent)
+        {
+            var entity = await _context.MembershipPointsReporting.FirstOrDefaultAsync(c => c.MembershipId == simpleEvent.Id);
+            entity.ApplyEvent(simpleEvent);
             _context.Update(entity);
             await _context.SaveChangesAsync();
         }

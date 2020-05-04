@@ -7,9 +7,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
+using SolidSampleApplication.Infrastructure.SampleData;
 using SolidSampleApplication.ReportingReadModel;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace SolidSampleApplication.Reporting.Api
@@ -101,6 +105,37 @@ namespace SolidSampleApplication.Reporting.Api
                 // readonly initialization hack for sample purpose
                 var reportingDbContext = serviceScope.ServiceProvider.GetService<ReportingReadModelDbContext>();
                 reportingDbContext.Database.EnsureCreated();
+
+                var dataSeeds = Seed.EventDataSeed();
+
+                var reportingModelEventHandlers = new MembershipHandlers(reportingDbContext);
+                var customerregisteredEvents = dataSeeds.Where(e => e.EntityType == (typeof(CustomerRegisteredEvent).AssemblyQualifiedName));
+                var membershipCreatedEvents = dataSeeds.Where(e => e.EntityType == (typeof(MembershipCreatedEvent).AssemblyQualifiedName));
+                var membershipPointsEarnedEvents = dataSeeds.Where(e => e.EntityType == (typeof(MembershipPointsEarnedEvent).AssemblyQualifiedName));
+
+                List<dynamic> dynamicCustomerRegistered = customerregisteredEvents
+                    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
+                    .ToList();
+
+                List<dynamic> dynamicMembershipCreated = membershipCreatedEvents
+                    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
+                    .ToList();
+
+                List<dynamic> dynamicMembershipPointsEarned = membershipPointsEarnedEvents
+                    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
+                    .ToList();
+                foreach(var @event in dynamicCustomerRegistered)
+                {
+                    reportingModelEventHandlers.Handle(@event);
+                }
+                foreach(var @event in dynamicMembershipCreated)
+                {
+                    reportingModelEventHandlers.Handle(@event);
+                }
+                foreach(var @event in dynamicMembershipPointsEarned)
+                {
+                    reportingModelEventHandlers.Handle(@event);
+                }
             }
         }
     }

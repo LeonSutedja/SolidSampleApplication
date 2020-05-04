@@ -38,10 +38,7 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
             var customer = new Customer(Guid.NewGuid(), username, firstname, lastname, email);
             await _eventStoreDbContext.SavePendingEventsAsync(customer.PendingEvents, 1, "Sample");
             await _eventBusService.Publish(customer.PendingEvents);
-            foreach(var e in customer.PendingEvents)
-            {
-                await _publishEndpoint.Publish(e, e.GetType());
-            }
+
             return true;
         }
 
