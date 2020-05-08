@@ -1,4 +1,5 @@
 using FluentValidation.AspNetCore;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,9 +13,7 @@ using SolidSampleApplication.Api.PipelineBehavior;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
-using SolidSampleApplication.ReportingReadModel;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace SolidSampleApplication.Api
@@ -72,6 +71,20 @@ namespace SolidSampleApplication.Api
             //reportingConnection.Open();
             //services.AddDbContext<ReportingReadModelDbContext>(
             //    options => options.UseSqlite(reportingConnection));
+
+            // in memory mass transit configuration
+            services.AddMassTransit(cfg =>
+            {
+                cfg.AddBus(provider =>
+                {
+                    return Bus.Factory.CreateUsingInMemory(cfg =>
+                    {
+                        MessageDataDefaults.ExtraTimeToLive = TimeSpan.FromDays(1);
+                        MessageDataDefaults.Threshold = 2000;
+                        MessageDataDefaults.AlwaysWriteToRepository = false;
+                    });
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
