@@ -13,12 +13,19 @@ namespace SolidSampleApplication.Core
 
         public DateTime EarnedAt { get; private set; }
 
-        public MembershipPointsEarnedEvent(Guid id, double amount, MembershipPointsType pointsType, DateTime earnedAt)
+        public DateTime Timestamp { get; private set; }
+        public int CurrentVersion { get; private set; }
+        public int AppliedVersion { get; private set; }
+
+        public MembershipPointsEarnedEvent(Guid id, double amount, MembershipPointsType pointsType, DateTime earnedAt, int currentVersion)
         {
             Id = id;
             Amount = amount;
             PointsType = pointsType;
             EarnedAt = earnedAt;
+            Timestamp = DateTime.UtcNow;
+            CurrentVersion = currentVersion;
+            AppliedVersion = currentVersion + 1;
         }
     }
 }

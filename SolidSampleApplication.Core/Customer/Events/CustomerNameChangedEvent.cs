@@ -11,14 +11,14 @@ namespace SolidSampleApplication.Core
         public int CurrentVersion { get; private set; }
         public int AppliedVersion { get; private set; }
 
-        public CustomerNameChangedEvent(Guid id, string firstName, string lastName, int version)
+        public CustomerNameChangedEvent(Guid id, string firstName, string lastName, int currentVersion)
         {
             Id = id;
             FirstName = firstName ?? throw new ArgumentNullException(nameof(firstName));
             LastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
             Timestamp = DateTime.UtcNow;
-            CurrentVersion = version;
-            AppliedVersion = version + 1;
+            CurrentVersion = currentVersion;
+            AppliedVersion = currentVersion + 1;
         }
     }
 }

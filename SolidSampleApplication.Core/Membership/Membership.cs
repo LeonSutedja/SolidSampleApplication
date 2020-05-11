@@ -31,21 +31,21 @@ namespace SolidSampleApplication.Core
 
         public void UpgradeMembership()
         {
-            var @event = new MembershipLevelUpgradedEvent(Id, DateTime.Now);
+            var @event = new MembershipLevelUpgradedEvent(Id, DateTime.UtcNow, Version);
             ApplyEvent(@event);
             AppendEvent(@event);
         }
 
         public void DowngradeMembership()
         {
-            var @event = new MembershipLevelDowngradedEvent(Id, DateTime.Now);
+            var @event = new MembershipLevelDowngradedEvent(Id, DateTime.UtcNow, Version);
             ApplyEvent(@event);
             AppendEvent(@event);
         }
 
         public void PointsEarned(double points, MembershipPointsType type)
         {
-            var @event = new MembershipPointsEarnedEvent(Id, points, type, DateTime.Now);
+            var @event = new MembershipPointsEarnedEvent(Id, points, type, DateTime.UtcNow, Version);
             ApplyEvent(@event);
             AppendEvent(@event);
         }

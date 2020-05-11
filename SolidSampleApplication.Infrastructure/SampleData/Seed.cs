@@ -30,10 +30,10 @@ namespace SolidSampleApplication.Infrastructure.SampleData
             var charlotteMembershipCreated = new MembershipCreatedEvent(Guid.NewGuid(), charlotte.Id);
             var mia = new CustomerRegisteredEvent(Guid.NewGuid(), "milee", "Mia", "Lee", "mialee@sampleemail.com");
             var miaMembershipCreated = new MembershipCreatedEvent(Guid.NewGuid(), mia.Id);
-            var miaMembershipPoint1 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 10, MembershipPointsType.Movie, DateTime.Now.AddDays(-10));
-            var miaMembershipPoint2 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 40, MembershipPointsType.Movie, DateTime.Now.AddDays(-9));
-            var miaMembershipPoint3 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 20, MembershipPointsType.Music, DateTime.Now.AddDays(-5));
-            var miaUpgradeMembership = new MembershipLevelUpgradedEvent(miaMembershipCreated.Id, DateTime.Now.AddDays(-5));
+            var miaMembershipPoint1 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 10, MembershipPointsType.Movie, DateTime.Now.AddDays(-10), 1);
+            var miaMembershipPoint2 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 40, MembershipPointsType.Movie, DateTime.Now.AddDays(-9), 2);
+            var miaMembershipPoint3 = new MembershipPointsEarnedEvent(miaMembershipCreated.Id, 20, MembershipPointsType.Music, DateTime.Now.AddDays(-6), 3);
+            var miaUpgradeMembership = new MembershipLevelUpgradedEvent(miaMembershipCreated.Id, DateTime.Now.AddDays(-5), 4);
 
             var apocalypsoNameChanged = new CustomerNameChangedEvent(apocalypso.Id, "Apocal", "Lypso", 1);
             var aphroditeNameChanged = new CustomerNameChangedEvent(aphrodite.Id, "Aphrod", "Ite", 1);
