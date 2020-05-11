@@ -24,7 +24,7 @@ namespace SolidSampleApplication.Core.Rewards
 
         public Reward(Guid customerId, RewardType type)
         {
-            var @event = new RewardEarnedEvent(Guid.NewGuid(), customerId, type, DateTime.Now);
+            var @event = new RewardEarnedEvent(Guid.NewGuid(), customerId, type);
             ApplyEvent(@event);
             AppendEvent(@event);
         }
@@ -34,8 +34,8 @@ namespace SolidSampleApplication.Core.Rewards
             Id = simpleEvent.Id;
             CustomerId = simpleEvent.CustomerId;
             RewardType = simpleEvent.RewardType;
-            EarnedAt = simpleEvent.EarnedAt;
-            Version = 1;
+            EarnedAt = simpleEvent.Timestamp;
+            Version = simpleEvent.AppliedVersion;
         }
     }
 
@@ -46,15 +46,18 @@ namespace SolidSampleApplication.Core.Rewards
         public Guid CustomerId { get; private set; }
 
         public RewardType RewardType { get; private set; }
+        public DateTime Timestamp { get; private set; }
+        public int CurrentVersion { get; private set; }
+        public int AppliedVersion { get; private set; }
 
-        public DateTime EarnedAt { get; private set; }
-
-        public RewardEarnedEvent(Guid id, Guid customerId, RewardType rewardType, DateTime earnedAt)
+        public RewardEarnedEvent(Guid id, Guid customerId, RewardType rewardType)
         {
             Id = id;
             CustomerId = customerId;
             RewardType = rewardType;
-            EarnedAt = earnedAt;
+            Timestamp = DateTime.UtcNow;
+            CurrentVersion = 0;
+            AppliedVersion = CurrentVersion + 1;
         }
     }
 }

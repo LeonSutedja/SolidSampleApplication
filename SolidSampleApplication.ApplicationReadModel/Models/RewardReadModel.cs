@@ -41,8 +41,8 @@ namespace SolidSampleApplication.ApplicationReadModel
             Id = simpleEvent.Id;
             CustomerId = simpleEvent.CustomerId;
             RewardType = simpleEvent.RewardType;
-            EarnedAt = simpleEvent.EarnedAt;
-            Version = 1;
+            EarnedAt = simpleEvent.Timestamp;
+            Version = simpleEvent.AppliedVersion;
         }
     }
 
