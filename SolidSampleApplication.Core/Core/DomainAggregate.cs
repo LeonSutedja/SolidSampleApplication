@@ -4,10 +4,6 @@ using System.Collections.Generic;
 
 namespace SolidSampleApplication.Core
 {
-    public interface ISimpleEvent : INotification
-    {
-    }
-
     public interface IEntityEvent
     {
         Guid Id { get; }
