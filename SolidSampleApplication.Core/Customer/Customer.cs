@@ -23,31 +23,31 @@ namespace SolidSampleApplication.Core
         {
             var @event = new CustomerRegisteredEvent(id, username, firstName, lastName, email);
             ApplyEvent(@event);
-            Append(@event);
+            AppendEvent(@event);
         }
 
         public void ChangeName(string firstname, string lastname)
         {
-            var @event = new CustomerNameChangedEvent(Id, firstname, lastname);
+            var @event = new CustomerNameChangedEvent(Id, firstname, lastname, Version);
             ApplyEvent(@event);
-            Append(@event);
+            AppendEvent(@event);
         }
 
-        public void ApplyEvent(CustomerRegisteredEvent simpleEvent)
+        public void ApplyEvent(CustomerRegisteredEvent @event)
         {
-            Id = simpleEvent.Id;
-            Username = simpleEvent.Username;
-            FirstName = simpleEvent.FirstName;
-            LastName = simpleEvent.LastName;
-            Email = simpleEvent.Email;
-            Version = 1;
+            Id = @event.Id;
+            Username = @event.Username;
+            FirstName = @event.FirstName;
+            LastName = @event.LastName;
+            Email = @event.Email;
+            Version = @event.AppliedVersion;
         }
 
-        public void ApplyEvent(CustomerNameChangedEvent simpleEvent)
+        public void ApplyEvent(CustomerNameChangedEvent @event)
         {
-            FirstName = simpleEvent.FirstName;
-            LastName = simpleEvent.LastName;
-            Version++;
+            FirstName = @event.FirstName;
+            LastName = @event.LastName;
+            Version = @event.AppliedVersion;
         }
     }
 }

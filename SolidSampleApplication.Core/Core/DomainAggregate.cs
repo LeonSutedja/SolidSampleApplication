@@ -28,7 +28,7 @@ namespace SolidSampleApplication.Core
             PendingEvents = new Queue<ISimpleEvent>();
         }
 
-        protected void Append(ISimpleEvent @event)
+        protected void AppendEvent(ISimpleEvent @event)
         {
             PendingEvents.Enqueue(@event);
         }

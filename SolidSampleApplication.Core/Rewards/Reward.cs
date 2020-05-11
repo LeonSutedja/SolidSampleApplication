@@ -26,7 +26,7 @@ namespace SolidSampleApplication.Core.Rewards
         {
             var @event = new RewardEarnedEvent(Guid.NewGuid(), customerId, type, DateTime.Now);
             ApplyEvent(@event);
-            Append(@event);
+            AppendEvent(@event);
         }
 
         public void ApplyEvent(RewardEarnedEvent simpleEvent)

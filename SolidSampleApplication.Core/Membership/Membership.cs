@@ -26,28 +26,28 @@ namespace SolidSampleApplication.Core
         {
             var @event = new MembershipCreatedEvent(Guid.NewGuid(), customerId);
             ApplyEvent(@event);
-            Append(@event);
+            AppendEvent(@event);
         }
 
         public void UpgradeMembership()
         {
             var @event = new MembershipLevelUpgradedEvent(Id, DateTime.Now);
             ApplyEvent(@event);
-            Append(@event);
+            AppendEvent(@event);
         }
 
         public void DowngradeMembership()
         {
             var @event = new MembershipLevelDowngradedEvent(Id, DateTime.Now);
             ApplyEvent(@event);
-            Append(@event);
+            AppendEvent(@event);
         }
 
         public void PointsEarned(double points, MembershipPointsType type)
         {
             var @event = new MembershipPointsEarnedEvent(Id, points, type, DateTime.Now);
             ApplyEvent(@event);
-            Append(@event);
+            AppendEvent(@event);
         }
 
         public void ApplyEvent(MembershipPointsEarnedEvent simpleEvent)
