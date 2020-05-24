@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SolidSampleApplication.Infrastructure.ApplicationBus;
+using System;
 using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Api.Customers
@@ -21,15 +22,17 @@ namespace SolidSampleApplication.Api.Customers
             return (await _bus.Send(new GetAllCustomersQuery())).ActionResult;
         }
 
-        [HttpPut]
-        public async Task<ActionResult> ChangeName(ChangeNameCustomerCommand request)
+        [HttpPost]
+        public async Task<ActionResult> RegisterCustomer(RegisterCustomerCommand request)
         {
             return (await _bus.Send(request)).ActionResult;
         }
 
-        [HttpPost]
-        public async Task<ActionResult> RegisterCustomer(RegisterCustomerCommand request)
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<ActionResult> ChangeName(Guid id, ChangeNameCustomerCommand request)
         {
+            request.CustomerId = id;
             return (await _bus.Send(request)).ActionResult;
         }
     }

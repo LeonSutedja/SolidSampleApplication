@@ -88,12 +88,11 @@ namespace SolidSampleApplication.Api.Test
 
             var request = new ChangeNameCustomerCommand()
             {
-                CustomerId = customer.Id,
                 FirstName = firstName,
                 LastName = lastName
             };
 
-            var response = await _client.PutRequestAsStringContent("/customers", request);
+            var response = await _client.PutRequestAsStringContent($"/customers/{customer.Id}", request);
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync();
@@ -101,7 +100,7 @@ namespace SolidSampleApplication.Api.Test
             _output.WriteLine(content);
 
             var jsonObject = JObject.Parse(content);
-            jsonObject.ShouldContainKeyAndValue("id", request.CustomerId.ToString());
+            jsonObject.ShouldContainKeyAndValue("id", customer.Id.ToString());
             jsonObject.ShouldContainKeyAndValue("username", customer.Username);
             jsonObject.ShouldContainKeyAndValue("firstName", request.FirstName);
             jsonObject.ShouldContainKeyAndValue("lastName", request.LastName);
@@ -132,12 +131,11 @@ namespace SolidSampleApplication.Api.Test
 
             var request = new ChangeNameCustomerCommand()
             {
-                CustomerId = customer.Id,
                 FirstName = firstName,
                 LastName = lastName
             };
 
-            var response = await _client.PutRequestAsStringContent("/customers", request);
+            var response = await _client.PutRequestAsStringContent($"/customers/{customer.Id}", request);
             response.IsSuccessStatusCode.ShouldBeFalse();
             response.StatusCode.ShouldBe(System.Net.HttpStatusCode.BadRequest);
 
