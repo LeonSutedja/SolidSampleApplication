@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit" Version="6.2.5" />
+    <PackageReference Include="MassTransit" Version="7.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.3" />
   </ItemGroup>
 
@@ -13,5 +13,4 @@
     <ProjectReference Include="..\SolidSampleApplication.Core\SolidSampleApplication.Core.csproj" />
     <ProjectReference Include="..\SolidSampleApplication.Infrastructure\SolidSampleApplication.Infrastructure.csproj" />
   </ItemGroup>
-
 </Project>
