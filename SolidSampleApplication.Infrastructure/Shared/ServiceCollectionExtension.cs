@@ -63,6 +63,18 @@ namespace SolidSampleApplication.Infrastructure
             }
         }
 
+        private static List<Assembly> _getAllReferencedAssemblies<T>(Assembly mainAssembly)
+        {
+            var namespaceName = typeof(T).Namespace;
+            var assembliesName = mainAssembly
+                .GetReferencedAssemblies()
+                .Where(a => a.Name.Contains("SolidSampleApplication"))
+                .ToList();
+            var loadedAssemblies = assembliesName.Select(a => Assembly.Load(a)).ToList();
+            loadedAssemblies.Add(mainAssembly);
+            return loadedAssemblies.ToList();
+        }
+
         private static List<Assembly> _getAllReferencedAssemblies(Assembly mainAssembly)
         {
             var assembliesName = mainAssembly
