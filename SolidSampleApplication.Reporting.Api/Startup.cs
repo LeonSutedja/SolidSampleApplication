@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.SampleData;
+using SolidSampleApplication.Reporting.Api.Controllers;
 using SolidSampleApplication.ReportingReadModel;
 using System;
 using System.Collections.Generic;
@@ -52,29 +53,30 @@ namespace SolidSampleApplication.Reporting.Api
             services.AddMassTransit(cfg =>
             {
                 cfg.AddConsumersFromNamespaceContaining<MembershipPointsConsumerHandlers>();
-                cfg.AddBus(provider =>
-                {
-                    return Bus.Factory.CreateUsingRabbitMq(cfg =>
-                    {
-                        var host = cfg.Host(new Uri("rabbitmq://localhost"), h =>
-                        {
-                            h.Username("guest");
-                            h.Password("guest");
-                        });
 
-                        MessageDataDefaults.ExtraTimeToLive = TimeSpan.FromDays(1);
-                        MessageDataDefaults.Threshold = 2000;
-                        MessageDataDefaults.AlwaysWriteToRepository = false;
+                //cfg.AddBus(provider =>
+                //{
+                //    return Bus.Factory.CreateUsingRabbitMq(cfg =>
+                //    {
+                //        var host = cfg.Host(new Uri("rabbitmq://localhost"), h =>
+                //        {
+                //            h.Username("guest");
+                //            h.Password("guest");
+                //        });
 
-                        cfg.UseHealthCheck(provider);
+                //        MessageDataDefaults.ExtraTimeToLive = TimeSpan.FromDays(1);
+                //        MessageDataDefaults.Threshold = 2000;
+                //        MessageDataDefaults.AlwaysWriteToRepository = false;
 
-                        cfg.ReceiveEndpoint("new_queue", ep =>
-                        {
-                            //ep.LoadFrom(serviceProvider);
-                            ep.Consumer<MembershipPointsConsumerHandlers>(provider);
-                        });
-                    });
-                });
+                //        cfg.UseHealthCheck(provider);
+
+                //        cfg.ReceiveEndpoint("new_queue", ep =>
+                //        {
+                //            //ep.LoadFrom(serviceProvider);
+                //            ep.Consumer<MembershipPointsConsumerHandlers>(provider);
+                //        });
+                //    });
+                //});
             });
 
             services.AddMassTransitHostedService();

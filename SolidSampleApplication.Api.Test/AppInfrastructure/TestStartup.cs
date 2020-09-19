@@ -1,5 +1,7 @@
+using Automatonymous;
 using FluentValidation.AspNetCore;
 using MassTransit;
+using MassTransit.Testing;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,16 +10,80 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Moq;
 using SolidSampleApplication.Api.Healthcheck;
+using SolidSampleApplication.Api.Membership;
 using SolidSampleApplication.Api.PipelineBehavior;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
-using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SolidSampleApplication.Api
 {
+    public static class MasstransitTestHarness
+    {
+        private static InMemoryTestHarness _harness;
+        public static Dictionary<string, dynamic> StateMachines;
+
+        public static InMemoryTestHarness SingletonHarness
+        {
+            get
+            {
+                if(_harness == null)
+                {
+                    _harness = new InMemoryTestHarness();
+                }
+                return _harness;
+            }
+        }
+
+        public static void AddStateMachineSaga<IInstanceState, IStateMachine>()
+            where IStateMachine : MassTransitStateMachine<IInstanceState>, new()
+            where IInstanceState : class, SagaStateMachineInstance
+        {
+            if(StateMachines == null)
+                StateMachines = new Dictionary<string, dynamic>();
+            var machine = new IStateMachine();
+            var key = machine.GetType().Name;
+            if(!StateMachines.ContainsKey(key))
+            {
+                var stateMachineTestHarness = SingletonHarness.StateMachineSaga<IInstanceState, IStateMachine>(machine);
+                StateMachines.Add(key, stateMachineTestHarness);
+            }
+        }
+
+        public static void Start() => SingletonHarness.Start();
+    }
+
+    public static class MockedObjects
+    {
+        private static Mock<IPublishEndpoint> _iPublishEndpoint;
+
+        public static Mock<IPublishEndpoint> IPublishEndpoint
+        {
+            get
+            {
+                if(_iPublishEndpoint == null)
+                    _iPublishEndpoint = new Mock<IPublishEndpoint>();
+                return _iPublishEndpoint;
+            }
+        }
+
+        private static Mock<IRequestClient<SagaStatusRequestedEvent>> _sagaStatusRequestClient;
+
+        public static Mock<IRequestClient<SagaStatusRequestedEvent>> SagaStatusRequestClient
+        {
+            get
+            {
+                if(_sagaStatusRequestClient == null)
+                    _sagaStatusRequestClient = new Mock<IRequestClient<SagaStatusRequestedEvent>>();
+                return _sagaStatusRequestClient;
+            }
+        }
+    }
+
     public class TestStartup
     {
         public TestStartup(IConfiguration configuration)
@@ -31,7 +97,6 @@ namespace SolidSampleApplication.Api
         public void ConfigureServices(IServiceCollection services)
         {
             var mainAssembly = typeof(Startup).Assembly;
-
             // the way to add and register
             // controller from another assemblies.
             services.AddControllers()
@@ -67,24 +132,45 @@ namespace SolidSampleApplication.Api
             services.AddDbContext<ReadModelDbContext>(
                 options => options.UseSqlite(applicationReadModel));
 
+            //MasstransitTestHarness.AddStateMachineSaga<SagaSampleInstanceState, SagaSampleStateMachine>();
+            //MasstransitTestHarness.Start();
+
+            //var publishEndpointMoq = new Mock<IPublishEndpoint>();
+            //var sagaStatusRequestEvent = new Mock<IRequestClient<SagaStatusRequestedEvent>>();
+            services.AddSingleton<IPublishEndpoint>(MockedObjects.IPublishEndpoint.Object);
+            services.AddSingleton<IRequestClient<SagaStatusRequestedEvent>>(MockedObjects.SagaStatusRequestClient.Object);
+
             //var reportingConnection = new SqliteConnection("Data Source=:memory:");
             //reportingConnection.Open();
             //services.AddDbContext<ReportingReadModelDbContext>(
             //    options => options.UseSqlite(reportingConnection));
 
             // in memory mass transit configuration
-            services.AddMassTransit(cfg =>
-            {
-                cfg.AddBus(provider =>
-                {
-                    return Bus.Factory.CreateUsingInMemory(cfg =>
-                    {
-                        MessageDataDefaults.ExtraTimeToLive = TimeSpan.FromDays(1);
-                        MessageDataDefaults.Threshold = 2000;
-                        MessageDataDefaults.AlwaysWriteToRepository = false;
-                    });
-                });
-            });
+            //services.TryAddSingleton(KebabCaseEndpointNameFormatter.Instance);
+            //services.AddMassTransit(cfg =>
+            //{
+            //    // uses in memory saga state machine
+            //    cfg.AddSagaStateMachine<SagaSampleStateMachine, SagaSampleInstanceState>()
+            //        .InMemoryRepository();
+
+            //    cfg.UsingInMemory((context, x) =>
+            //    {
+            //        x.ConfigureEndpoints(context);
+            //    });
+
+            //    //cfg.AddBus(provider =>
+            //    //{
+            //    //    return Bus.Factory.CreateUsingInMemory(cfg =>
+            //    //    {
+            //    //        MessageDataDefaults.ExtraTimeToLive = TimeSpan.FromDays(1);
+            //    //        MessageDataDefaults.Threshold = 2000;
+            //    //        MessageDataDefaults.AlwaysWriteToRepository = false;
+
+            //    //        cfg.ConfigureEndpoints(provider);
+            //    //    });
+            //    //});
+            //    cfg.AddRequestClient<SagaStatusRequestedEvent>();
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

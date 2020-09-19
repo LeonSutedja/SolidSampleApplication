@@ -1,5 +1,6 @@
 using FluentValidation.AspNetCore;
 using MassTransit;
+using MassTransit.Definition;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,8 +8,10 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SolidSampleApplication.Api.Healthcheck;
+using SolidSampleApplication.Api.Membership;
 using SolidSampleApplication.Api.PipelineBehavior;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core;
@@ -53,18 +56,9 @@ namespace SolidSampleApplication.Api
             // fluent validation generic registration
             services.AddControllers()
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(mainAssembly));
-
-            var namespaceToCheck = "SolidSampleApplication";
-            var allAssemblies = mainAssembly.GetAllAssembliesInNamespace(namespaceToCheck);
-            services.AddMediatR(allAssemblies.ToArray());
-
             services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
 
-            // we want to use mediatr pipeline to help with the fluent validation, rather than attaching it to the mvc.
-            // This is because, we want the mediatr pipeline to be triggered first.
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggerPipelineBehavior<,>));
+            ConfigureMediatr(services, mainAssembly);
 
             // As sqllite db context is scoped, repository must become scoped as well
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");
@@ -90,28 +84,45 @@ namespace SolidSampleApplication.Api
             //    options => options.UseSqlite(reportingConnection));
 
             // mass transit configuration
+            services.TryAddSingleton(KebabCaseEndpointNameFormatter.Instance);
+
             services.AddMassTransit(cfg =>
             {
+                // uses in memory saga state machine
+                cfg.AddSagaStateMachine<SagaSampleStateMachine, SagaSampleInstanceState>()
+                    .InMemoryRepository();
+
+                cfg.AddMessageScheduler(new Uri("queue:scheduler"));
+
                 cfg.AddBus(provider =>
                 {
                     return Bus.Factory.CreateUsingRabbitMq(cfg =>
                     {
-                        var host = cfg.Host(new Uri("rabbitmq://localhost"), h =>
-                        {
-                            h.Username("guest");
-                            h.Password("guest");
-                        });
+                        // In memory Quartz Scheduler
+                        cfg.UseInMemoryScheduler("scheduler");
 
-                        MessageDataDefaults.ExtraTimeToLive = TimeSpan.FromDays(1);
-                        MessageDataDefaults.Threshold = 2000;
-                        MessageDataDefaults.AlwaysWriteToRepository = false;
-
-                        cfg.UseHealthCheck(provider);
+                        // gives an endpoint, and listens to the queue
+                        cfg.ConfigureEndpoints(provider);
                     });
                 });
+
+                cfg.AddRequestClient<SagaStatusRequestedEvent>();
             });
 
             services.AddMassTransitHostedService();
+        }
+
+        public void ConfigureMediatr(IServiceCollection services, Assembly assembly)
+        {
+            var namespaceToCheck = "SolidSampleApplication";
+            var allAssemblies = assembly.GetAllAssembliesInNamespace(namespaceToCheck);
+            services.AddMediatR(allAssemblies.ToArray());
+
+            // we want to use mediatr pipeline to help with the fluent validation, rather than attaching it to the mvc.
+            // This is because, we want the mediatr pipeline to be triggered first.
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(FluentValidationPipelineBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingPipelineBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggerPipelineBehavior<,>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
