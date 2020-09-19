@@ -20,5 +20,12 @@ namespace SolidSampleApplication.Api.Membership
         {
             return (await _busService.Send(new GetAllApplicationEventRequest())).ActionResult;
         }
+
+        [HttpGet]
+        [Route("{type}")]
+        public async Task<ActionResult> GetApplicationEvents(string type)
+        {
+            return (await _busService.Send(new GetApplicationEventTypeRequest(type))).ActionResult;
+        }
     }
 }
