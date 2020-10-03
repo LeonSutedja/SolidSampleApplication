@@ -29,7 +29,9 @@ namespace SolidSampleApplication.Api.Membership
             _eventStoreDbContext = eventStoreDbContext;
             _eventTypeMap = new Dictionary<string, List<string>>()
             {
-                { "customer", new List<string>() { "CustomerRegisteredEvent", "CustomerNameChangedEvent" } }
+                { "customer", new List<string>() { "CustomerRegisteredEvent", "CustomerNameChangedEvent" } },
+                { "membership", new List<string>() { "MembershipCreatedEvent", "MembershipLevelDowngradedEvent",
+                    "MembershipLevelUpgradedEvent", "MembershipPointsEarnedEvent" } }
             };
         }
 
