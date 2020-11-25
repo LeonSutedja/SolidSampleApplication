@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -38,6 +39,32 @@ namespace SolidSampleApplication.Infrastructure
             {
                 var interfaceType = t.GetInterfaces().First(i => i.GetGenericTypeDefinition() == typeof(T));
                 services.TryAddEnumerable(ServiceDescriptor.Singleton(interfaceType, t));
+            }
+        }
+
+        /// <summary>
+        /// Usage:
+        /// services.AddGenericInterfaces(assembly, typeof(MyGenericInterfaces<>, ServiceLifeTime.Transient);
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="assembly"></param>
+        /// <param name="ty"></param>
+        /// <param name="serviceLifeTime"></param>
+        public static void AddGenericInterfaces(this IServiceCollection services, Assembly assembly, Type ty, ServiceLifetime serviceLifeTime = ServiceLifetime.Scoped)
+        {
+            var allTypes = assembly.GetTypes().Where(x =>
+                !x.IsAbstract &&
+                !x.IsInterface &&
+                x.GetInterfaces().Any(i => i.IsGenericType && (i.GetGenericTypeDefinition() == ty))).ToList();
+            foreach(var t in allTypes)
+            {
+                var interfaceType = t.GetInterfaces().First(i => i.GetGenericTypeDefinition() == ty);
+                if(serviceLifeTime == ServiceLifetime.Scoped)
+                    services.TryAddEnumerable(ServiceDescriptor.Scoped(interfaceType, t));
+                if(serviceLifeTime == ServiceLifetime.Transient)
+                    services.TryAddEnumerable(ServiceDescriptor.Transient(interfaceType, t));
+                else
+                    services.TryAddEnumerable(ServiceDescriptor.Singleton(interfaceType, t));
             }
         }
 
