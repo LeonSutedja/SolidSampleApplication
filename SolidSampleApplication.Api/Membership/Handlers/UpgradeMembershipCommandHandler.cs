@@ -12,29 +12,9 @@ namespace SolidSampleApplication.Api.Membership
 {
     public class UpgradeMembershipCommand : ICommand<DefaultResponse>
     {
-        // A way to make this value immutable, whilst at the same time able to be mapped from the controller
-        private Guid? _id { get; set; }
+        public Guid? Id { get; init; }
 
-        public Guid? Id
-        {
-            get
-            {
-                return _id;
-            }
-            set
-            {
-                if(_id != null)
-                    throw new Exception("Value has already been set");
-                _id = value;
-            }
-        }
-
-        // empty constructor require for api
-        protected UpgradeMembershipCommand()
-        {
-        }
-
-        public UpgradeMembershipCommand(Guid id)
+        public UpgradeMembershipCommand(Guid? id)
         {
             Id = id;
         }
