@@ -16,6 +16,7 @@ using SolidSampleApplication.Api.PipelineBehavior;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
+using SolidSampleApplication.TableEngine;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -110,6 +111,8 @@ namespace SolidSampleApplication.Api
             });
 
             services.AddMassTransitHostedService();
+
+            services.AddSimpleTableBuilders(mainAssembly);
         }
 
         public void ConfigureMediatr(IServiceCollection services, Assembly assembly)
