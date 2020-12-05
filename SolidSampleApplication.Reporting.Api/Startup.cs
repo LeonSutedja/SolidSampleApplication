@@ -111,20 +111,20 @@ namespace SolidSampleApplication.Reporting.Api
                 var dataSeeds = Seed.EventDataSeed();
 
                 var reportingModelEventHandlers = new MembershipHandlers(reportingDbContext);
-                var customerregisteredEvents = dataSeeds.Where(e => e.EntityType == (typeof(CustomerRegisteredEvent).AssemblyQualifiedName));
-                var membershipCreatedEvents = dataSeeds.Where(e => e.EntityType == (typeof(MembershipCreatedEvent).AssemblyQualifiedName));
-                var membershipPointsEarnedEvents = dataSeeds.Where(e => e.EntityType == (typeof(MembershipPointsEarnedEvent).AssemblyQualifiedName));
+                var customerregisteredEvents = dataSeeds.Where(e => e.EventType == (typeof(CustomerRegisteredEvent).AssemblyQualifiedName));
+                var membershipCreatedEvents = dataSeeds.Where(e => e.EventType == (typeof(MembershipCreatedEvent).AssemblyQualifiedName));
+                var membershipPointsEarnedEvents = dataSeeds.Where(e => e.EventType == (typeof(MembershipPointsEarnedEvent).AssemblyQualifiedName));
 
                 List<dynamic> dynamicCustomerRegistered = customerregisteredEvents
-                    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
+                    .Select(e => e.EventData.FromJson(Type.GetType(e.EventType)))
                     .ToList();
 
                 List<dynamic> dynamicMembershipCreated = membershipCreatedEvents
-                    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
+                    .Select(e => e.EventData.FromJson(Type.GetType(e.EventType)))
                     .ToList();
 
                 List<dynamic> dynamicMembershipPointsEarned = membershipPointsEarnedEvents
-                    .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
+                    .Select(e => e.EventData.FromJson(Type.GetType(e.EventType)))
                     .ToList();
                 foreach(var @event in dynamicCustomerRegistered)
                 {

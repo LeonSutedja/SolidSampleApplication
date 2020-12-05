@@ -37,9 +37,9 @@ namespace SolidSampleApplication.Api.Membership
 
         public async Task<DefaultResponse> Handle(GetApplicationEventTypeRequest request, CancellationToken cancellationToken)
         {
-            var entityTypes = _eventTypeMap[request.Type];
+            var eventTypes = _eventTypeMap[request.Type];
             var allEvents = await _eventStoreDbContext.ApplicationEvents.ToListAsync();
-            var events = allEvents.Where(evt => entityTypes.Any(t => evt.EntityType.Contains(t))).ToList();
+            var events = allEvents.Where(evt => eventTypes.Any(t => evt.EventType.Contains(t))).ToList();
             return DefaultResponse.Success(events);
         }
     }

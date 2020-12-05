@@ -69,7 +69,7 @@ namespace SolidSampleApplication.Api.Membership
         {
             // parse here if we need to parse some values
             var dt = new SimpleReportAuditData();
-            var actionType = evt.EntityType.Split(',').First().Split('.').LastOrDefault();
+            var actionType = evt.EventType.Split(',').First().Split('.').LastOrDefault();
             dt.Action = actionType switch
             {
                 "CustomerRegisteredEvent" => "Customer Registration",
@@ -77,8 +77,8 @@ namespace SolidSampleApplication.Api.Membership
                 null => "Empty",
                 _ => actionType
             };
-            dt.ActionTarget = evt.EntityId;
-            dt.ActionTargetValue = evt.EntityJson;
+            dt.ActionTarget = evt.AggregateId;
+            dt.ActionTargetValue = evt.EventData;
             dt.ActionedBy = evt.RequestedBy;
             dt.ActionedDateAndTime = evt.RequestedTime;
             return dt;

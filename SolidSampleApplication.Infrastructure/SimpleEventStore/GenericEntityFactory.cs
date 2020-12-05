@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace SolidSampleApplication.Infrastructure
 {
-    public class GenericEntityFactory<TEntity> where TEntity : IEntityEvent, new()
+    public class GenericEntityFactory<TAggregate> where TAggregate : IEntityEvent, new()
     {
-        public static async Task<TEntity> GetEntityAsync(SimpleEventStoreDbContext context, string entityId)
+        public static async Task<TAggregate> GetEntityAsync(SimpleEventStoreDbContext context, string entityId)
         {
-            var factory = new GenericEntityFactory<TEntity>(context);
+            var factory = new GenericEntityFactory<TAggregate>(context);
             return await factory.GetEntityAsync(entityId);
         }
 
@@ -22,9 +22,9 @@ namespace SolidSampleApplication.Infrastructure
             _context = context;
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllEntitiesAsync(int max = 200)
+        public async Task<IEnumerable<TAggregate>> GetAllEntitiesAsync(int max = 200)
         {
-            var interfaces = typeof(TEntity).GetInterfaces();
+            var interfaces = typeof(TAggregate).GetInterfaces();
             var implementedHasSimpleEventTypes = interfaces
                 .Where(i => i.Name.Contains("IHasSimpleEvent"))
                 .Select(i => i.GenericTypeArguments.First())
@@ -36,21 +36,21 @@ namespace SolidSampleApplication.Infrastructure
 
             // We get all the list first from applicationEvents
             var distinctEntityIds = await _context.ApplicationEvents
-                .Where(ae => assemblyQualifiedNameTypes.Contains(ae.EntityType))
+                .Where(ae => assemblyQualifiedNameTypes.Contains(ae.EventType))
                 .OrderByDescending(ae => ae.RequestedTime)
-                .Select(ae => ae.EntityId)
+                .Select(ae => ae.AggregateId)
                 .Distinct()
                 .Take(max)
                 .ToListAsync();
 
-            var allEvents = (await _getApplicationEvents(distinctEntityIds, assemblyQualifiedNameTypes)).GroupBy(allEvents => allEvents.EntityId);
+            var allEvents = (await _getApplicationEvents(distinctEntityIds, assemblyQualifiedNameTypes)).GroupBy(allEvents => allEvents.AggregateId);
 
-            var entityList = new List<TEntity>();
+            var entityList = new List<TAggregate>();
             foreach(var entityEvents in allEvents)
             {
                 // Currently, we try to avoid using reflection (Activator.CreateInstance) to create entity.
                 // This is because of the performance impact from reflection.
-                var entity = new TEntity();
+                var entity = new TAggregate();
                 var implementedHasSimpleEvents = GetSimpleEventsFromApplicationEvents(entityEvents, assemblyQualifiedNameTypes);
                 implementedHasSimpleEvents.ForEach((simpleEvent) => ((dynamic)entity).ApplyEvent(simpleEvent));
                 entityList.Add(entity);
@@ -58,9 +58,9 @@ namespace SolidSampleApplication.Infrastructure
             return entityList;
         }
 
-        public async Task<TEntity> GetEntityAsync(string entityId)
+        public async Task<TAggregate> GetEntityAsync(string entityId)
         {
-            var interfaces = typeof(TEntity).GetInterfaces();
+            var interfaces = typeof(TAggregate).GetInterfaces();
             var implementedHasSimpleEventTypes = interfaces
                 .Where(i => i.Name.Contains("IHasSimpleEvent"))
                 .Select(i => i.GenericTypeArguments.First())
@@ -74,7 +74,7 @@ namespace SolidSampleApplication.Infrastructure
                 new List<string>() { entityId },
                 assemblyQualifiedNameTypes);
 
-            var entity = new TEntity();
+            var entity = new TAggregate();
             var implementedHasSimpleEvents = GetSimpleEventsFromApplicationEvents(allEvents, assemblyQualifiedNameTypes);
             implementedHasSimpleEvents.ForEach((simpleEvent) => ((dynamic)entity).ApplyEvent(simpleEvent));
             return entity;
@@ -83,8 +83,8 @@ namespace SolidSampleApplication.Infrastructure
         private async Task<IEnumerable<SimpleApplicationEvent>> _getApplicationEvents(List<string> entityIds, List<string> entityTypes)
         {
             var allEvents = await _context.ApplicationEvents
-                     .Where(ae => entityIds.Contains(ae.EntityId) &&
-                        entityTypes.Contains(ae.EntityType))
+                     .Where(ae => entityIds.Contains(ae.AggregateId) &&
+                        entityTypes.Contains(ae.EventType))
                      .OrderBy(e => e.RequestedTime)
                      .ToListAsync();
             return allEvents;
@@ -95,10 +95,10 @@ namespace SolidSampleApplication.Infrastructure
             List<string> assemblyQualifiedNameTypes)
         {
             return applicationEvents
-                .Where(e => assemblyQualifiedNameTypes.Contains(e.EntityType))
+                .Where(e => assemblyQualifiedNameTypes.Contains(e.EventType))
                 .OrderBy(t => t.RequestedTime)
                 .ToList()
-                .Select(e => e.EntityJson.FromJson(Type.GetType(e.EntityType)))
+                .Select(e => e.EventData.FromJson(Type.GetType(e.EventType)))
                 .ToList();
         }
     }

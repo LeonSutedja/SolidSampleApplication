@@ -25,43 +25,40 @@ namespace SolidSampleApplication.Infrastructure
         //    optionsBuilder.UseSqlite("DataSource=:memory:");
         //}
 
-        public async Task SavePendingEventsAsync(Queue<ISimpleEvent> pendingEvents, int entityTypeVersion, string requestedBy)
+        public async Task SavePendingEventsAsync(Queue<ISimpleEvent> pendingEvents, int aggregateVersion, string requestedBy)
         {
-            foreach(var @event in pendingEvents)
-            {
-                var simpleApplicationEvent = SimpleApplicationEvent.New(@event, entityTypeVersion, DateTime.Now, requestedBy);
-                await ApplicationEvents.AddAsync(simpleApplicationEvent);
-            }
+            var applicationEvents = pendingEvents.Select(e => SimpleApplicationEvent.New(e, aggregateVersion, DateTime.UtcNow, requestedBy));
+            await ApplicationEvents.AddRangeAsync(applicationEvents);
             await SaveChangesAsync();
         }
 
-        public async Task SaveEventAsync<T>(T @event, int entityTypeVersion, DateTime requestedTime, string requestedBy)
+        public async Task SaveEventAsync<T>(T @event, int aggregateVersion, DateTime requestedTime, string requestedBy)
         {
-            var simpleApplicationEvent = SimpleApplicationEvent.New(@event, entityTypeVersion, requestedTime, requestedBy);
+            var simpleApplicationEvent = SimpleApplicationEvent.New(@event, aggregateVersion, requestedTime, requestedBy);
             await ApplicationEvents.AddAsync(simpleApplicationEvent);
             await SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<SimpleApplicationEvent>> FindEventsAsync<T>(string entityId)
+        public async Task<IEnumerable<SimpleApplicationEvent>> FindEventsAsync<TEvent>(string aggregateId)
         {
-            var entityType = typeof(T).AssemblyQualifiedName;
+            var eventType = typeof(TEvent).AssemblyQualifiedName;
             return await ApplicationEvents
-                .Where(e => e.EntityId == entityId && e.EntityType == entityType)
+                .Where(e => e.AggregateId == aggregateId && e.EventType == eventType)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<SimpleApplicationEvent>> FindEventsAsync<T>()
+        public async Task<IEnumerable<SimpleApplicationEvent>> FindEventsAsync<TEvent>()
         {
-            var entityType = typeof(T).AssemblyQualifiedName;
+            var eventType = typeof(TEvent).AssemblyQualifiedName;
             return await ApplicationEvents
-                .Where(e => e.EntityType == entityType)
+                .Where(e => e.EventType == eventType)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<SimpleApplicationEvent>> FindEventsAsync(string entityId)
+        public async Task<IEnumerable<SimpleApplicationEvent>> FindEventsAsync(string aggregateId)
         {
             return await ApplicationEvents
-                .Where(e => e.EntityId == entityId)
+                .Where(e => e.AggregateId == aggregateId)
                 .ToListAsync();
         }
 
