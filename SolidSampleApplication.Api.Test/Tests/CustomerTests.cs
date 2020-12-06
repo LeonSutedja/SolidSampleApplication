@@ -70,27 +70,15 @@ namespace SolidSampleApplication.Api.Test
                 .AddParameterDefinition("FirstName", new List<object> { "batman", "four", "1234567890", "~`@#$%^&*()_+{}:><?,./;[]=-'" }, true)
                 .AddParameterDefinition("LastName", new List<object> { "batman", "four", "1234567890", "~`@#$%^&*()_+{}:><?,./;[]=-'" }, true)
                 .GeneratePermutation<ChangeNameCustomerCommand>();
-            foreach(var input in pressiusInputs)
-            {
-                yield return new object[]
-                {
-                    input.FirstName, input.LastName
-                };
-            }
+            return pressiusInputs.Select(i => new object[] { i }).ToList();
         }
 
         [Theory]
         [MemberData(nameof(ValidNames))]
-        public async Task ChangeCustomerName_ShouldReturn_Ok(string firstName, string lastName)
+        public async Task ChangeCustomerName_ShouldReturn_Ok(ChangeNameCustomerCommand request)
         {
             var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
             var customer = await readModelContext.Customers.FirstOrDefaultAsync();
-
-            var request = new ChangeNameCustomerCommand()
-            {
-                FirstName = firstName,
-                LastName = lastName
-            };
 
             var response = await _client.PutRequestAsStringContent($"/customers/{customer.Id}", request);
             response.EnsureSuccessStatusCode();
@@ -113,27 +101,15 @@ namespace SolidSampleApplication.Api.Test
                 .AddParameterDefinition("FirstName", new List<object> { null, "a", "ab", "abc", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" }, true)
                 .AddParameterDefinition("LastName", new List<object> { null, "a", "ab", "abc", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" }, true)
                 .GeneratePermutation<ChangeNameCustomerCommand>();
-            foreach(var input in pressiusInputs)
-            {
-                yield return new object[]
-                {
-                    input.FirstName, input.LastName
-                };
-            }
+            return pressiusInputs.Select(i => new object[] { i }).ToList();
         }
 
         [Theory]
         [MemberData(nameof(InvalidNames))]
-        public async Task ChangeCustomerName_WithInvalidCommand_ShouldReturn_BadRequest(string firstName, string lastName)
+        public async Task ChangeCustomerName_WithInvalidCommand_ShouldReturn_BadRequest(ChangeNameCustomerCommand request)
         {
             var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
             var customer = await readModelContext.Customers.FirstOrDefaultAsync();
-
-            var request = new ChangeNameCustomerCommand()
-            {
-                FirstName = firstName,
-                LastName = lastName
-            };
 
             var response = await _client.PutRequestAsStringContent($"/customers/{customer.Id}", request);
             response.IsSuccessStatusCode.ShouldBeFalse();
@@ -250,31 +226,13 @@ namespace SolidSampleApplication.Api.Test
                 .AddParameterDefinition("LastName", new List<object> { null, "a", "ab", "abc", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" }, true)
                 .AddParameterDefinition("Email", new List<object> { null, "a", "ab", "abc" }, true)
                 .GeneratePermutation<RegisterCustomerCommand>();
-            foreach(var input in pressiusInputs)
-            {
-                yield return new object[]
-                {
-                    input.Username, input.FirstName, input.LastName, input.Email
-                };
-            }
+            return pressiusInputs.Select(i => new object[] { i }).ToList();
         }
 
         [Theory]
         [MemberData(nameof(InvalidRegisterCustomerCommand))]
-        public async Task RegisterCustomer_WithInvalidRequests_Should_ReturnBadRequest(
-            string username,
-            string firstname,
-            string lastname,
-            string email)
+        public async Task RegisterCustomer_WithInvalidRequests_Should_ReturnBadRequest(RegisterCustomerCommand request)
         {
-            var request = new RegisterCustomerCommand()
-            {
-                Username = username,
-                FirstName = firstname,
-                LastName = lastname,
-                Email = email
-            };
-
             var response = await _client.PostRequestAsStringContent("/customers", request);
 
             // assert

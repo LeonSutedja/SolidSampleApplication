@@ -78,8 +78,7 @@ namespace SolidSampleApplication.Infrastructure.SampleData
 
         public static void SeedApplicationEvent(ModelBuilder modelBuilder)
         {
-            var events = EventDataSeed();
-            modelBuilder.Entity<SimpleApplicationEvent>().HasData(events);
+            modelBuilder.Entity<SimpleApplicationEvent>().HasData(EventDataSeed());
         }
     }
 }

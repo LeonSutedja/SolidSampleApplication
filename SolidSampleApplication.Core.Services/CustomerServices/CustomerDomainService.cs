@@ -1,5 +1,4 @@
-﻿using MassTransit;
-using SolidSampleApplication.ApplicationReadModel;
+﻿using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.EventBus;
 using System;
@@ -13,18 +12,15 @@ namespace SolidSampleApplication.Core.Services.CustomerServices
         private readonly ReadModelDbContext _readModelDbContext;
         private readonly SimpleEventStoreDbContext _eventStoreDbContext;
         private readonly IEventBusService _eventBusService;
-        private readonly IPublishEndpoint _publishEndpoint;
 
         public CustomerDomainService(
             ReadModelDbContext readModelDbContext,
             SimpleEventStoreDbContext eventStoreDbContext,
-            IEventBusService eventBusService,
-            IPublishEndpoint publishEndpoint)
+            IEventBusService eventBusService)
         {
             _readModelDbContext = readModelDbContext;
             _eventStoreDbContext = eventStoreDbContext;
             _eventBusService = eventBusService;
-            this._publishEndpoint = publishEndpoint;
         }
 
         public async Task<bool> RegisterCustomerAsync(string username, string firstname, string lastname, string email)

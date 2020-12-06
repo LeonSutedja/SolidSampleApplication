@@ -78,19 +78,21 @@ namespace SolidSampleApplication.Api.Test
             }
         }
 
-        [Fact]
-        public async Task EarnPoints_ShouldReturn_Ok()
+        [Theory]
+        [InlineData("chajohn2013", 50, MembershipPointsType.Movie)]
+        [InlineData("milee", 150, MembershipPointsType.Music)]
+        [InlineData("beaver", 10, MembershipPointsType.Retail)]
+        [InlineData("olivia", 25, MembershipPointsType.FastFood)]
+        public async Task EarnPoints_ShouldReturn_Ok(string customerUsername, int pointsToAdd, MembershipPointsType membershipPointsType)
         {
             var readModelContext = (ReadModelDbContext)_fixture.Services.GetService(typeof(ReadModelDbContext));
-            var customerUsername = "chajohn2013";
 
             var customer = (await readModelContext.Customers.FirstOrDefaultAsync(c => c.Username == customerUsername));
             var member = (await readModelContext.Memberships.FirstOrDefaultAsync(m => m.CustomerId == customer.Id));
 
             var currentPoint = member.TotalPoints;
             var currentVersion = member.Version;
-            var pointsToAdd = 50;
-            var request = new EarnPointsAggregateMembershipCommand(member.Id, Core.MembershipPointsType.Movie, pointsToAdd);
+            var request = new EarnPointsAggregateMembershipCommand(member.Id, membershipPointsType, pointsToAdd);
             var response = await _client.PutRequestAsStringContent("/Membership/points", request);
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();

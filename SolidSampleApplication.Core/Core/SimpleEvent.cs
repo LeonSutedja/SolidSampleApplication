@@ -18,21 +18,15 @@ namespace SolidSampleApplication.Core
 
         public int AppliedVersion { get; }
 
-        public SimpleEvent()
+        protected SimpleEvent() : this(0)
         {
-            Timestamp = DateTime.UtcNow;
-            CurrentVersion = 0;
-            AppliedVersion = CurrentVersion + 1;
         }
 
-        public SimpleEvent(int currentVersion)
+        protected SimpleEvent(int currentVersion) : this(DateTime.UtcNow, currentVersion)
         {
-            Timestamp = DateTime.UtcNow;
-            CurrentVersion = currentVersion;
-            AppliedVersion = currentVersion + 1;
         }
 
-        public SimpleEvent(DateTime timestamp, int currentVersion)
+        protected SimpleEvent(DateTime timestamp, int currentVersion)
         {
             Timestamp = timestamp;
             CurrentVersion = currentVersion;
