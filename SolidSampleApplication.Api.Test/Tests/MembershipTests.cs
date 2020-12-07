@@ -80,7 +80,6 @@ namespace SolidSampleApplication.Api.Test
 
         [Theory]
         [InlineData("chajohn2013", 50, MembershipPointsType.Movie)]
-        [InlineData("milee", 150, MembershipPointsType.Music)]
         [InlineData("beaver", 10, MembershipPointsType.Retail)]
         [InlineData("olivia", 25, MembershipPointsType.FastFood)]
         public async Task EarnPoints_ShouldReturn_Ok(string customerUsername, int pointsToAdd, MembershipPointsType membershipPointsType)
