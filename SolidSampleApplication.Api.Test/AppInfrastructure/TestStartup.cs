@@ -17,6 +17,7 @@ using SolidSampleApplication.Api.PipelineBehavior;
 using SolidSampleApplication.ApplicationReadModel;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
+using SolidSampleApplication.TableEngine;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -110,6 +111,8 @@ namespace SolidSampleApplication.Api
 
             services.AddMediatR(allAssemblies.ToArray());
             services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
+
+            services.AddSimpleTableBuilders(mainAssembly);
 
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Service");
