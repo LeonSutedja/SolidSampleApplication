@@ -16,9 +16,9 @@ namespace SolidSampleApplication.Api.Membership
 
     public class GetEventReportRequestHandler : IQueryHandler<GetEventReportRequest, DefaultResponse>
     {
-        private readonly ISimpleTableBuilder<SimpleReportAuditData, InputData> _reportTableBuilder;
+        private readonly ISimpleTableBuilder<SimpleApplicationEvent, InputData> _reportTableBuilder;
 
-        public GetEventReportRequestHandler(ISimpleTableBuilder<SimpleReportAuditData, InputData> reportTableBuilder)
+        public GetEventReportRequestHandler(ISimpleTableBuilder<SimpleApplicationEvent, InputData> reportTableBuilder)
         {
             _reportTableBuilder = reportTableBuilder;
         }
@@ -31,7 +31,7 @@ namespace SolidSampleApplication.Api.Membership
         }
     }
 
-    public class ReportAuditTableBuilder : SimpleTableBuilderGeneric<SimpleReportAuditData, InputData>
+    public class ReportAuditTableBuilder : SimpleTableBuilderGeneric<SimpleApplicationEvent, InputData>
     {
         private readonly SimpleEventStoreDbContext _eventStoreDbContext;
 
@@ -51,56 +51,34 @@ namespace SolidSampleApplication.Api.Membership
             return tableColumns;
         }
 
-        protected override List<SimpleTableRow> GetDataAsSimpleTableRow(InputData input)
-        {
-            var newList = new List<SimpleTableRow>();
-            var applicationEvents = _eventStoreDbContext.ApplicationEvents.ToList();
-            applicationEvents.ForEach((ae) =>
-            {
-                newList.Add(Membership.SimpleReportAuditData.FromSimpleApplicationEvent(ae).ToSimpleTableRow());
-            });
-            return newList;
-        }
-    }
+        protected override IEnumerable<SimpleApplicationEvent> GetDataAsEntity(InputData input)
+            => _eventStoreDbContext.ApplicationEvents.ToList().AsEnumerable();
 
-    public class SimpleReportAuditData
-    {
-        public static SimpleReportAuditData FromSimpleApplicationEvent(SimpleApplicationEvent evt)
+        protected override SimpleTableRow MapToTableRow(SimpleApplicationEvent evt)
         {
-            // parse here if we need to parse some values
-            var dt = new SimpleReportAuditData();
             var actionType = evt.EventType.Split(',').First().Split('.').LastOrDefault();
-            dt.Action = actionType switch
+            var action = actionType switch
             {
                 "CustomerRegisteredEvent" => "Customer Registration",
                 "MembershipPointsEarnedEvent" => "Points Earned",
                 null => "Empty",
                 _ => actionType
             };
-            dt.ActionTarget = evt.AggregateId;
-            dt.ActionTargetValue = evt.EventData;
-            dt.ActionedBy = evt.RequestedBy;
-            dt.ActionedDateAndTime = evt.RequestedTime;
-            return dt;
-        }
-
-        public string Action { get; set; }
-        public string ActionTarget { get; set; }
-        public string ActionTargetValue { get; set; }
-        public string ActionedBy { get; set; }
-        public DateTime ActionedDateAndTime { get; set; }
-
-        public SimpleTableRow ToSimpleTableRow()
-        {
-            var tableRow = new SimpleTableRow();
-            tableRow.Cells = new List<string> { Action, ActionTarget, ActionTargetValue, ActionedBy, ActionedDateAndTime.ToString() };
+            var actionTarget = evt.AggregateId;
+            var actionTargetValue = evt.EventData;
+            var actionedBy = evt.RequestedBy;
+            var actionedDateAndTime = evt.RequestedTime;
+            var tableRow = new SimpleTableRow()
+            {
+                Cells = new List<string> { action, actionTarget, actionTargetValue, actionedBy, actionedDateAndTime.ToString() }
+            };
             return tableRow;
         }
     }
 
     public class InputData
     {
-        public string EmployeeNumber { get; set; }
+        public string CustomerName { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
     }
