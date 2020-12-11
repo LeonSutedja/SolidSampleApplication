@@ -2,11 +2,19 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Linq;
 using System.Reflection;
+using Wkhtmltopdf.NetCore;
 
 namespace SolidSampleApplication.TableEngine
 {
     public static class TableEngineExtensions
     {
+        public static void AddTableEngine(this IServiceCollection services, Assembly assembly)
+        {
+            AddSimpleTableBuilders(services, assembly);
+            services.AddWkhtmltopdf();
+            services.AddTransient<IPdfGeneratorWrapper, PdfGeneratorWrapper>();
+        }
+
         public static void AddSimpleTableBuilders(this IServiceCollection services, Assembly assembly)
         {
             var ty = typeof(ISimpleTableBuilder<,>);

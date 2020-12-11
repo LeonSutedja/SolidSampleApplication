@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using RazorEngine;
+using RazorEngine.Templating;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Wkhtmltopdf.NetCore;
 
 namespace SolidSampleApplication.TableEngine
 {
@@ -20,12 +25,34 @@ namespace SolidSampleApplication.TableEngine
     public interface ISimpleTableBuilder<TEntity, TInput>
     {
         SimpleTableData Build(TInput input);
+
+        byte[] GenerateFileContentsPdf(TInput input);
+    }
+
+    public class PdfGeneratorWrapper : IPdfGeneratorWrapper
+    {
+        private readonly IGeneratePdf _generatePdf;
+
+        public PdfGeneratorWrapper(IGeneratePdf generatePdf)
+        {
+            _generatePdf = generatePdf;
+        }
+
+        public IGeneratePdf GeneratePdf => _generatePdf;
+    }
+
+    public interface IPdfGeneratorWrapper
+    {
+        public IGeneratePdf GeneratePdf { get; }
     }
 
     public abstract class SimpleTableBuilderGeneric<TEntity, TInput> : ISimpleTableBuilder<TEntity, TInput>
     {
-        protected SimpleTableBuilderGeneric()
+        public IPdfGeneratorWrapper _generatePdf;
+
+        protected SimpleTableBuilderGeneric(IPdfGeneratorWrapper generatePdf)
         {
+            _generatePdf = generatePdf;
         }
 
         public SimpleTableData Build(TInput input)
@@ -45,5 +72,22 @@ namespace SolidSampleApplication.TableEngine
         protected abstract SimpleTableRow MapToTableRow(TEntity entity);
 
         protected abstract IEnumerable<TEntity> GetDataAsEntity(TInput input);
+
+        public byte[] GenerateFileContentsPdf(TInput input)
+        {
+            var thisPath = AppDomain.CurrentDomain.BaseDirectory;
+            var table = Build(input);
+            string template = File.ReadAllText(Path.Combine(thisPath, "template.cshtml"));
+            string html = Engine.Razor.RunCompile(template, "templateKey", null, new { Data = (dynamic)table });
+
+            byte[] res = null;
+            using(MemoryStream ms = new MemoryStream())
+            {
+                var pdf = _generatePdf.GeneratePdf.GetByteArrayViewInHtml(html).Result;
+                ms.Write(pdf, 0, pdf.Length);
+                res = ms.ToArray();
+            }
+            return res;
+        }
     }
 }

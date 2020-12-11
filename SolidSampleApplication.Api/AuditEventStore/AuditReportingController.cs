@@ -16,9 +16,9 @@ namespace SolidSampleApplication.Api.Membership
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetReport()
+        public async Task<ActionResult> GetReport(bool asPdf)
         {
-            return (await _busService.Send(new GetEventReportRequest())).ActionResult;
+            return (await _busService.Send(new GetEventReportRequest(asPdf))).ActionResult;
         }
     }
 }

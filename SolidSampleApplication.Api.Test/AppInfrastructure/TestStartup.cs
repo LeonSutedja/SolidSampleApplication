@@ -112,7 +112,7 @@ namespace SolidSampleApplication.Api
             services.AddMediatR(allAssemblies.ToArray());
             services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
 
-            services.AddSimpleTableBuilders(mainAssembly);
+            services.AddTableEngine(mainAssembly);
 
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Repository");
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Service");

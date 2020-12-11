@@ -115,28 +115,17 @@ namespace SolidSampleApplication.Api.Test
         }
 
         [Fact]
-        public async Task GetReport_ShouldReturn_Report()
+        public void GetReport_ShouldReturn_Report()
         {
-            var response = await _client.GetAsync("/AuditReporting");
-            response.EnsureSuccessStatusCode();
-
-            var content = await response.Content.ReadAsStringAsync();
-            content.ShouldNotBeEmpty();
-            var count = 0;
-            _output.WriteLine(content);
-
-            //ActionJsonStringList(content, (evt, index) =>
-            //{
-            //    _output.WriteLine($"{index} - {evt.id}");
-            //    _output.WriteLine($"{evt.aggregateId} {evt.aggregateVersion} - {evt.eventType} at {evt.requestedTime} by {evt.requestedBy}");
-            //    _output.WriteLine($"{evt.eventData}");
-            //    string eType = evt.eventType;
-            //    eType.ShouldContain("Membership");
-            //    eType.ShouldNotContain("Customer");
-            //    count = index;
-            //});
-
-            //count.ShouldBeGreaterThan(0);
+            HttpResponseMessage response;
+            Should.NotThrow(async () =>
+            {
+                response = await _client.GetAsync("/AuditReporting");
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+                content.ShouldNotBeEmpty();
+                _output.WriteLine(content);
+            });
         }
     }
 }

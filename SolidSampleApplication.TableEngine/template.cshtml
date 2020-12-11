@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                @foreach(var column in @Model.Data.Columns)
+                {
+                    <td>@column.Heading</td>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var row in @Model.Data.Rows)
+            {
+                <tr>
+                    @foreach(var cell in row.Cells)
+                    {
+                        <td>@cell</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

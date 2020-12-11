@@ -112,7 +112,7 @@ namespace SolidSampleApplication.Api
 
             services.AddMassTransitHostedService();
 
-            services.AddSimpleTableBuilders(mainAssembly);
+            services.AddTableEngine(mainAssembly);
         }
 
         public void ConfigureMediatr(IServiceCollection services, Assembly assembly)

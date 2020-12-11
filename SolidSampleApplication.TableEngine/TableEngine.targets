@@ -1,0 +1,8 @@
+﻿<Project>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)tempalte.cshtml">
+      <Link>template.cshtml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

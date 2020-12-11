@@ -12,6 +12,12 @@ namespace SolidSampleApplication.Api.Membership
 {
     public class GetEventReportRequest : IQuery<DefaultResponse>
     {
+        public bool AsPdf { get; init; }
+
+        public GetEventReportRequest(bool asPdf)
+        {
+            AsPdf = asPdf;
+        }
     }
 
     public class GetEventReportRequestHandler : IQueryHandler<GetEventReportRequest, DefaultResponse>
@@ -26,6 +32,11 @@ namespace SolidSampleApplication.Api.Membership
         public async Task<DefaultResponse> Handle(GetEventReportRequest request, CancellationToken cancellationToken)
         {
             var inputData = new InputData();
+            if(request.AsPdf)
+            {
+                var fileContents = _reportTableBuilder.GenerateFileContentsPdf(inputData);
+                return DefaultResponse.SuccessAsFile(fileContents);
+            }
             var output = _reportTableBuilder.Build(inputData);
             return DefaultResponse.Success(output);
         }
@@ -35,7 +46,7 @@ namespace SolidSampleApplication.Api.Membership
     {
         private readonly SimpleEventStoreDbContext _eventStoreDbContext;
 
-        public ReportAuditTableBuilder(SimpleEventStoreDbContext eventStoreDbContext)
+        public ReportAuditTableBuilder(SimpleEventStoreDbContext eventStoreDbContext, IPdfGeneratorWrapper pdfGeneratorWrapper) : base(pdfGeneratorWrapper)
         {
             _eventStoreDbContext = eventStoreDbContext;
         }
