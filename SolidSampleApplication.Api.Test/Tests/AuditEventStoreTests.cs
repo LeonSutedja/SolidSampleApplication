@@ -1,13 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Shouldly;
-using SolidSampleApplication.Api.Membership;
-using SolidSampleApplication.ApplicationReadModel;
-using SolidSampleApplication.Core;
-using SolidSampleApplication.Infrastructure;
-using SolidSampleApplication.ReportingReadModel;
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;

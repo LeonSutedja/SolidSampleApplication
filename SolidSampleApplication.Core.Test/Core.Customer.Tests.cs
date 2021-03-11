@@ -31,7 +31,14 @@ namespace SolidSampleApplication.Core.Test
             c.PendingEvents.Count.ShouldBe(1);
             var evt = c.PendingEvents.Dequeue();
             evt.ShouldBeOfType<CustomerRegisteredEvent>();
-            evt.CurrentVersion.ShouldBe(0);
+
+            var evtAsType = (CustomerRegisteredEvent)evt;
+            evtAsType.Username.ShouldBe(cmd.Username);
+            evtAsType.FirstName.ShouldBe(cmd.FirstName);
+            evtAsType.LastName.ShouldBe(cmd.LastName);
+            evtAsType.Email.ShouldBe(cmd.Email);
+            evtAsType.CurrentVersion.ShouldBe(0);
+            evtAsType.Id.ShouldBe(c.Id);
         }
 
         public static IEnumerable<object[]> InValidNames()
@@ -54,6 +61,51 @@ namespace SolidSampleApplication.Core.Test
             {
                 var c = Customer.Registration(null, cmd.FirstName, cmd.LastName, cmd.Email);
             });
+        }
+
+        [Fact]
+        public void CustomerChangeName_Should_ChangeName_And_CustomerNameChangedEvent()
+        {
+            // setup
+            var firstname = "Bruce";
+            var lastname = "Wayne";
+            var c = Customer.Registration("username", "Mary", "Poppin", "mary@poppin.com.au");
+            // act
+            c.ChangeName(firstname, lastname);
+
+            // assert
+            c.PendingEvents.Count.ShouldBe(2);
+
+            // remove the first event first
+            c.PendingEvents.Dequeue();
+
+            // assert
+            var evt = c.PendingEvents.Dequeue();
+            evt.ShouldBeOfType<CustomerNameChangedEvent>();
+            var evtAsType = (CustomerNameChangedEvent)evt;
+            evtAsType.FirstName.ShouldBe(firstname);
+            evtAsType.LastName.ShouldBe(lastname);
+            evtAsType.CurrentVersion.ShouldBe(1);
+            evtAsType.Id.ShouldBe(c.Id);
+        }
+
+        [Theory]
+        [InlineData(null, "Wayne")]
+        [InlineData("Bruce", null)]
+        public void CustomerChangeName_ShouldNot_ChangeName_With_InvalidNames(string firstname, string lastname)
+        {
+            // setup
+            var c = Customer.Registration("username", "Mary", "Poppin", "mary@poppin.com.au");
+            // remove the first event first
+            c.PendingEvents.Dequeue();
+
+            // act
+            Should.Throw<ArgumentNullException>(() =>
+            {
+                c.ChangeName(firstname, lastname);
+            });
+
+            c.PendingEvents.Count.ShouldBe(0);
         }
     }
 }
