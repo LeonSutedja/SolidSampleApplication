@@ -54,21 +54,11 @@ namespace SolidSampleApplication.Api.Test
         private readonly ITestOutputHelper _output;
         private readonly InMemoryTestHarness _harness;
         private readonly StateMachineSagaTestHarness<SagaSampleInstanceState, SagaSampleStateMachine> _stateMachineSagaTestHarness;
-        private IScheduler _scheduler;
         private TimeSpan _testOffset;
 
         private void ConfigureInMemoryBus(IInMemoryBusFactoryConfigurator configurator)
         {
-            configurator.UseInMemoryScheduler(out _scheduler);
-        }
-
-        private void AdvanceTime(TimeSpan duration)
-        {
-            _scheduler.Standby();
-
-            _testOffset += duration;
-
-            _scheduler.Start();
+            configurator.UseInMemoryScheduler("scheduler");
         }
 
         public SagaSampleStateMachineTests(DefaultWebHostTestFixture fixture, ITestOutputHelper output)
@@ -109,7 +99,7 @@ namespace SolidSampleApplication.Api.Test
         {
             dynamic jsonDynamicList = JValue.Parse(jsonList);
             var count = 0;
-            foreach(var jsonItem in jsonDynamicList)
+            foreach (var jsonItem in jsonDynamicList)
             {
                 action(jsonItem, count);
                 count++;
