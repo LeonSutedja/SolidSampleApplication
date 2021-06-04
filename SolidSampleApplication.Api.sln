@@ -27,10 +27,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolidSampleApplication.Repo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolidSampleApplication.TableEngine", "SolidSampleApplication.TableEngine\SolidSampleApplication.TableEngine.csproj", "{BFD03AC6-12F7-4984-B35E-3D7DC5284D8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidSampleApplication.Core.Test", "SolidSampleApplication.Core.Test\SolidSampleApplication.Core.Test.csproj", "{3F3B4EAD-3F3E-41F6-BBD5-E3DF22136E88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolidSampleApplication.Core.Test", "SolidSampleApplication.Core.Test\SolidSampleApplication.Core.Test.csproj", "{3F3B4EAD-3F3E-41F6-BBD5-E3DF22136E88}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8DDF3277-C7AB-4550-98A2-56689546D0C4} = {8DDF3277-C7AB-4550-98A2-56689546D0C4}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidSampleApplication.Common", "SolidSampleApplication.Common\SolidSampleApplication.Common.csproj", "{E790D6D3-1AD6-400E-83F1-3ADE0E0C739F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +80,10 @@ Global
 		{3F3B4EAD-3F3E-41F6-BBD5-E3DF22136E88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F3B4EAD-3F3E-41F6-BBD5-E3DF22136E88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F3B4EAD-3F3E-41F6-BBD5-E3DF22136E88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E790D6D3-1AD6-400E-83F1-3ADE0E0C739F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E790D6D3-1AD6-400E-83F1-3ADE0E0C739F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E790D6D3-1AD6-400E-83F1-3ADE0E0C739F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E790D6D3-1AD6-400E-83F1-3ADE0E0C739F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

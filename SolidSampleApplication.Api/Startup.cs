@@ -14,10 +14,10 @@ using SolidSampleApplication.Api.Healthcheck;
 using SolidSampleApplication.Api.Membership;
 using SolidSampleApplication.Api.PipelineBehavior;
 using SolidSampleApplication.ApplicationReadModel;
+using SolidSampleApplication.Common;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.TableEngine;
-using System;
 using System.Linq;
 using System.Reflection;
 
@@ -85,6 +85,8 @@ namespace SolidSampleApplication.Api
             //    options => options.UseSqlite(reportingConnection));
 
             // mass transit configuration
+            var massTransitConfig = Configuration.GetSection("MassTransit").Get<MassTransitConfiguration>();
+
             services.TryAddSingleton(KebabCaseEndpointNameFormatter.Instance);
 
             services.AddMassTransit(cfg =>
@@ -93,25 +95,49 @@ namespace SolidSampleApplication.Api
                 cfg.AddSagaStateMachine<SagaSampleStateMachine, SagaSampleInstanceState>()
                     .InMemoryRepository();
 
-                cfg.AddMessageScheduler(new Uri("queue:scheduler"));
+                // Azure service bus configuration
+                //cfg.UsingAzureServiceBus((context, x) =>
+                //{
+                //    x.Host("massTransitConfig.AzureServiceBus.ConnectionString");
+                //});
 
-                cfg.AddBus(provider =>
+                // Amazon SQS configuration
+                //cfg.AddDelayedMessageScheduler();
+
+                cfg.UsingAmazonSqs((context, x) =>
                 {
-                    return Bus.Factory.CreateUsingRabbitMq(cfg =>
+                    x.Host(massTransitConfig.AmazonSqs.Host, h =>
                     {
-                        // In memory Quartz Scheduler
-                        cfg.UseInMemoryScheduler("scheduler");
+                        h.AccessKey(massTransitConfig.AmazonSqs.AccessKey);
+                        h.SecretKey(massTransitConfig.AmazonSqs.SecretKey);
+                    }
+                    );
 
-                        // gives an endpoint, and listens to the queue
-                        cfg.ConfigureEndpoints(provider);
-                    });
+                    //x.UseDelayedMessageScheduler();
+
+                    x.ConfigureEndpoints(context);
                 });
+
+                // using quartz/hangfire scheduler. scheduler runs in the service and schedules messages using a queue
+                //cfg.AddMessageScheduler(new Uri("queue:scheduler"));
+
+                // RabbitMq configuration
+                //cfg.AddBus(provider =>
+                //{
+                //    return Bus.Factory.CreateUsingRabbitMq(cfg =>
+                //    {
+                //        // In memory Quartz Scheduler
+                //        cfg.UseInMemoryScheduler("scheduler");
+
+                //        // gives an endpoint, and listens to the queue
+                //        cfg.ConfigureEndpoints(provider);
+                //    });
+                //});
 
                 cfg.AddRequestClient<SagaStatusRequestedEvent>();
             });
 
             services.AddMassTransitHostedService();
-
             services.AddTableEngine(mainAssembly);
         }
 
@@ -131,17 +157,14 @@ namespace SolidSampleApplication.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if(env.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseCors();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -156,7 +179,7 @@ namespace SolidSampleApplication.Api
             // NOTE: this must go at the end of Configure
             // ensure db is created
             var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
-            using(var serviceScope = serviceScopeFactory.CreateScope())
+            using (var serviceScope = serviceScopeFactory.CreateScope())
             {
                 var eventStoreDbContext = serviceScope.ServiceProvider.GetService<SimpleEventStoreDbContext>();
                 eventStoreDbContext.Database.EnsureCreated();

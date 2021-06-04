@@ -1,3 +1,4 @@
+using GreenPipes; // for call to Immediate
 using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -7,10 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SolidSampleApplication.Common;
 using SolidSampleApplication.Core;
 using SolidSampleApplication.Infrastructure;
 using SolidSampleApplication.Infrastructure.SampleData;
-using SolidSampleApplication.Reporting.Api.Controllers;
 using SolidSampleApplication.ReportingReadModel;
 using System;
 using System.Collections.Generic;
@@ -50,9 +51,26 @@ namespace SolidSampleApplication.Reporting.Api
             services.AddImplementedInterfacesNameEndsWith(mainAssembly, "Service");
 
             // mass transit configuration
+            var massTransitConfig = Configuration.GetSection("MassTransit").Get<MassTransitConfiguration>();
+
             services.AddMassTransit(cfg =>
             {
                 cfg.AddConsumersFromNamespaceContaining<MembershipPointsConsumerHandlers>();
+
+                cfg.UsingAmazonSqs((context, x) =>
+                {
+                    x.Host(massTransitConfig.AmazonSqs.Host, h =>
+                    {
+                        h.AccessKey(massTransitConfig.AmazonSqs.AccessKey);
+                        h.SecretKey(massTransitConfig.AmazonSqs.SecretKey);
+                    }
+                    );
+
+                    //cfg.UseDelayedMessageScheduler();
+
+                    x.ConfigureEndpoints(context);
+                    x.UseMessageRetry(r => r.Immediate(5));
+                });
 
                 //cfg.AddBus(provider =>
                 //{
@@ -85,7 +103,7 @@ namespace SolidSampleApplication.Reporting.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if(env.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -102,7 +120,7 @@ namespace SolidSampleApplication.Reporting.Api
             });
 
             var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
-            using(var serviceScope = serviceScopeFactory.CreateScope())
+            using (var serviceScope = serviceScopeFactory.CreateScope())
             {
                 // readonly initialization hack for sample purpose
                 var reportingDbContext = serviceScope.ServiceProvider.GetService<ReportingReadModelDbContext>();
@@ -126,15 +144,15 @@ namespace SolidSampleApplication.Reporting.Api
                 List<dynamic> dynamicMembershipPointsEarned = membershipPointsEarnedEvents
                     .Select(e => e.EventData.FromJson(Type.GetType(e.EventType)))
                     .ToList();
-                foreach(var @event in dynamicCustomerRegistered)
+                foreach (var @event in dynamicCustomerRegistered)
                 {
                     reportingModelEventHandlers.Handle(@event);
                 }
-                foreach(var @event in dynamicMembershipCreated)
+                foreach (var @event in dynamicMembershipCreated)
                 {
                     reportingModelEventHandlers.Handle(@event);
                 }
-                foreach(var @event in dynamicMembershipPointsEarned)
+                foreach (var @event in dynamicMembershipPointsEarned)
                 {
                     reportingModelEventHandlers.Handle(@event);
                 }
