@@ -69,7 +69,7 @@ namespace SolidSampleApplication.Reporting.Api
                     //cfg.UseDelayedMessageScheduler();
 
                     x.ConfigureEndpoints(context);
-                    x.UseMessageRetry(r => r.Immediate(5));
+                    x.UseMessageRetry(r => r.Incremental(8, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3)));
                 });
 
                 //cfg.AddBus(provider =>

@@ -1,7 +1,6 @@
 ﻿using Automatonymous;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using SolidSampleApplication.Infrastructure.ApplicationBus;
 using SolidSampleApplication.Infrastructure.Shared;
 using System;
@@ -101,7 +100,7 @@ namespace SolidSampleApplication.Api.Membership
         {
             var (status, notfound) = await _sagaStatusRequestClient.GetResponse<SagaStatus, SagaStatusNotFound>(
                 new SagaStatusRequestedEvent { ItemId = request.ItemId });
-            if(status.IsCompletedSuccessfully)
+            if (status.IsCompletedSuccessfully)
             {
                 var response = await status;
                 return DefaultResponse.Success(response);
@@ -117,7 +116,7 @@ namespace SolidSampleApplication.Api.Membership
         {
             var (status, notfound) = await _sagaStatusRequestClient.GetResponse<SagaStatus, SagaStatusNotFound>(
                 new SagaTextChangedEvent { ItemId = request.ItemId, TextChangedTo = request.TextChangedTo });
-            if(status.IsCompletedSuccessfully)
+            if (status.IsCompletedSuccessfully)
             {
                 var response = await status;
                 return DefaultResponse.Success(response);
@@ -181,13 +180,11 @@ namespace SolidSampleApplication.Api.Membership
             // Correlates between the ids
             Event(() => SagaStarted, x =>
             {
-                x.SelectId(x => NewId.NextGuid());
-                //x.CorrelateBy<int>(x => x.ItemId, x => x.Message.ItemId);
                 x.CorrelateById<int>(h => h.ItemId, z => z.Message.ItemId);
+                x.SelectId(x => NewId.NextGuid());
             });
             Event(() => SagaStatusRequested, x =>
             {
-                //x.CorrelateBy<int>(x => x.ItemId, x => x.Message.ItemId);
                 x.CorrelateById<int>(h => h.ItemId, z => z.Message.ItemId);
                 x.OnMissingInstance(n =>
                 {
@@ -199,11 +196,13 @@ namespace SolidSampleApplication.Api.Membership
                 });
             });
 
+            // As we are using scheduler in here, don't forget to ensure that scheduler is available with the broker.
             Schedule(() => Elapsed15Seconds, instance => instance.ElapsedTokenId, s =>
             {
                 s.Delay = TimeSpan.FromSeconds(15);
                 s.Received = r => r.CorrelateById(y => y.ItemId, y => y.Message.ItemId);
             });
+
             Schedule(() => Elapsed30Seconds, instance => instance.ElapsedTokenId, s =>
             {
                 s.Delay = TimeSpan.FromSeconds(15);

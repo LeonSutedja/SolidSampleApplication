@@ -102,7 +102,7 @@ namespace SolidSampleApplication.Api
                 //});
 
                 // Amazon SQS configuration
-                //cfg.AddDelayedMessageScheduler();
+                cfg.AddDelayedMessageScheduler();
 
                 cfg.UsingAmazonSqs((context, x) =>
                 {
@@ -112,8 +112,7 @@ namespace SolidSampleApplication.Api
                         h.SecretKey(massTransitConfig.AmazonSqs.SecretKey);
                     }
                     );
-
-                    //x.UseDelayedMessageScheduler();
+                    x.UseDelayedMessageScheduler();
 
                     x.ConfigureEndpoints(context);
                 });
