@@ -26,11 +26,11 @@ namespace SolidSampleApplication.Api.Membership
             return (await _bus.Send(request)).ActionResult;
         }
 
-        //[HttpPost("/ChangeText")]
-        //public async Task<ActionResult> ChangeSagaText(ChangeSagaTextCommand request)
-        //{
-        //    return (await _bus.Send(request)).ActionResult;
-        //}
+        [HttpPost("/ChangeText")]
+        public async Task<ActionResult> ChangeSagaText(ChangeSagaTextCommand request)
+        {
+            return (await _bus.Send(request)).ActionResult;
+        }
 
         //[HttpPost("/Reset")]
         //public async Task<ActionResult> Reset(ResetSagaCommand request)
@@ -80,8 +80,8 @@ namespace SolidSampleApplication.Api.Membership
             IPublishEndpoint publishEndpoint,
             IRequestClient<SagaStatusRequestedEvent> sagaStatusRequestClient)
         {
-            this._publishEndpoint = publishEndpoint;
-            this._sagaStatusRequestClient = sagaStatusRequestClient;
+            _publishEndpoint = publishEndpoint;
+            _sagaStatusRequestClient = sagaStatusRequestClient;
         }
 
         public async Task<DefaultResponse> Handle(StartSagaSampleCommand request, CancellationToken cancellationToken)
@@ -114,8 +114,11 @@ namespace SolidSampleApplication.Api.Membership
 
         public async Task<DefaultResponse> Handle(ChangeSagaTextCommand request, CancellationToken cancellationToken)
         {
+            var @event = new SagaTextChangedEvent { ItemId = request.ItemId, TextChangedTo = request.TextChangedTo };
+            await _publishEndpoint.Publish(@event);
+
             var (status, notfound) = await _sagaStatusRequestClient.GetResponse<SagaStatus, SagaStatusNotFound>(
-                new SagaTextChangedEvent { ItemId = request.ItemId, TextChangedTo = request.TextChangedTo });
+                new SagaStatusRequestedEvent { ItemId = request.ItemId });
             if (status.IsCompletedSuccessfully)
             {
                 var response = await status;
@@ -183,6 +186,18 @@ namespace SolidSampleApplication.Api.Membership
                 x.CorrelateById<int>(h => h.ItemId, z => z.Message.ItemId);
                 x.SelectId(x => NewId.NextGuid());
             });
+            Event(() => SagaTextChangedEvent, x =>
+            {
+                x.CorrelateById<int>(h => h.ItemId, z => z.Message.ItemId);
+                x.OnMissingInstance(n =>
+                {
+                    return n.ExecuteAsync(r =>
+                    {
+                        return r.RespondAsync(new SagaStatusNotFound
+                        { ItemId = r.Message.ItemId });
+                    });
+                });
+            });
             Event(() => SagaStatusRequested, x =>
             {
                 x.CorrelateById<int>(h => h.ItemId, z => z.Message.ItemId);
@@ -227,6 +242,14 @@ namespace SolidSampleApplication.Api.Membership
                 Ignore(SagaStarted));
 
             DuringAny(
+                When(SagaTextChangedEvent)
+                .Then(ctx =>
+                {
+                    ctx.Instance.Text = ctx.Data.TextChangedTo;
+                    ctx.Instance.LastUpdated = DateTime.UtcNow;
+                }));
+
+            DuringAny(
                 When(SagaStatusRequested)
                     .RespondAsync(x =>
                     {
@@ -258,6 +281,7 @@ namespace SolidSampleApplication.Api.Membership
 
         public Event<SagaStartedEvent> SagaStarted { get; private set; }
         public Event<SagaStatusRequestedEvent> SagaStatusRequested { get; private set; }
+        public Event<SagaTextChangedEvent> SagaTextChangedEvent { get; private set; }
         public Schedule<SagaSampleInstanceState, Elapsed15SecondsEvent> Elapsed15Seconds { get; private set; }
         public Schedule<SagaSampleInstanceState, Elapsed30SecondsEvent> Elapsed30Seconds { get; private set; }
     }
