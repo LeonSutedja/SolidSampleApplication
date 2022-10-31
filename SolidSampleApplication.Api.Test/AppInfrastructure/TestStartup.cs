@@ -1,4 +1,5 @@
 using Automatonymous;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using MassTransit;
 using MassTransit.Testing;
@@ -101,11 +102,11 @@ namespace SolidSampleApplication.Api
             // the way to add and register
             // controller from another assemblies.
             services.AddControllers()
-                .AddApplicationPart(mainAssembly)
-                // This is the default way of registering all fluent validation abstract validator
-                // fluent validation generic registration
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(mainAssembly));
+                .AddApplicationPart(mainAssembly);
 
+            // This is the default way of registering all fluent validation abstract validator
+            // fluent validation generic registration
+            services.AddValidatorsFromAssembly(mainAssembly);
             var namespaceToCheck = "SolidSampleApplication";
             var allAssemblies = mainAssembly.GetAllAssembliesInNamespace(namespaceToCheck);
 

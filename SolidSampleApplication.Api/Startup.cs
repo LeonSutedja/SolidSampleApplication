@@ -1,3 +1,4 @@
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using MassTransit;
 using MassTransit.Definition;
@@ -55,8 +56,8 @@ namespace SolidSampleApplication.Api
 
             // This is the default way of registering all fluent validation abstract validator
             // fluent validation generic registration
-            services.AddControllers()
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(mainAssembly));
+            services.AddControllers();
+            services.AddValidatorsFromAssembly(mainAssembly);
             services.AddEnumerableInterfaces<IHealthcheckSystem>(mainAssembly);
 
             ConfigureMediatr(services, mainAssembly);
