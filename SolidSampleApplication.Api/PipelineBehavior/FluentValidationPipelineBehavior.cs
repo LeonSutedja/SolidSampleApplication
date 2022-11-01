@@ -8,6 +8,7 @@ namespace SolidSampleApplication.Api.PipelineBehavior
 {
     public class FluentValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TResponse : DefaultResponse
+        where TRequest : IRequest<TResponse>
     {
         private readonly IValidator<TRequest> _fluentValidator;
 
@@ -22,7 +23,7 @@ namespace SolidSampleApplication.Api.PipelineBehavior
             _fluentValidator = fluentValidator;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             if(_fluentValidator != null)
             {

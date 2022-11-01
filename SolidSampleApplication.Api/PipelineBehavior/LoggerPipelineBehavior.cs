@@ -9,6 +9,7 @@ namespace SolidSampleApplication.Api.PipelineBehavior
 {
     public class LoggerPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TResponse : DefaultResponse
+        where TRequest : IRequest<TResponse>
     {
         private readonly ILogger<TRequest> _logger;
 
@@ -21,7 +22,7 @@ namespace SolidSampleApplication.Api.PipelineBehavior
             _logger = logger;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Message {request.ToJson()} received. Processing...");
             var result = await next();
