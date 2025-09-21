@@ -1,6 +1,4 @@
-using Automatonymous;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using MassTransit;
 using MassTransit.Testing;
 using MediatR;

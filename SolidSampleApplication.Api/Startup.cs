@@ -1,7 +1,5 @@
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using MassTransit;
-using MassTransit.Definition;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -137,7 +135,7 @@ namespace SolidSampleApplication.Api
                 cfg.AddRequestClient<SagaStatusRequestedEvent>();
             });
 
-            services.AddMassTransitHostedService();
+            //services.AddMassTransitHostedService();
             services.AddTableEngine(mainAssembly);
         }
 
@@ -174,7 +172,7 @@ namespace SolidSampleApplication.Api
 
             // Add OpenAPI/Swagger middlewares
             app.UseOpenApi(); // Serves the registered OpenAPI/Swagger documents by default on `/swagger/{documentName}/swagger.json`
-            app.UseSwaggerUi3(); // Serves the Swagger UI 3 web ui to view the OpenAPI/Swagger documents by default on `/swagger`
+            //app.UseSwaggerUi3(); // Serves the Swagger UI 3 web ui to view the OpenAPI/Swagger documents by default on `/swagger`
 
             // NOTE: this must go at the end of Configure
             // ensure db is created
