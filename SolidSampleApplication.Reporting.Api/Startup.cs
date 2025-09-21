@@ -1,4 +1,4 @@
-using GreenPipes; // for call to Immediate
+//using GreenPipes; // for call to Immediate
 using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -97,7 +97,7 @@ namespace SolidSampleApplication.Reporting.Api
                 //});
             });
 
-            services.AddMassTransitHostedService();
+            //services.AddMassTransitHostedService();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
