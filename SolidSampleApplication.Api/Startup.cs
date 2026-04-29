@@ -143,7 +143,12 @@ namespace SolidSampleApplication.Api
         {
             var namespaceToCheck = "SolidSampleApplication";
             var allAssemblies = assembly.GetAllAssembliesInNamespace(namespaceToCheck);
-            services.AddMediatR(allAssemblies.ToArray());
+
+            services.AddMediatR(cfg =>
+                cfg.RegisterServicesFromAssemblies(allAssemblies.ToArray()));
+
+            // deprecated - mediatr < 12
+            //services.AddMediatR(allAssemblies.ToArray());
 
             // we want to use mediatr pipeline to help with the fluent validation, rather than attaching it to the mvc.
             // This is because, we want the mediatr pipeline to be triggered first.
